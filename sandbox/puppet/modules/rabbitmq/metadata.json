@@ -1,0 +1,193 @@
+{
+  "checksums": {
+    "spec/README.markdown": "32a1fc0121c28aff554ef5d422b8b51e",
+    "files/README.markdown": "3d44458cc68d8513b51e3b56c604eec4",
+    "templates/rabbitmq.config": "e8bb73b4898d4e88763742b6dae59b99",
+    "spec/unit/puppet/type/rabbitmq_user_permissions_spec.rb": "a10256e8f138d77feaff83344d5c774c",
+    "spec/unit/puppet/provider/rabbitmq_user/rabbitmqctl_spec.rb": "eeee287b82db7101f16a04a19c2bef38",
+    "Modulefile": "28b355bc0125160f026de5e244a20e31",
+    "LICENSE": "0e5ccf641e613489e66aa98271dbe798",
+    "lib/puppet/provider/rabbitmq_user/rabbitmqctl.rb": "e46973774d83034782622786eec4332e",
+    "tests/repo/apt.pp": "4ea43b4f8dcaf474ec11d796efef66a3",
+    "spec/unit/puppet/provider/rabbitmq_user_permissions/rabbitmqctl_spec.rb": "1965423bd0f9657a4d2e77927863730d",
+    "manifests/repo/apt.pp": "65eb3285ee84b4b3e2fb525d3c6c5ceb",
+    "lib/puppet/provider/rabbitmq_user_permissions/default.rb": "a30af4fcbc0caa035f5556d922852df6",
+    "lib/puppet/provider/rabbitmq_user/default.rb": "73b6c890e97e30c7f8f56087fcd5e79b",
+    "CHANGELOG": "fae593038d27ce03a23d57eb97dc555b",
+    "tests/user/add.pp": "3fc8096048295bf611ab701348892601",
+    "tests/server.pp": "cd6cd7006b741faf53fb6ffcbe6a1697",
+    "TODO": "53cf21155ec1e83e3e167f711fd3ff9f",
+    "tests/vhosts/add.pp": "f054d84ac87dc206f586d779fc312fa6",
+    "tests/full.pp": "e8c8327e04a3f97c0340b164532239c0",
+    "templates/README.markdown": "aada0a1952329e46b98695349dba6203",
+    "lib/puppet/type/rabbitmq_vhost.rb": "9bbd7676d2611d0559a3f328376f730b",
+    "lib/puppet/provider/rabbitmq_user_permissions/rabbitmqctl.rb": "e07bf2d7708f8c1b50a2c21dd76de95e",
+    "tests/service.pp": "f06296b103daf449f9e7644fd9eee58b",
+    "tests/plugin.pp": "788f465e719a3408e82bce6d37d2aaee",
+    "tests/permissions/add.pp": "8cede62afe395e31705ad78752b6aeef",
+    "files/plugins/rabbit_stomp-2.3.1.ez": "f552a986409a6d407a080b1aceb80d20",
+    "templates/rabbitmq-env.conf.erb": "5e94fe0a9c0170da3edaf928a94fbde3",
+    "README.md": "64de5fe0365e767096e69d62c901390a",
+    "manifests/service.pp": "60cf398ee9fb8f34f14ad2c9cbf60880",
+    "tests/site.pp": "653334bf690768a8af42cd13e8e53ef2",
+    "templates/rabbit.pub.key": "e454b517476b3eaee39f09c71036fa7c",
+    "spec/unit/puppet/type/rabbitmq_vhost_spec.rb": "cd77120a72db14f8265a7a5e507ff941",
+    "spec/spec.opts": "a600ded995d948e393fbe2320ba8e51c",
+    "lib/puppet/provider/rabbitmq_vhost/rabbitmqctl.rb": "7ec2726fa30617bc589955a73bf4257b",
+    "lib/puppet/provider/rabbitmq_plugin/default.rb": "bcf98ac1eee12ae7dcd97a3b81ee27fe",
+    "spec/unit/puppet/provider/rabbitmq_vhost/rabbitmqctl_spec.rb": "56695718b2f0a6f73d8bee330e424abf",
+    "spec/spec_helper.rb": "ca19ec4f451ebc7fdb035b52eae6e909",
+    "lib/puppet/type/rabbitmq_user_permissions.rb": "6a5a099cd122d3449367ab240a7e72ea",
+    "lib/puppet/type/rabbitmq_user.rb": "7e9dc2665bac19254fc40fc4266a32ef",
+    "lib/puppet/type/rabbitmq_plugin.rb": "6a707d089d0e50a949ecf8fae114eab0",
+    "lib/puppet/provider/rabbitmq_vhost/default.rb": "e7c89c9a31286c1672038bb1a3f40b26",
+    "lib/puppet/provider/rabbitmq_plugin/rabbitmqplugins.rb": "6f92cd2ca3efa9488eb4eb0a74a03817",
+    "files/plugins/amqp_client-2.3.1.ez": "543ec53b7208fdc2dc4eba3684868011",
+    "spec/unit/puppet/type/rabbitmq_user_spec.rb": "9ad72e1c132020c1290e0d9631d4b86b",
+    "manifests/server.pp": "ece597b5f127781f5ffaceb3d0c0b94c"
+  },
+  "license": "Apache",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 2.0.0"
+    },
+    {
+      "name": "puppetlabs/apt",
+      "version_requirement": ">= 0.0.3"
+    }
+  ],
+  "version": "2.0.1",
+  "summary": "RabbitMQ Puppet Module",
+  "description": "This module manages RabbitMQ. Tested on Debian/Ubuntu",
+  "author": "puppetlabs",
+  "source": "git://github.com/puppetlabs/puppetlabs-rabbitmq.git",
+  "types": [
+    {
+      "parameters": [
+        {
+          "name": "name",
+          "doc": "  Values can match `/^\\S+$/`."
+        }
+      ],
+      "properties": [
+        {
+          "name": "ensure",
+          "doc": "  Valid values are `present`, `absent`."
+        }
+      ],
+      "name": "rabbitmq_plugin",
+      "providers": [
+        {
+          "name": "default",
+          "doc": ""
+        },
+        {
+          "name": "rabbitmqplugins",
+          "doc": "Required binaries: `rabbitmq-plugins`.  Default for `feature` == `posix`."
+        }
+      ],
+      "doc": "manages rabbitmq plugins"
+    },
+    {
+      "parameters": [
+        {
+          "name": "name",
+          "doc": "Name of user  Values can match `/^\\S+$/`."
+        },
+        {
+          "name": "password",
+          "doc": "User password to be set *on creation*"
+        }
+      ],
+      "properties": [
+        {
+          "name": "ensure",
+          "doc": "  Valid values are `present`, `absent`."
+        },
+        {
+          "name": "admin",
+          "doc": "rather or not user should be an admin  Values can match `/true|false/`."
+        }
+      ],
+      "name": "rabbitmq_user",
+      "providers": [
+        {
+          "name": "default",
+          "doc": ""
+        },
+        {
+          "name": "rabbitmqctl",
+          "doc": "Required binaries: `rabbitmqctl`.  Default for `feature` == `posix`."
+        }
+      ],
+      "doc": "Native type for managing rabbitmq users"
+    },
+    {
+      "parameters": [
+        {
+          "name": "name",
+          "doc": "  Values can match `/^\\S+@\\S+$/`."
+        }
+      ],
+      "properties": [
+        {
+          "name": "ensure",
+          "doc": "  Valid values are `present`, `absent`."
+        },
+        {
+          "name": "configure_permission",
+          "doc": "regexp representing configuration permissions"
+        },
+        {
+          "name": "read_permission",
+          "doc": "regexp representing read permissions"
+        },
+        {
+          "name": "write_permission",
+          "doc": "regexp representing write permissions"
+        }
+      ],
+      "name": "rabbitmq_user_permissions",
+      "providers": [
+        {
+          "name": "default",
+          "doc": ""
+        },
+        {
+          "name": "rabbitmqctl",
+          "doc": "Required binaries: `rabbitmqctl`.  Default for `feature` == `posix`."
+        }
+      ],
+      "doc": "Type for managing rabbitmq user permissions"
+    },
+    {
+      "parameters": [
+        {
+          "name": "name",
+          "doc": "  Values can match `/^\\S+$/`."
+        }
+      ],
+      "properties": [
+        {
+          "name": "ensure",
+          "doc": "  Valid values are `present`, `absent`."
+        }
+      ],
+      "name": "rabbitmq_vhost",
+      "providers": [
+        {
+          "name": "default",
+          "doc": ""
+        },
+        {
+          "name": "rabbitmqctl",
+          "doc": "Required binaries: `rabbitmqctl`.  Default for `feature` == `posix`."
+        }
+      ],
+      "doc": "manages rabbitmq vhosts"
+    }
+  ],
+  "name": "puppetlabs-rabbitmq",
+  "project_page": "http://github.com/puppetlabs/puppetlabs-rabbitmq"
+}
