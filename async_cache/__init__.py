@@ -1,1 +1,1 @@
-from async_cache.tasks import AsyncCacheJob
+from async_cache.jobs import AsyncCacheJob

@@ -1,64 +1,41 @@
+import logging
 import time
 
-from django.core.cache import cache
 from celery import task
+from django.utils import importlib
 
 
-class AsyncCacheJob(object):
-    lifetime = 600 
-
-    def get(self, *args, **kwargs):
-        """
-        Return the data for this function
-        """
-        key = self.key(*args, **kwargs)
-        result = cache.get(key)
-        now = time.time()
-        if result is None:
-            # Cache is empty - trigger a refresh and return the 'empty'
-            # value
-            self.refresh(key, *args, **kwargs)
-            return self.empty()
-        elif result[0] < now:
-            # Cache is stale - we return the stale result but trigger a         
-            # refresh.
-            self.refresh(key, *args, **kwargs)
-        return result[1]
-    
-    def refresh(self, key, *args, **kwargs):
-        """
-        Fetch the results and re-populate the cache
-        """
-        refresh_cache.delay(key, self.fetch, self.lifetime, *args, **kwargs)
-
-    # Override these methods
-
-    def empty(self):
-        return None
-
-    def key(self, *args, **kwargs):
-        """
-        Return the cache key to use
-        """
-        raise NotImplementedError()
-
-    def fetch(self, *args, **kwargs):
-        """
-        Return the data for this job
-        """
-        raise NotImplementedError()
+logger = logging.getLogger(__name__)
 
 
 @task()
-def refresh_cache(key, fn, ttl, *args, **kwargs):
+def refresh_cache(klass, *args, **kwargs):
     """
-    Re-populate cache
+    Re-populate cache using the given job class and parameters to call the
+    'fetch' method with.
 
-    :key: Cache key
-    :fn: Data fetching function
-    :ttl: Time-to-live
+    :klass: String repr of class (eg 'apps.twitter.jobs.FetchTweetsJob')
     :args: Function args
     :kwargs: Function kwargs
     """
-    results = fn(*args, **kwargs)
-    cache.set(key, (ttl, results))
+    logger.info("Running %s with args %r and kwargs %r", klass, args,
+                kwargs)
+    mod_name, klass_name = klass.rsplit('.', 1)
+    try:
+        mod = importlib.import_module(mod_name)
+    except ImportError,e :
+        logger.error("Error importing job module %s: '%s'", mod_name, e)
+        return
+    try:
+        klass = getattr(mod, klass_name)
+    except AttributeError:
+        logger.error("Module '%s' does not define a '%s' class", mod_name,
+                     klass_name)
+    start = time.time()
+    try:
+        klass().refresh(*args, **kwargs)
+    except Exception, e:
+        logger.error("Error running job: '%s'", e)
+    else:
+        duration = time.time() - start
+        logger.info("Fetched data in %.4f", duration)
