@@ -2,3 +2,6 @@ Get Django running within VirtualEnv on VM
 Implement as a decorator
 
 Add constructor args so they can be passed 
+
+Implement as a manager!
+Frobs.cached.filter('asdf')
