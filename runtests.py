@@ -28,6 +28,7 @@ if not settings.configured:
             'async_cache',
             'djcelery',
             'djcelery.transport',
+            'tests.dummyapp',
             ],
         BROKER_URL = 'django://',
         CELERY_ALWAYS_EAGER=True,

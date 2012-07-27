@@ -38,4 +38,4 @@ def refresh_cache(klass, *args, **kwargs):
         logger.error("Error running job: '%s'", e)
     else:
         duration = time.time() - start
-        logger.info("Fetched data in %.4f", duration)
+        logger.info("Fetched data in %.6f seconds", duration)
