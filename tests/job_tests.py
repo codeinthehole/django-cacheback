@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.cache import cache
+from django.db import connection
 
 from async_cache import AsyncCacheJob
 from tests.dummyapp import models
@@ -53,6 +54,7 @@ class TestQuerySetJob(TestCase):
     def test_first_pass_returns_none(self):
         self.assertIsNone(self.job.get('Alan'))
 
-    def test_second_pass_returns_queryset(self):
-        self.assertIsNone(self.job.get('Alan'))
-        self.assertEqual(1, len(self.job.get('Alan')))
+    def test_only_one_database_query(self):
+        with self.assertNumQueries(1):
+            for _ in xrange(10):
+                self.job.get('Alan')

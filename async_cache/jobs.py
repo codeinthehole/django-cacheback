@@ -37,12 +37,13 @@ class AsyncCacheJob(object):
         Fetch the result SYNCHRONOUSLY and populate the cache
         """
         result = self.fetch(*args, **kwargs)
-        cache.set(self.key(*args, **kwargs), (self.lifetime, result))
+        cache.set(self.key(*args, **kwargs),
+                  (self.time_to_live(*args, **kwargs), result))
         return result
 
     def async_refresh(self, key, *args, **kwargs):
         """
-        Fetch the results ASYNCHRONOUSLY and populate the cache
+        Trigger an asynchronous job to refresh the cache
         """
         klass = '%s.%s' % (self.__module__, self.__class__.__name__)
         tasks.refresh_cache.delay(klass, *args, **kwargs)
@@ -55,6 +56,12 @@ class AsyncCacheJob(object):
         repopulation of the cache)
         """
         return None
+
+    def time_to_live(self, *args, **kwargs):
+        """
+        Return the TTL for this item.
+        """
+        return time.time() + self.lifetime
 
     def key(self, *args, **kwargs):
         """

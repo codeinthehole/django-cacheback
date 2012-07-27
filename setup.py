@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(name='django-async-cache',
       version='0.1',
-      url='https://github.com/codeinthehole/django-async-cache',
+#      url='https://github.com/codeinthehole/django-async-cache',
       author="David Winterbottom",
       author_email="david.winterbottom@gmail.com",
       description="Async cache objects that use Celery to refresh",
