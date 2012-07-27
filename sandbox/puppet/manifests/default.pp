@@ -1,9 +1,15 @@
-class site {
-    # Using puppet for provisioning requires a puppet group
-    group {"puppet":
-        ensure => present,
-    }
+# See https://github.com/puppetlabs/puppetlabs-rabbitmq
+class {"rabbitmq::server":
+    port => '5673',
+	delete_guest_user => true
 }
-
-Exec { path => [ "/usr/local/bin", "/bin", "/sbin", "/usr/bin", "/usr/sbin" ] }
-include site
+rabbitmq_user {"cb_rabbit_user":
+    password => "somepasswordhere",
+	provider => "rabbitmqctl"
+}
+rabbitmq_user_permissions {"cb_rabbit_user@/":
+    configure_permission => ".*",
+    read_permission => ".*",
+    write_permission => ".*",
+	provider => "rabbitmqctl"
+}
