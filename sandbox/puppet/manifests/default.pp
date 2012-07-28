@@ -13,3 +13,14 @@ rabbitmq_user_permissions {"cb_rabbit_user@/":
     write_permission => ".*",
 	provider => "rabbitmqctl"
 }
+
+include python::dev
+include python::venv
+python::venv::isolate { "/var/www/virtualenv": 
+	requirements => "/vagrant/requirements.txt"
+}
+
+# Set default path for all Exec tasks
+Exec {
+	path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+}
