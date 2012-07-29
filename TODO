@@ -1,11 +1,7 @@
-Sandbox
-- get rabbit connection working
-- view using cache
-
+QS version
 Implement as a decorator
 
 Prevent cache hammering
-Manually trigger cache refresh
 
 Add constructor args so they can be passed 
 

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.cache import cache
 
-from async_cache import AsyncCacheJob
+from async_cache import AsyncCacheJob, QuerySetFilterJob, QuerySetGetJob
 from tests.dummyapp import models
 
 
@@ -61,18 +61,16 @@ class TestSingleArgJob(TestCase):
         self.assertEqual('BARRY', self.job.get('barry'))
 
 
-class QuerySetJob(AsyncCacheJob):
+class ManualQuerySetJob(AsyncCacheJob):
 
     def fetch(self, name):
         return models.DummyModel.objects.filter(name=name)
 
 
-
-
-class TestQuerySetJob(TestCase):
+class TestManualQuerySetJob(TestCase):
 
     def setUp(self):
-        self.job = QuerySetJob()
+        self.job = ManualQuerySetJob()
         models.DummyModel.objects.create(name="Alan")
         models.DummyModel.objects.create(name="Barry")
 
@@ -88,3 +86,35 @@ class TestQuerySetJob(TestCase):
         with self.assertNumQueries(1):
             for _ in xrange(10):
                 self.job.get('Alan')
+
+
+class TestFilterQuerySetJob(TestCase):
+
+    def setUp(self):
+        self.job = QuerySetFilterJob(models.DummyModel)
+        models.DummyModel.objects.create(name="Alan")
+        models.DummyModel.objects.create(name="Barry")
+
+    def tearDown(self):
+        models.DummyModel.objects.all().delete()
+        cache.clear()
+
+    def test_first_pass_returns_result(self):
+        results = self.job.get(name='Alan')
+        self.assertEqual(1, len(results))
+
+
+class TestGetQuerySetJob(TestCase):
+
+    def setUp(self):
+        self.job = QuerySetGetJob(models.DummyModel)
+        models.DummyModel.objects.create(name="Alan")
+        models.DummyModel.objects.create(name="Barry")
+
+    def tearDown(self):
+        models.DummyModel.objects.all().delete()
+        cache.clear()
+
+    def test_first_pass_returns_result(self):
+        result = self.job.get(name='Alan')
+        self.assertEqual('Alan', result.name)

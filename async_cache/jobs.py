@@ -29,7 +29,8 @@ class AsyncCacheJob(object):
             #    the fetch has finished, or
             # b) trigger an async refresh
             if self.fetch_on_empty:
-                logger.debug("Job %s with key '%s' - cache MISS - calling refresh",
+                logger.debug(("Job %s with key '%s' - cache MISS - running "
+                              "synchronous refresh"),
                              self.class_path, key)
                 return self.refresh(*args, **kwargs)
             else:
@@ -97,7 +98,9 @@ class AsyncCacheJob(object):
             return self.class_path
         if args and not kwargs:
             return args
-        return "%s-%s" % (args, kwargs)
+        return "%s-%s-%s" % (hash(args),
+                             hash(tuple(kwargs.keys())),
+                             hash(tuple(kwargs.values())))
 
     def fetch(self, *args, **kwargs):
         """
@@ -105,3 +108,28 @@ class AsyncCacheJob(object):
         be encapsulated.
         """
         raise NotImplementedError()
+
+
+class QuerySetJob(AsyncCacheJob):
+
+    def __init__(self, model):
+        self.model = model
+
+    def key(self, *args, **kwargs):
+        return "%s-%s" % (
+            self.model.__name__,
+            super(QuerySetJob, self).key(*args, **kwargs)
+        )
+
+
+class QuerySetGetJob(QuerySetJob):
+
+    def fetch(self, *args, **kwargs):
+        return self.model.objects.get(**kwargs)
+
+
+class QuerySetFilterJob(QuerySetJob):
+
+    def fetch(self, *args, **kwargs):
+        return self.model.objects.filter(**kwargs)
+
