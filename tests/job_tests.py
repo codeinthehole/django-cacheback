@@ -1,43 +1,72 @@
 from django.test import TestCase
 from django.core.cache import cache
-from django.db import connection
 
 from async_cache import AsyncCacheJob
 from tests.dummyapp import models
 
 
-class UppercaseJob(AsyncCacheJob):
+class NoArgsJob(AsyncCacheJob):
+    def fetch(self):
+        return 1,2,3
 
-    def key(self, name):
-        return name
+
+class TestNoArgsJob(TestCase):
+
+    def setUp(self):
+        self.job = NoArgsJob()
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_returns_result_on_first_call(self):
+        self.assertEqual((1,2,3), self.job.get())
+
+
+class NoArgsUseEmptyJob(NoArgsJob):
+    fetch_on_empty = False
+
+
+class TestNoArgsUseEmptyJob(TestCase):
+
+    def setUp(self):
+        self.job = NoArgsUseEmptyJob()
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_returns_none_on_first_call(self):
+        self.assertIsNone(self.job.get())
+
+    def test_returns_value_on_second_call(self):
+        self.assertIsNone(self.job.get())
+        self.assertEqual((1,2,3), self.job.get())
+
+
+class SingleArgJob(AsyncCacheJob):
 
     def fetch(self, name):
         return name.upper()
 
 
-class QuerySetJob(AsyncCacheJob):
+class TestSingleArgJob(TestCase):
 
-    def key(self, name):
-        return name
+    def setUp(self):
+        self.job = SingleArgJob()
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_correct_results_returned(self):
+        self.assertEqual('ALAN', self.job.get('alan'))
+        self.assertEqual('BARRY', self.job.get('barry'))
+
+
+class QuerySetJob(AsyncCacheJob):
 
     def fetch(self, name):
         return models.DummyModel.objects.filter(name=name)
 
 
-class TestUppercaseJob(TestCase):
-
-    def setUp(self):
-        self.job = UppercaseJob()
-
-    def tearDown(self):
-        cache.clear()
-
-    def test_first_pass_returns_none(self):
-        self.assertIsNone(self.job.get('dave'))
-
-    def test_second_pass_returns_value(self):
-        self.assertIsNone(self.job.get('dave'))
-        self.assertEqual('DAVE', self.job.get('dave'))
 
 
 class TestQuerySetJob(TestCase):
@@ -51,8 +80,9 @@ class TestQuerySetJob(TestCase):
         models.DummyModel.objects.all().delete()
         cache.clear()
 
-    def test_first_pass_returns_none(self):
-        self.assertIsNone(self.job.get('Alan'))
+    def test_first_pass_returns_result(self):
+        results = self.job.get('Alan')
+        self.assertEqual(1, len(results))
 
     def test_only_one_database_query(self):
         with self.assertNumQueries(1):

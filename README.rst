@@ -35,6 +35,14 @@ Yes, subject to the `MIT license`_.
 
 .. _`MIT license`: http://example.com
 
+How do I install?
+=================
+
+1. Add ``async_cache`` to ``INSTALLED_APPS``.
+2. Set-up Celery 
+
+
+
 I've found a bug
 ================
 No you haven't.
