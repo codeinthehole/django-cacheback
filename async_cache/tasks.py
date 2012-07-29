@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def refresh_cache(klass, *args, **kwargs):
     """
     Re-populate cache using the given job class and parameters to call the
-    'fetch' method with.
+    'refresh' method with.
 
     :klass: String repr of class (eg 'apps.twitter.jobs.FetchTweetsJob')
     :args: Function args

@@ -10,7 +10,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'db.sqlite3',                      # Or path to database file if using sqlite3.
+        'NAME': '/vagrant/sandbox/db.sqlite3',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -96,6 +96,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -120,7 +121,13 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'dummyapp',
+    'async_cache',
+    'debug_toolbar',
+    'djcelery',
 )
+
+INTERNAL_IPS = ('10.0.2.2',)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -148,5 +155,23 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+    }
+}
+
+# Celery settings
+import djcelery
+djcelery.setup_loader()
+#BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost:5672'
+BROKER_HOST = "localhost"
+BROKER_PORT = 5673
+BROKER_USER = "cb_rabbit_user"
+BROKER_PASSWORD = "somepasswordhere"
+BROKER_VHOST = "/"
+
+CACHES = {
+    'default': {
+        'BACKEND':
+        'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
     }
 }

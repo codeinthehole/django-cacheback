@@ -45,8 +45,11 @@ class AsyncCacheJob(object):
         """
         Trigger an asynchronous job to refresh the cache
         """
-        klass = '%s.%s' % (self.__module__, self.__class__.__name__)
-        tasks.refresh_cache.delay(klass, *args, **kwargs)
+        tasks.refresh_cache.delay(self.class_path, *args, **kwargs)
+
+    @property
+    def class_path(self):
+        return '%s.%s' % (self.__module__, self.__class__.__name__)
 
     # Override these methods
 
@@ -65,9 +68,12 @@ class AsyncCacheJob(object):
 
     def key(self, *args, **kwargs):
         """
-        Return the cache key to use
+        Return the cache key to use.
+
+        If no parameters are passed to the 'get' method then this method doesn
+        not need to be overridden.
         """
-        raise NotImplementedError()
+        return self.class_path
 
     def fetch(self, *args, **kwargs):
         """

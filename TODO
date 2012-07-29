@@ -1,7 +1,15 @@
-Get Django running within VirtualEnv on VM
+Sandbox
+- get rabbit connection working
+- view using cache
+
 Implement as a decorator
 
+Prevent cache hammering
+Manually trigger cache refresh
+
 Add constructor args so they can be passed 
+
+Sort out names!
 
 Implement as a manager!
 Frobs.cached.filter('asdf')
