@@ -4,8 +4,11 @@ from dummyapp import models
 
 
 class VanillaJob(jobs.AsyncCacheJob):
+    fetch_on_empty = False
 
     def fetch(self):
+        import time
+        time.sleep(10)
         return models.DummyModel.objects.all()
 
 

@@ -37,29 +37,48 @@ class AsyncCacheJob(object):
                 logger.debug(("Job %s with key '%s' - cache MISS - triggering "
                               "async refresh and returning empty result"),
                              self.class_path, key)
+                # Fetch empty result and put it in the cache as a dead result to
+                # avoid cache hammering.
+                empty = self.empty()
+                self.cache_set(key, None, empty)
                 self.async_refresh(key, *args, **kwargs)
-                return self.empty()
+                return empty
 
-        if result[0] < time.time():
+        if result[0] is None:
+            # Cache is stale - but the cache refresh job has already been
+            # triggered.  We return the stale result
+            logger.debug(("Job %s with key '%s' - DEAD cache hit -  "
+                          "refresh already triggered - returning stale result"),
+                         self.class_path, key)
+        elif result[0] < time.time():
             # Cache is stale - we trigger a refresh but allow the stale result
-            # to be returned this time
-            logger.debug(("Job %s with key '%s' - stale cache HIT - triggering "
+            # to be returned this time.  This is normally acceptable.
+            logger.debug(("Job %s with key '%s' - STALE cache hit - triggering "
                           "async refresh and returning stale result"),
                          self.class_path, key)
+            # We replace the item in the cache with one without a TTL - this
+            # prevents cache hammering.
+            self.cache_set(key, None, result[1])
             self.async_refresh(key, *args, **kwargs)
         else:
             logger.debug(("Job %s with key '%s' - cache HIT"), self.class_path,
                          key)
         return result[1]
 
+    def cache_set(self, key, ttl, result):
+        """
+        Add a result to the cache
+        """
+        cache.set(key, (ttl, result), MEMCACHE_MAX_EXPIRATION)
+
     def refresh(self, *args, **kwargs):
         """
         Fetch the result SYNCHRONOUSLY and populate the cache
         """
         result = self.fetch(*args, **kwargs)
-        cache.set(self.key(*args, **kwargs),
-                  (self.time_to_live(*args, **kwargs), result),
-                  MEMCACHE_MAX_EXPIRATION)
+        self.cache_set(self.key(*args, **kwargs),
+                       self.time_to_live(*args, **kwargs),
+                       result)
         return result
 
     def async_refresh(self, key, *args, **kwargs):
