@@ -1,10 +1,11 @@
-Implement as a decorator
-
-Prevent cache hammering
-
-Add constructor args so they can be passed 
-
 Sort out names!
+Docs
+PyPi
+Blog
+Checkout out competitors
 
+Backlog
+-------
 Implement as a manager!
-Frobs.cached.filter('asdf')
+ - Frobs.cached.filter('asdf')
+Implement as a decorator

@@ -110,26 +110,32 @@ class AsyncCacheJob(object):
         """
         Return the cache key to use.
 
-        If no parameters are passed to the 'get' method then this method doesn
-        not need to be overridden.
+        If you're passing anything but primitive types to the ``get`` method,
+        it's likely that you'll need to override this method.
         """
         if not args and not kwargs:
             return self.class_path
         if args and not kwargs:
             return args
-        return "%s-%s-%s" % (hash(args),
+        # The line might break if your passed values are un-hashable.  If it
+        # does, you need to override this method and implement your own key
+        # algorithm.
+        return "%s:%s:%s" % (hash(args),
                              hash(tuple(kwargs.keys())),
                              hash(tuple(kwargs.values())))
 
     def fetch(self, *args, **kwargs):
         """
         Return the data for this job - this is where the expensive work should
-        be encapsulated.
+        be done.
         """
         raise NotImplementedError()
 
 
 class QuerySetJob(AsyncCacheJob):
+    """
+    Helper class for wrapping ORM reads
+    """
 
     def __init__(self, model):
         self.model = model
