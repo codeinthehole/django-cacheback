@@ -20,7 +20,7 @@ class AsyncCacheJob(object):
     # is None, this indicates that there is already a job created for refreshing
     # this item.
 
-    # Default cache lifetime is 5 minutes
+    #: Default cache lifetime is 5 minutes
     lifetime = 600
 
     # Default behaviour is to do a synchronous fetch when the cache is empty.
