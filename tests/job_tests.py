@@ -118,3 +118,25 @@ class TestGetQuerySetJob(TestCase):
     def test_first_pass_returns_result(self):
         result = self.job.get(name='Alan')
         self.assertEqual('Alan', result.name)
+
+
+class EchoJob(AsyncCacheJob):
+    def fetch(self, *args, **kwargs):
+        return (args, kwargs)
+
+
+class TestEchoJob(TestCase):
+
+    def setUp(self):
+        self.job = EchoJob()
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_unhashable_arg_raises_exception(self):
+        with self.assertRaises(RuntimeError):
+            self.job.get({})
+
+    def test_unhashable_kwarg_raises_exception(self):
+        with self.assertRaises(RuntimeError):
+            self.job.get(name={})

@@ -131,14 +131,19 @@ class AsyncCacheJob(object):
         """
         if not args and not kwargs:
             return self.class_path
-        if args and not kwargs:
-            return args
-        # The line might break if your passed values are un-hashable.  If it
-        # does, you need to override this method and implement your own key
-        # algorithm.
-        return "%s:%s:%s" % (hash(args),
-                             hash(tuple(kwargs.keys())),
-                             hash(tuple(kwargs.values())))
+        try:
+            if args and not kwargs:
+                return hash(args)
+            # The line might break if your passed values are un-hashable.  If it
+            # does, you need to override this method and implement your own key
+            # algorithm.
+            return "%s:%s:%s" % (hash(args),
+                                hash(tuple(kwargs.keys())),
+                                hash(tuple(kwargs.values())))
+        except TypeError:
+            raise RuntimeError("Unable to generate cache key due to unhashable"
+                               "args or kwargs - you need to implement your own"
+                               "key generation method to avoid this problem")
 
     def fetch(self, *args, **kwargs):
         """
