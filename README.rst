@@ -2,6 +2,8 @@
 Django-async-cache
 ==================
 
+Asynchronous cache refreshing using Celery.
+
 **This is a work in progress**
 
 What does this library do?
