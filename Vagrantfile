@@ -6,7 +6,8 @@ Vagrant::Config.run do |config|
 	config.vm.forward_port 8000, 8080
     config.vm.provision :puppet do |puppet|
         puppet.manifests_path = "sandbox/puppet/manifests"
-        puppet.manifest_file = "default.pp"
+        puppet.manifest_file = "site.pp"
         puppet.module_path = "sandbox/puppet/modules"
+		puppet.options = "--debug"
     end
 end

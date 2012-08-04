@@ -1,20 +1,25 @@
-==================
-Django-async-cache
-==================
+=========
+CacheFlow
+=========
 
-Asynchronous cache refreshing using Celery.
+Asynchronous cache refreshing for Django.
+
+This library allows you to fetch all your reads from cache, using a Celery task
+to refresh the cache when items becomes stale.  
 
 **This is a work in progress**
 
+FAQ
+===
+
 What does this library do?
-==========================
+--------------------------
 It provides a caching mechanism that populates the cache asynchronously using
 Celery.  It allows you to structure your views so that all reads from cache.
 This can be a significant performance boost.
 
 I don't get it...
-=================
-
+-----------------
 1. User makes request, we look in cache for the result
    a) Cache MISS - we return an empty result set
    b) Cache HIT with a valid result which is returned
@@ -80,8 +85,15 @@ No you haven't.
 
 I want to contribute
 ====================
-There is a VagrantFile for setting up a testing VM.  First install puppet
-modules::
+
+Running tests
+-------------
+
+Sandbox VM
+----------
+
+There is a VagrantFile for setting up a sandbox VM where you can play around
+with the functionality.  First install the necessary puppet modules::
 
     make puppet
 
@@ -89,6 +101,17 @@ then boot and provision the VM::
 
     vagrant up
 
-This will set up a Ubuntu Precise64 VM with RabbitMQ installed and configured.
+This may take a while but will set up a Ubuntu Precise64 VM with RabbitMQ
+installed and configured.  You can then SSH into the machine and run the Django
+development server::
 
-Vagrant is awesome btw
+    vagrant ssh
+    cd /vagrant/sandbox
+    source /var/www/virtual/bin/activate
+    ./manage.py runserver 0.0.0.0:8000
+
+The dummy site will be available at ``localhost:8080``.
+
+Run a Celery worker using::
+
+    ./manage.py celeryctl worker --loglevel=INFO

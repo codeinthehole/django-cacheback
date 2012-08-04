@@ -159,7 +159,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'async_cache.jobs': {
+        'async_cache': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
@@ -170,12 +170,7 @@ LOGGING = {
 # Celery settings
 import djcelery
 djcelery.setup_loader()
-#BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost:5672'
-BROKER_HOST = "localhost"
-BROKER_PORT = 5673
-BROKER_USER = "cb_rabbit_user"
-BROKER_PASSWORD = "somepasswordhere"
-BROKER_VHOST = "/"
+BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost/'
 
 CACHES = {
     'default': {

@@ -5,7 +5,7 @@ from django.core.cache import cache
 
 from async_cache import tasks
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('async_cache')
 
 # We don't use memcache to handle expiry so all items are set using the max TTL.
 MEMCACHE_MAX_EXPIRATION = 2592000
@@ -35,6 +35,7 @@ class AsyncCacheJob(object):
         """
         key = self.key(*args, **kwargs)
         result = cache.get(key)
+
         if result is None:
             # Cache is empty - we can either:
             # a) fetch the data immediately, blocking execution until

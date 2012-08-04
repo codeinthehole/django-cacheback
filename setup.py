@@ -3,6 +3,7 @@
 from setuptools import setup, find_packages
 import os
 
+os.chdir(os.path.dirname(__file__))
 
 setup(name='django-async-cache',
       version='0.1',

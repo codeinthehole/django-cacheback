@@ -1,9 +1,9 @@
-from async_cache import jobs
+import async_cache
 
 from dummyapp import models
 
 
-class VanillaJob(jobs.AsyncCacheJob):
+class VanillaJob(async_cache.AsyncCacheJob):
     fetch_on_empty = False
 
     def fetch(self):
@@ -12,7 +12,7 @@ class VanillaJob(jobs.AsyncCacheJob):
         return models.DummyModel.objects.all()
 
 
-class KeyedJob(jobs.AsyncCacheJob):
+class KeyedJob(async_cache.AsyncCacheJob):
 
     def key(self, name):
         return name

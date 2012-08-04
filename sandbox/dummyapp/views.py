@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from async_cache.jobs import QuerySetFilterJob
+from async_cache import QuerySetFilterJob
 from dummyapp import jobs
 from dummyapp import models
 

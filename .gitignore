@@ -1,3 +1,4 @@
 .vagrant
 sandbox/puppet/modules
 docs/_build
+dist/*
