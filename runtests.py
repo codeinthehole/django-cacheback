@@ -25,7 +25,7 @@ if not settings.configured:
             'django.contrib.sessions',
             'django.contrib.sites',
             'django.contrib.flatpages',
-            'async_cache',
+            'cacheback',
             'djcelery',
             'djcelery.transport',
             'tests.dummyapp',

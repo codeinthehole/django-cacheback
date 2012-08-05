@@ -1,4 +1,4 @@
-from async_cache import AsyncCacheJob
+from cacheback import AsyncCacheJob
 
 
 class QuerySetJob(AsyncCacheJob):

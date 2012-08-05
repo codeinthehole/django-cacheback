@@ -3,15 +3,17 @@
 from setuptools import setup, find_packages
 import os
 
-os.chdir(os.path.dirname(__file__))
+PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
+os.chdir(PACKAGE_DIR)
+print PACKAGE_DIR
 
-setup(name='django-async-cache',
+setup(name='django-cacheback',
       version='0.1',
-      url='https://github.com/codeinthehole/django-async-cache',
+      url='https://github.com/codeinthehole/django-cacheback',
       author="David Winterbottom",
       author_email="david.winterbottom@gmail.com",
       description="Async cache objects that use Celery to refresh",
-      long_description=os.path.join(os.path.dirname(__file__), 'README.rst'),
+      long_description=os.path.join(PACKAGE_DIR, 'README.rst'),
       license='MIT',
       packages=find_packages(exclude=["sandbox*", "tests*"]),
       include_package_data=True,

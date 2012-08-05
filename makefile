@@ -1,3 +1,7 @@
+develop:
+	python setup.py develop
+	pip install -r requirements.txt
+
 puppet:
 	# Install puppet modules required to set-up sandbox server
 	puppet module install --target-dir sandbox/puppet/modules/ puppetlabs-rabbitmq -v 2.0.1

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.cache import cache
 
-from async_cache import AsyncCacheJob, QuerySetFilterJob, QuerySetGetJob
+from cacheback import AsyncCacheJob, QuerySetFilterJob, QuerySetGetJob
 from tests.dummyapp import models
 
 

@@ -3,9 +3,9 @@ import logging
 
 from django.core.cache import cache
 
-from async_cache import tasks
+from cacheback import tasks
 
-logger = logging.getLogger('async_cache')
+logger = logging.getLogger('cacheback')
 
 # We don't use memcache to handle expiry so all items are set using the max TTL.
 MEMCACHE_MAX_EXPIRATION = 2592000

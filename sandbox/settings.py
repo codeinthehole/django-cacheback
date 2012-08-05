@@ -122,7 +122,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'dummyapp',
-    'async_cache',
+    'cacheback',
     'debug_toolbar',
     'djcelery',
 )
@@ -159,7 +159,7 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'async_cache': {
+        'cacheback': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,

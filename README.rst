@@ -85,9 +85,15 @@ No you haven't.
 
 I want to contribute
 ====================
+Get set up by cloning, creating a virtualenv and running::
+
+    make develop
 
 Running tests
 -------------
+Use::
+
+    ./runtests.py
 
 Sandbox VM
 ----------
