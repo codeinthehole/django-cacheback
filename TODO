@@ -1,4 +1,4 @@
-Sort out names! -> rename as django-cacheflow
+Rename cache classes
 Docs
 PyPi
 Blog
@@ -11,3 +11,4 @@ Implement as a manager!
  - Frobs.cached.filter('asdf')
 Implement as a decorator
 Remove hard dependency on Django
+Give two time cutoffs - one where stale results are not acceptable
