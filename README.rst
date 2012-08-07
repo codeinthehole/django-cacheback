@@ -1,11 +1,12 @@
 =========
 Cacheback
 =========
-
+-----------------------------------------
 Asynchronous cache refreshing for Django.
+-----------------------------------------
 
 This library allows you to fetch all your reads from cache, using a Celery task
-to refresh the cache when items becomes stale.  
+to refresh the cache when items becomes stale. 
 
 Questions
 =========
@@ -20,10 +21,10 @@ I don't get it...
 -----------------
 User makes request, we look in cache for the result
 
-   1. Cache MISS - we return an empty result set.  This can be configured to
+1. Cache MISS - we return an empty result set.  This can be configured to
    perform a synchronous read if returning an empty result set is unacceptable.
-   2. Cache HIT with a valid result - return result.
-   3. Cache HIT but with a stale result - we trigger a job to refresh this cache
+2. Cache HIT with a valid result - return result.
+3. Cache HIT but with a stale result - we trigger a job to refresh this cache
    item but return the stale item.
 
 The key thing to note is that we do allow stale results to be returned.  This is
