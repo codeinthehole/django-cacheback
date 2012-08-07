@@ -37,7 +37,7 @@ class AsyncCacheJob(object):
         result = cache.get(key)
 
         if result is None:
-            # Cache is empty - we can either:
+            # Cache MISS - we can either:
             # a) fetch the data immediately, blocking execution until
             #    the fetch has finished, or
             # b) trigger an async refresh and return an empty result
@@ -50,7 +50,7 @@ class AsyncCacheJob(object):
                 logger.debug(("Job %s with key '%s' - cache MISS - triggering "
                               "async refresh and returning empty result"),
                              self.class_path, key)
-                # Before triggering the async refersh, we fetch empty result and
+                # Before triggering the async refresh, we fetch empty result and
                 # put it in the cache as a dead result to avoid cache hammering.
                 empty = self.empty()
                 self.cache_set(key, None, empty)
@@ -58,7 +58,7 @@ class AsyncCacheJob(object):
                 return empty
 
         if result[0] is None:
-            # Cache is dead - ie the cache refresh job has already been
+            # Cache HIT but no expiry - ie the cache refresh job has already been
             # triggered.  We return the stale result.
             logger.debug(("Job %s with key '%s' - DEAD cache hit -  "
                           "refresh already triggered - returning stale result"),
