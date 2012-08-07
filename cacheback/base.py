@@ -27,12 +27,6 @@ class AsyncCacheJob(object):
     # Stale results are generally ok, but not no results.
     fetch_on_miss = True
 
-    def __init__(self, lifetime=None, fetch_on_miss=None):
-        if lifetime is not None:
-            self.lifetime = int(lifetime)
-        if fetch_on_miss is not None:
-            self.fetch_on_miss = fetch_on_miss
-
     def get(self, *raw_args, **raw_kwargs):
         """
         Return the data for this function (using the cache if possible).

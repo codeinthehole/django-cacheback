@@ -142,8 +142,3 @@ class TestEchoJob(TestCase):
             self.job.get(name={})
 
 
-class TestUsingConstructorArgs(TestCase):
-
-    def test_passing_lifetime(self):
-        job = AsyncCacheJob(300)
-        self.assertEqual(300, job.lifetime)

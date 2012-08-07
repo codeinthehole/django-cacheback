@@ -24,7 +24,7 @@ class FunctionJob(AsyncCacheJob):
         module_path, fn_name = fn_string.split(":")
         module = importlib.import_module(module_path)
         fn = getattr(module, fn_name)
-        # Look for a raw function attribute - this is set by the decorator.
+        # Look for 'fn' attribute which is used by the decorator
         if hasattr(fn, 'fn'):
             fn = fn.fn
         return fn(*args, **kwargs)
@@ -34,17 +34,18 @@ class FunctionJob(AsyncCacheJob):
         Return the kwargs that need to be passed to __init__ when reconstructing
         this class.
         """
-        return {'lifetime': self.lifetime,
-                'fetch_on_miss': self.fetch_on_miss}
+        # We don't need to pass fetch_on_miss as it isn't used by the refresh
+        # method.
+        return {'lifetime': self.lifetime}
 
 
-def cacheback(lifetime=None):
-    job = FunctionJob()
-    def wrapper(fn):
-        def _wrapper(*args, **kwargs):
-            # Assign reference to unwrapped function so that we can access it
-            # later without incurring infinite regress.
-            _wrapper.fn = fn
-            return job.get(fn, lifetime, *args, **kwargs)
-        return _wrapper
-    return wrapper
+def cacheback(lifetime=None, fetch_on_miss=None):
+    job = FunctionJob(lifetime, fetch_on_miss)
+    def _wrapper(fn):
+        def __wrapper(*args, **kwargs):
+            return job.get(fn, *args, **kwargs)
+        # Assign reference to unwrapped function so that we can access it
+        # later without descending into infinite regress.
+        __wrapper.fn = fn
+        return __wrapper
+    return _wrapper
