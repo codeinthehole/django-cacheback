@@ -34,9 +34,9 @@ class AsyncCacheJob(object):
         This method is not intended to be overidden
         """
         key = self.key(*args, **kwargs)
-        result = cache.get(key)
+        item = cache.get(key)
 
-        if result is None:
+        if item is None:
             # Cache MISS - we can either:
             # a) fetch the data immediately, blocking execution until
             #    the fetch has finished, or
@@ -57,26 +57,27 @@ class AsyncCacheJob(object):
                 self.async_refresh(*args, **kwargs)
                 return empty
 
-        if result[0] is None:
+        expiry, data = item
+        if expiry is None:
             # Cache HIT but no expiry - ie the cache refresh job has already been
             # triggered.  We return the stale result.
             logger.debug(("Job %s with key '%s' - DEAD cache hit -  "
                           "refresh already triggered - returning stale result"),
                          self.class_path, key)
-        elif result[0] < time.time():
-            # Cache is stale - we trigger a refresh but allow the stale result
+        elif expiry < time.time():
+            # Cache HIT but STALE expiry - we trigger a refresh but allow the stale result
             # to be returned this time.  This is normally acceptable.
             logger.debug(("Job %s with key '%s' - STALE cache hit - triggering "
                           "async refresh and returning stale result"),
                          self.class_path, key)
             # We replace the item in the cache with one without an expiry - this
             # prevents cache hammering.
-            self.cache_set(key, None, result[1])
+            self.cache_set(key, None, data)
             self.async_refresh(*args, **kwargs)
         else:
             logger.debug(("Job %s with key '%s' - cache HIT"), self.class_path,
                          key)
-        return result[1]
+        return data
 
     def cache_set(self, key, expiry, data):
         """
