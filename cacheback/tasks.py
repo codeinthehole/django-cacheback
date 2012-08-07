@@ -9,17 +9,38 @@ logger = logging.getLogger(__name__)
 
 
 @task()
-def refresh_cache(klass, *args, **kwargs):
+def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
     """
     Re-populate cache using the given job class and parameters to call the
     'refresh' method with.
 
     :klass: String repr of class (eg 'apps.twitter.jobs.FetchTweetsJob')
-    :args: Function args
-    :kwargs: Function kwargs
+    :obj_args: Constructor args
+    :obj_kwargs: Constructor kwargs
+    :call_args: Refresh args
+    :call_kwargs: Refresh kwargs
     """
-    logger.info("Running %s with args %r and kwargs %r", klass, args,
-                kwargs)
+    klass = _get_job_class(klass_str)
+    if klass is None:
+        logger.error("Unable to construct %s with args %r and kwargs %r",
+                     klass_str, obj_args, obj_kwargs)
+        return
+
+    logger.info("Using %s with constructor args %r and kwargs %r",
+                klass_str, obj_args, obj_kwargs)
+    logger.info("Calling refresh with args %r and kwargs %r", call_args,
+                call_kwargs)
+    start = time.time()
+    try:
+        klass(*obj_args, **obj_kwargs).refresh(*call_args, **call_kwargs)
+    except Exception, e:
+        logger.error("Error running job: '%s'", e)
+    else:
+        duration = time.time() - start
+        logger.info("Fetched data in %.6f seconds", duration)
+
+
+def _get_job_class(klass):
     mod_name, klass_name = klass.rsplit('.', 1)
     try:
         mod = importlib.import_module(mod_name)
@@ -31,11 +52,5 @@ def refresh_cache(klass, *args, **kwargs):
     except AttributeError:
         logger.error("Module '%s' does not define a '%s' class", mod_name,
                      klass_name)
-    start = time.time()
-    try:
-        klass().refresh(*args, **kwargs)
-    except Exception, e:
-        logger.error("Error running job: '%s'", e)
-    else:
-        duration = time.time() - start
-        logger.info("Fetched data in %.6f seconds", duration)
+        return
+    return klass

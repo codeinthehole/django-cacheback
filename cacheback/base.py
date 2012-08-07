@@ -25,7 +25,13 @@ class AsyncCacheJob(object):
 
     # Default behaviour is to do a synchronous fetch when the cache is empty.
     # Stale results are generally ok, but not no results.
-    fetch_on_empty = True
+    fetch_on_miss = True
+
+    def __init__(self, lifetime=None, fetch_on_miss=None):
+        if lifetime is not None:
+            self.lifetime = int(lifetime)
+        if fetch_on_miss is not None:
+            self.fetch_on_miss = fetch_on_miss
 
     def get(self, *raw_args, **raw_kwargs):
         """
@@ -35,8 +41,9 @@ class AsyncCacheJob(object):
         """
         # We pass args and kwargs through a filter to allow them to be converted
         # into values that can be picked.
-        args = self.prepare_args(raw_args)
-        kwargs = self.prepare_kwargs(raw_kwargs)
+        args = self.prepare_args(*raw_args)
+        kwargs = self.prepare_kwargs(**raw_kwargs)
+
         key = self.key(*args, **kwargs)
         item = cache.get(key)
 
@@ -45,7 +52,7 @@ class AsyncCacheJob(object):
             # a) fetch the data immediately, blocking execution until
             #    the fetch has finished, or
             # b) trigger an async refresh and return an empty result
-            if self.fetch_on_empty:
+            if self.fetch_on_miss:
                 logger.debug(("Job %s with key '%s' - cache MISS - running "
                               "synchronous refresh"),
                              self.class_path, key)
@@ -83,10 +90,10 @@ class AsyncCacheJob(object):
                          key)
         return data
 
-    def prepare_args(self, args):
+    def prepare_args(self, *args):
         return args
 
-    def prepare_kwargs(self, kwargs):
+    def prepare_kwargs(self, **kwargs):
         return kwargs
 
     def cache_set(self, key, expiry, data):
@@ -113,7 +120,25 @@ class AsyncCacheJob(object):
         """
         Trigger an asynchronous job to refresh the cache
         """
-        tasks.refresh_cache.delay(self.class_path, *args, **kwargs)
+        # We trigger the task with the class path to import as well as the
+        # (a) args and kwargs for instantiating the class
+        # (b) args and kwargs for calling the 'refresh' method
+        tasks.refresh_cache.delay(
+            self.class_path,
+            obj_args=self.get_constructor_args(),
+            obj_kwargs=self.get_constructor_kwargs(),
+            call_args=args,
+            call_kwargs=kwargs)
+
+    def get_constructor_args(self):
+        return ()
+
+    def get_constructor_kwargs(self):
+        """
+        Return the kwargs that need to be passed to __init__ when reconstructing
+        this class.
+        """
+        return {}
 
     @property
     def class_path(self):

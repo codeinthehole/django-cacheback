@@ -13,7 +13,7 @@ class TestDecorator(TestCase):
 
     def setUp(self):
         self.job = FunctionJob()
-        self.job.fetch_on_empty = False
+        self.job.fetch_on_miss = False
 
     def test_wrapping_argless_function(self):
         self.assertIsNone(self.job.get(fetch))

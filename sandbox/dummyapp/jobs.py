@@ -4,7 +4,7 @@ from dummyapp import models
 
 
 class VanillaJob(cacheback.AsyncCacheJob):
-    fetch_on_empty = False
+    fetch_on_miss = False
 
     def fetch(self):
         import time

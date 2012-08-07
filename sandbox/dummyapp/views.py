@@ -23,7 +23,7 @@ def index(request):
             items = jobs.KeyedJob().get(name=request.GET['name'])
     if 'function' in request.GET:
         job = FunctionJob()
-        job.fetch_on_empty = False
+        job.fetch_on_miss = False
         if 'q' in request.GET:
             items = job.get(fetch_with_arg, request.GET['q'])
         else:

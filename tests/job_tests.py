@@ -23,7 +23,7 @@ class TestNoArgsJob(TestCase):
 
 
 class NoArgsUseEmptyJob(NoArgsJob):
-    fetch_on_empty = False
+    fetch_on_miss = False
 
 
 class TestNoArgsUseEmptyJob(TestCase):
@@ -140,3 +140,10 @@ class TestEchoJob(TestCase):
     def test_unhashable_kwarg_raises_exception(self):
         with self.assertRaises(RuntimeError):
             self.job.get(name={})
+
+
+class TestUsingConstructorArgs(TestCase):
+
+    def test_passing_lifetime(self):
+        job = AsyncCacheJob(300)
+        self.assertEqual(300, job.lifetime)
