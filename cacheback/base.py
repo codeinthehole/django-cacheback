@@ -27,12 +27,16 @@ class AsyncCacheJob(object):
     # Stale results are generally ok, but not no results.
     fetch_on_empty = True
 
-    def get(self, *args, **kwargs):
+    def get(self, *raw_args, **raw_kwargs):
         """
         Return the data for this function (using the cache if possible).
 
         This method is not intended to be overidden
         """
+        # We pass args and kwargs through a filter to allow them to be converted
+        # into values that can be picked.
+        args = self.prepare_args(raw_args)
+        kwargs = self.prepare_kwargs(raw_kwargs)
         key = self.key(*args, **kwargs)
         item = cache.get(key)
 
@@ -78,6 +82,12 @@ class AsyncCacheJob(object):
             logger.debug(("Job %s with key '%s' - cache HIT"), self.class_path,
                          key)
         return data
+
+    def prepare_args(self, args):
+        return args
+
+    def prepare_kwargs(self, kwargs):
+        return kwargs
 
     def cache_set(self, key, expiry, data):
         """

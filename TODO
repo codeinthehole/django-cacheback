@@ -1,3 +1,4 @@
+Passing lifetime args to Job when running from task
 s/fetch_on_empty/fetch_on_miss
 Rename cache classes
 Docs
