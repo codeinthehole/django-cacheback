@@ -20,8 +20,14 @@ class AsyncCacheJob(object):
     # is None, this indicates that there is already a job created for refreshing
     # this item.
 
-    #: Default cache lifetime is 5 minutes
+    #: Default cache lifetime is 5 minutes.  After this time, the result will be
+    #  considered stale and requests will trigger a job to refresh it.
     lifetime = 600
+
+    #: Time to store items in the cache.  After this time, we will get a cache
+    #  miss which can lead to synchronous refreshes if you have
+    #  fetch_on_miss=True.
+    cache_ttl = MEMCACHE_MAX_EXPIRATION
 
     # Default behaviour is to do a synchronous fetch when the cache is empty.
     # Stale results are generally ok, but not no results.
@@ -98,7 +104,7 @@ class AsyncCacheJob(object):
         :expiry: The expiry timestamp after which the result is stale
         :data: The data to cache
         """
-        cache.set(key, (expiry, data), MEMCACHE_MAX_EXPIRATION)
+        cache.set(key, (expiry, data), self.cache_ttl)
 
     def refresh(self, *args, **kwargs):
         """

@@ -18,17 +18,17 @@ def index(request):
     if 'name' in request.GET:
         name = request.GET['name']
         if 'qs' in request.GET:
-            items = QuerySetFilterJob(models.DummyModel).get(name=name)
+            items = QuerySetFilterJob(models.DummyModel, 10, False).get(name=name)
         else:
             items = jobs.KeyedJob().get(name=request.GET['name'])
-    if 'function' in request.GET:
+    elif 'function' in request.GET:
         job = FunctionJob()
         job.fetch_on_miss = False
         if 'q' in request.GET:
             items = job.get(fetch_with_arg, request.GET['q'])
         else:
             items = job.get(fetch)
-    if 'decorator' in request.GET:
+    elif 'decorator' in request.GET:
         items = decorated('3')
     else:
         items = jobs.VanillaJob().get()

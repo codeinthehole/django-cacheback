@@ -1,16 +1,14 @@
-Passing lifetime args to Job when running from task
-s/fetch_on_empty/fetch_on_miss
-Rename cache classes
+Test docs
+Rename cache classes to Job
 Docs
+- how to handle manual cache expiry
+- using cronjob to refresh caches
 PyPi
 Blog
 Checkout out competitors
-Celery into puppet config
 
 Backlog
 -------
 Implement as a manager!
  - Frobs.cached.filter('asdf')
-Implement as a decorator
 Remove hard dependency on Django
-Give two time cutoffs - one where stale results are not acceptable
