@@ -1,7 +1,7 @@
-from cacheback import AsyncCacheJob
+from cacheback import Job
 
 
-class QuerySetJob(AsyncCacheJob):
+class QuerySetJob(Job):
     """
     Helper class for wrapping ORM reads
     """

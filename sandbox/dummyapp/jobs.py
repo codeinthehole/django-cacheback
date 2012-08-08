@@ -3,7 +3,7 @@ import cacheback
 from dummyapp import models
 
 
-class VanillaJob(cacheback.AsyncCacheJob):
+class VanillaJob(cacheback.Job):
     fetch_on_miss = False
 
     def fetch(self):
@@ -12,7 +12,7 @@ class VanillaJob(cacheback.AsyncCacheJob):
         return models.DummyModel.objects.all()
 
 
-class KeyedJob(cacheback.AsyncCacheJob):
+class KeyedJob(cacheback.Job):
 
     def key(self, name):
         return name

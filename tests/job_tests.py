@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.core.cache import cache
 
-from cacheback import AsyncCacheJob, QuerySetFilterJob, QuerySetGetJob
+from cacheback import Job, QuerySetFilterJob, QuerySetGetJob
 from tests.dummyapp import models
 
 
-class NoArgsJob(AsyncCacheJob):
+class NoArgsJob(Job):
     def fetch(self):
         return 1,2,3
 
@@ -42,7 +42,7 @@ class TestNoArgsUseEmptyJob(TestCase):
         self.assertEqual((1,2,3), self.job.get())
 
 
-class SingleArgJob(AsyncCacheJob):
+class SingleArgJob(Job):
 
     def fetch(self, name):
         return name.upper()
@@ -61,7 +61,7 @@ class TestSingleArgJob(TestCase):
         self.assertEqual('BARRY', self.job.get('barry'))
 
 
-class ManualQuerySetJob(AsyncCacheJob):
+class ManualQuerySetJob(Job):
 
     def fetch(self, name):
         return models.DummyModel.objects.filter(name=name)
@@ -120,7 +120,7 @@ class TestGetQuerySetJob(TestCase):
         self.assertEqual('Alan', result.name)
 
 
-class EchoJob(AsyncCacheJob):
+class EchoJob(Job):
     def fetch(self, *args, **kwargs):
         return (args, kwargs)
 

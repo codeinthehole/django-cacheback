@@ -11,7 +11,7 @@ logger = logging.getLogger('cacheback')
 MEMCACHE_MAX_EXPIRATION = 2592000
 
 
-class AsyncCacheJob(object):
+class Job(object):
     """
     A cached read job
     """

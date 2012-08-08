@@ -1,5 +1,5 @@
-Test docs
 Rename cache classes to Job
+Cool logo
 Docs
 - how to handle manual cache expiry
 - using cronjob to refresh caches
@@ -11,4 +11,3 @@ Backlog
 -------
 Implement as a manager!
  - Frobs.cached.filter('asdf')
-Remove hard dependency on Django

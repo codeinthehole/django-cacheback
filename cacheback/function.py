@@ -1,9 +1,9 @@
 from django.utils import importlib
 
-from cacheback import AsyncCacheJob
+from cacheback import Job
 
 
-class FunctionJob(AsyncCacheJob):
+class FunctionJob(Job):
     """
     Job for executing a function and caching the result
     """
