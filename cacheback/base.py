@@ -7,13 +7,15 @@ from cacheback import tasks
 
 logger = logging.getLogger('cacheback')
 
-# We don't use memcache to handle expiry so all items are set using the max TTL.
 MEMCACHE_MAX_EXPIRATION = 2592000
 
 
 class Job(object):
     """
-    A cached read job
+    A cached read job.
+
+    This is the core class for the package which is intended to be subclassed to
+    allow the caching behaviour to be customised.
     """
     # All items are stored in memcache as a tuple (expiry, data).  We don't use the
     # TTL functionality within memcache but implement on own.  If the expiry value
