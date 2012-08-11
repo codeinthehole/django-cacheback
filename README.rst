@@ -6,7 +6,9 @@ Asynchronous cache refreshing for Django.
 -----------------------------------------
 
 This library allows you to fetch all your reads from cache, using a Celery task
-to refresh the cache when items becomes stale. 
+to refresh the cache when items becomes stale.  The key idea being that it's
+better to serve a stale item (and populate the cache asynchronously) than block
+the user in order to populate the cache synchronously.
 
 Questions
 =========
