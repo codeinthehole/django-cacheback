@@ -1,80 +1,30 @@
 =========
 Cacheback
 =========
------------------------------------------
-Asynchronous cache refreshing for Django.
------------------------------------------
-
-This library allows you to fetch all your reads from cache, using a Celery task
-to refresh the cache when items becomes stale.  The key idea being that it's
-better to serve a stale item (and populate the cache asynchronously) than block
-the user in order to populate the cache synchronously.
-
-Questions
-=========
+----------------------------------------
+Asynchronous cache refreshing for Django
+----------------------------------------
 
 What does this library do?
 --------------------------
-It provides a caching mechanism that populates the cache asynchronously using a
-Celery worker.  It allows you to structure your views so that all reads are from
-cache - this can be a significant performance boost.
+It's an extensible caching library that refreshes stale cache items
+asynchronously using a Celery_ task.  The key idea being that it's
+better to serve a stale item (and populate the cache asynchronously) than block
+the user in order to populate the cache synchronously.
 
-I don't get it...
------------------
-User makes request, we look in cache for the result
+.. _Celery: http://celeryproject.org/
 
-1. Cache MISS - we return an empty result set.  This can be configured to
-   perform a synchronous read if returning an empty result set is unacceptable.
-2. Cache HIT with a valid result - return result.
-3. Cache HIT but with a stale result - we trigger a job to refresh this cache
-   item but return the stale item.
+Using this library, you can structure your views so that all reads are from
+cache - this can be a significant performance boost.  
 
-The key thing to note is that we do allow stale results to be returned.  This is
-normally an acceptable trade-off for the performance benefits that this library
-provides.
-
-Show me an example
-------------------
-Ok, bossy-boots.  Suppose you have a view which makes an expensive read::
-
-    from django.shortcuts import render
-    import twitter # fictional library
-
-    def show_tweets(request, username):
-        tweets = twitter.user_tweets(username)
-        return render(request, 'tweets.html', 
-                      {'tweets': tweets})
-
-where the call to ``user_tweets`` is expensive.  You can introduce
-asynchronous caching by creating a simple class that wraps the read operation::
-
-    import cacheback
-    import twitter
-
-    class UserTweets(cacheback.AsyncCacheJob):
-        lifetime = 600 # Cache for 10 minutes
-        
-        def fetch(self, username):
-            return twitter.user_tweets(username)
-
-Now your view can be rewritten as::
-
-    from django.shortcuts import render
-    from jobs import UserTweets
-
-    def show_tweets(request, username):
-        tweets = UserTweets.get(username)
-        return render(request, 'tweets.html', 
-                      {'tweets': tweets})
-
-Now all requests will read tweets from cache - when the cached items expire,
-they will be refreshed asynchronously.
+A corollary of this technique is that cache hammering can be handled simply and
+elegantly, avoiding suddent surges of expensive reads when a cached items becomes stale.
 
 Can I use this in my project?
 -----------------------------
 Yes, subject to the `MIT license`_.
 
-.. _`MIT license`: http://example.com
+.. _`MIT license`: https://github.com/codeinthehole/django-cacheback/blob/master/LICENSE
 
 How do I install?
 -----------------
@@ -82,13 +32,16 @@ Fetch from PyPI::
 
     pip install django-cacheback
 
-and add ``cacheback`` to ``INSTALLED_APPS``.
+and add ``cacheback`` to ``INSTALLED_APPS``.  Since Celery is a dependency, you
+will also need to set up a broker.
 
 I want to contribute
 --------------------
 Get set up by cloning, creating a virtualenv and running::
 
     make develop
+
+to install the dependencies.
 
 Running tests
 ~~~~~~~~~~~~~
