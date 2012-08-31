@@ -8,17 +8,18 @@ os.chdir(PACKAGE_DIR)
 print PACKAGE_DIR
 
 setup(name='django-cacheback',
-      version='0.1',
+      version='0.1.1',
       url='https://github.com/codeinthehole/django-cacheback',
       author="David Winterbottom",
       author_email="david.winterbottom@gmail.com",
       description="Caching library for Django that uses Celery to refresh cache items asynchronously",
-      long_description=os.path.join(PACKAGE_DIR, 'README.rst'),
+      long_description=os.path.join(PACKAGE_DIR, 'README.rst').read(),
       license='MIT',
       packages=find_packages(exclude=["sandbox*", "tests*"]),
       include_package_data=True,
       install_requires=[
           'django>=1.3',
+          'django-celery==3.0.1',
           ],
       # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=['Environment :: Web Environment',

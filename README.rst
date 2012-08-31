@@ -35,6 +35,8 @@ Fetch from PyPI::
 and add ``cacheback`` to ``INSTALLED_APPS``.  Since Celery is a dependency, you
 will also need to set up a broker.
 
+You also need to ensure you have ``CACHES`` set-up properly.
+
 I want to contribute
 --------------------
 Get set up by cloning, creating a virtualenv and running::
