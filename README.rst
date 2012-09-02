@@ -14,7 +14,7 @@ the user in order to populate the cache synchronously.
 
 .. _Celery: http://celeryproject.org/
 
-Using this library, you can rework  your views so that all reads are from
+Using this library, you can rework your views so that all reads are from
 cache - which can be a significant performance boost.  
 
 A corollary of this technique is that cache hammering can be handled simply and
@@ -35,6 +35,6 @@ You betcha!
 
 Can I use this in my project?
 -----------------------------
-Definitely - subject to the `MIT license`_.
+Probably - subject to the `MIT license`_.
 
 .. _`MIT license`: https://github.com/codeinthehole/django-cacheback/blob/master/LICENSE
