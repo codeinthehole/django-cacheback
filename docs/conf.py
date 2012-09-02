@@ -15,7 +15,16 @@ import sys, os
 code_dir = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(code_dir)
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sandbox.settings')
+
+from django.conf import settings
+if not settings.configured:
+    settings.configure(
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                }
+            },
+    )
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
