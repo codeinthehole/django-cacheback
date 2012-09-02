@@ -167,7 +167,8 @@ LOGGING = {
     }
 }
 
-# Celery settings
+# CACHEBACK SETTINGS
+
 import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost/'

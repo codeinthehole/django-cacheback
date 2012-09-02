@@ -3,192 +3,193 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-================================================
-Django Cacheback - asynchronous cache refreshing
-================================================
+================
+Django Cacheback
+================
 
-Cacheback is a caching library that uses Celery to refresh stale cached items
-asynchronously.  The key idea being that it is better to serve a stale cache
-item than fetch the data synchronously.  Populating the cache asynchronously
-allows your views to be adjusted so all reads come from cache.  It also handles
-cache hammering gracefully.
+Cacheback is an extensible caching library that refreshes stale cache items
+asynchronously using a Celery_ task.  The key idea being that it's
+better to serve a stale item (and populate the cache asynchronously) than block
+the user in order to repopulate the cache synchronously.
 
-Cacheback provides a decorator for simple usage and provides a subclassable base
-class for more fine-grained control.
+.. _Celery: http://celeryproject.org/
 
-Simple example
---------------
-Suppose you have a view which displays a user's tweets, something like::
+Using this library, you can rework your views so that all reads are from
+cache - which can be a significant performance boost.  
+
+A corollary of this technique is that cache stampedes can be easily avoided,
+avoiding sudden surges of expensive reads when cached items becomes stale.
+
+Cacheback provides a decorator for simple usage, a subclassable base
+class for more fine-grained control and helper classes for working with
+querysets.
+
+Example
+=======
+
+Consider a view for showing a user's tweets:
+
+.. sourcecode:: python
 
     from django.shortcuts import render
-    import requests
+    from myproject.twitter import fetch_tweets
 
     def show_tweets(request, username):
-        url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
-        response = requests.get(url % username)
-        return render(request, 'tweets.html', {'tweets': response.json})
+        return render(request, 'tweets.html', 
+                      {'tweets': fetch_tweets(username)})
 
-The HTTP round-trip to Twitter is expensive.  We want to use some caching to
-improve performance.  
+This works fine but the ``fetch_tweets`` function involves a HTTP round-trip and
+is slow.  
 
-A better solution is to use Cacheback::
+Performance can be improved by using Django's `low-level cache API`_:
+
+.. _`low-level cache API`: https://docs.djangoproject.com/en/dev/topics/cache/?from=olddocs#the-low-level-cache-api
+        
+.. sourcecode:: python
 
     from django.shortcuts import render
-    import requests
+    from django.cache import cache
+    from myproject.twitter import fetch_tweets
+
+    def show_tweets(request, username):
+        return render(request, 'tweets.html', 
+                      {'tweets': fetch_cached_tweets(username)})
+
+    def fetch_cached_tweets(username):
+        tweets = cache.get(username)
+        if tweets is None:
+            tweets = fetch_tweets(username)
+            cache.set(username, tweets, 60*15)
+        return tweets
+
+Now tweets are cached for 15 minutes after they are first fetched, using the
+twitter username as a key.  This is obviously a performance improvement but the
+shortcomings of this approach are:
+
+* For a cache miss, the tweets are fetched synchronously, blocking code execution
+  and leading to a slow response time.
+
+* This in turn exposes exposes the view to a '`cache stampede`_' where
+  multiple expensive reads run simultaneously when the cached item expires.
+  Under heavy load, this can bring your site down.
+
+.. _`cache stampede`: http://en.wikipedia.org/wiki/Cache_stampede
+
+Now, consider an alternative implementation that uses a Celery task to repopulate the
+cache asynchronously instead of during the request/response cycle::
+
+    import datetime
+    from django.shortcuts import render
+    from django.cache import cache
+    from myproject.tasks import update_tweets
+
+    def show_tweets(request, username):
+        return render(request, 'tweets.html', 
+                      {'tweets': fetch_cached_tweets(username)})
+
+    def fetch_cached_tweets(username):
+        item = cache.get(username)
+        if item is None:
+            # Scenario 1: Cache miss - return empty result set and trigger a refresh
+            update_tweets.delay(username, 60*15)
+            return []
+        tweets, expiry = item
+        if expiry > datetime.datetime.now():
+            # Scenario 2: Cached item is stale - return it but trigger a refresh
+            update_tweets.delay(username, 60*15)
+        return tweets
+
+where the ``myproject.tasks.update_tweets`` task is implemented as:
+
+.. sourcecode:: python
+
+    import datetime
+    from celery import task
+    from django.cache import cache
+    from myproject.twitter import fetch_tweets
+
+    @task()
+    def update_tweets(username, ttl):
+        tweets = fetch_tweets(username)
+        now = datetime.datetime.now()
+        cache.set(username, (tweets, now+ttl), 2592000) 
+
+Some things to note:
+
+* Items are stored in the cache as tuples ``(data, expiry_timestamp)`` using
+  Memcache's maximum expiry setting (2592000 seconds).  By using this value, we
+  are effectively bypassing memcache's replacement policy in favour of our own.
+
+* As the comments indicate, there are two scenarios to consider:
+
+  1.  Cache miss.  In this case, we don't have any data (stale or otherwise) to
+      return.  In the example above, we trigger an asynchronous refresh and
+      return an empty result set.  In other scenarios, it may make sense to
+      perform a synchronous refresh.
+
+  2.  Cache hit but with stale data.  Here we return the stale data but trigger
+      a Celery task to refresh the cached item.
+
+This pattern of re-populating the cache asynchronously works well.  Indeed, it
+is the basis for the cacheback library.
+
+Here's the same functionality implemented using a django-cacheback decorator:
+
+.. sourcecode:: python
+
+    from django.shortcuts import render
+    from django.cache import cache
+    from myproject.twitter import fetch_tweets
     from cacheback import cacheback
 
-    @cacheback(1200)
-    def fetch_tweets(username):
-        url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
-        return requests.get(url % username).json
-        
     def show_tweets(request, username):
-        return render(request, 'tweets.html', {'tweets': fetch_tweets(username)})
+        return render(request, 'tweets.html', 
+                      {'tweets': cacheback(60*15, fetch_on_miss=False)(fetch_tweets(username))})
 
-The behaviour of this implementation is as follows:
+Here the decorator simply wraps the ``fetch_tweets`` function - nothing else is
+needed.  Cacheback ships with a flexible Celery task that can run any function
+asynchronously.
 
-* The first request for a particular user's tweets will fetch the tweet data
-  synchronously as the cache will be empty.  
+To be clear, the behaviour of this implementation is as follows:
 
-* Any subsequent requests within 1200 seconds will be served straight from
-  cache.
+* The first request for a particular user's tweets will be a cache miss.  The
+  default behaviour of Cacheback is to fetch the data synchronously in this
+  situation, but by passing ``fetch_on_miss=False``, we indicate that it's ok
+  to return ``None`` in this situation and to trigger an asynchronous refresh.
 
-* The first request after 1200 seconds will serve the (now-stale) cache result
-  but will trigger a Celery task to fetch the user's tweets and repopulate the
-  cache.
+* A Celery worker will pick up the job to refresh the cache for this user's
+  tweets.  If will import the ``fetch_tweets`` function and execute it with the
+  correct username.  The resulting data will be added to the cache with a
+  lifetime of 15 minutes.
 
-* Any requests the arrive after this request but before the cache has been
-  refreshed will return the stale result.
+* Any requests for this user's tweets during the period that Celery is
+  refreshing the cache will also return ``None``.  However Cacheback is aware of
+  cache stampedes and does not trigger any additional jobs for refreshing the
+  cached item.
 
-Much of this behaviour can be configured.  Note that the initial synchronous
-fetch can be avoided by passing ``fetch_on_miss=False`` to the decorator.  This will
-lead to an empty result being returned for the first request with an
-asynchronous job populating the cache.
+* Once the cached item is refreshed, any subsequent requests within the next 15
+  minutes will be served from cache.
 
-Install
--------
-Run::
+* The first request after 15 minutes has elapsed will serve the (now-stale)
+  cache result but will trigger a Celery task to fetch the user's tweets and
+  repopulate the cache.
 
-    pip install django-cacheback
+Much of this behaviour can be configured by using a subclass of
+``cacheback.Job``.  The decorator is only intended for simple use-cases.  See
+the :doc:`usage` and :doc:`api` documentation for more information.
 
-Examples
---------
+Contents
+========
 
-Example 1 - Decorate
-~~~~~~~~~~~~~~~~~~~~
-Extract the data fetching into a function and decorate::
+.. toctree::
+   :maxdepth: 2
 
-    from django.shortcuts import render
-    import requests
-    from cacheback import cacheback
-
-    @cacheback()
-    def fetch_tweets(username):
-        url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
-        return requests.get(url % username).json
-        
-    def show_tweets(request, username):
-        return render(request, 'tweets.html', {'tweets': fetch_tweets(username)})
-
-The default behaviour of the ``cacheback`` decorator is to:
-
-* Cache items for 5 minutes.  After that, they will be considered stale and a
-  job will be triggered to refresh the cache.
-
-* When the cache is empty for a given key, the data will be fetched
-  synchronously.  This behaviour can be changed so that the read never blocks -
-  see later.
-    
-Example 2 - Decorate plus
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-You can tweak the decorator to cache items for longer and also to not block on a
-cache miss::
-
-    from django.shortcuts import render
-    import requests
-    from cacheback import cacheback
-
-    @cacheback(1200, fetch_on_miss=False)
-    def fetch_tweets(username):
-        url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
-        return requests.get(url % username).json
-        
-    def show_tweets(request, username):
-        return render(request, 'tweets.html', {'tweets': fetch_tweets(username)})
-    
-Example 3 - Subclassing for greater control
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Subclassing ``cacheback.Job`` gives you complete control over the caching
-behaviour::
-
-    import requests
-    from cacheback import Job
-
-    class UserTweets(Job):
-        
-        def fetch(self, username):
-            url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
-            return requests.get(url % username).json
-
-        def lifetime(self, username):
-            return 1200 if username.startswith('a') else 600
-
-API
----
-
-.. autoclass:: cacheback.Job
-    :members: fetch, empty, expiry, key, prepare_args, prepare_kwargs
+   installation
+   usage
+   api
+   contributing
 
 
-Queryset jobs
--------------
-
-There are two classes for easy caching of ORM reads.  These don't need
-subclassing but rather take the model class as a ``__init__`` parameter.
-
-.. autoclass:: cacheback.QuerySetFilterJob
-    :members:
-
-.. autoclass:: cacheback.QuerySetGetJob
-    :members:
-
-Example usage::
- 
-    from django.contrib.auth import models
-    from django.shortcuts import render
-    from cacheback import QuerySetGetJob, QuerySetFilterJob
-
-    def user_detail(request, username):
-        user = QuerySetGetJob(models.User).get(username=username)
-        return render(request, 'user.html',
-                      {'user': user})
-
-    def staff(request):
-        staff = QuerySetFilterJob(models.User).filter(is_staff=True)
-        return render(request, 'staff.html',
-                      {'users': staff})
-
-These classes are helpful for simple ORM reads but won't be suitable for more
-complicated queries where ``filter`` is chained together with ``exclude``.
-
-Advanced usage
---------------
-
-Two thresholds for cache invalidation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-It's possible to employ two threshold times for cache behaviour:
-
-1.  A time after which the cached item is considered 'stale'.  When a stale item
-    is returned, a async job is triggered to refresh the item but the stale item
-    is returned.  This is controlled by the ``lifetime`` attribute of the
-    ``Job`` class - the default value is 600 seconds (5 minutes).
-
-2.  A time after which the cached item is removed (a cache miss).  If you have
-    ``fetch_on_miss=True``, then this will trigger a synchronous data fetch.
-    This is controlled by the ``cache_ttl`` attribute of the ``Job`` class - the
-    default value is 2592000 seconds, which is the maximum ttl that memcached
-    supports.
 
 Indices and tables
 ==================
