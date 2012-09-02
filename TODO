@@ -1,12 +1,11 @@
-Cool logo
 Docs
 - how to handle manual cache expiry
 - using cronjob to refresh caches
-PyPi
 Blog
 Checkout out competitors
 
 Backlog
 -------
+Cool logo - README art
 Implement as a manager!
  - Frobs.cached.filter('asdf')

@@ -26,6 +26,13 @@ Yup - `over on readthedocs.org`_.
 
 .. _`over on readthedocs.org`: http://django-cacheback.readthedocs.org/en/latest/
 
+Do you have tests?
+------------------
+You betcha!  
+
+.. image:: https://secure.travis-ci.org/codeinthehole/django-cacheback.png
+
+
 Can I use this in my project?
 -----------------------------
 Definitely - subject to the `MIT license`_.
