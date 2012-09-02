@@ -1,6 +1,6 @@
 from django.utils import importlib
 
-from cacheback import Job
+from cacheback.base import Job
 
 
 class FunctionJob(Job):
@@ -37,15 +37,3 @@ class FunctionJob(Job):
         # We don't need to pass fetch_on_miss as it isn't used by the refresh
         # method.
         return {'lifetime': self.lifetime}
-
-
-def cacheback(lifetime=None, fetch_on_miss=None):
-    job = FunctionJob(lifetime, fetch_on_miss)
-    def _wrapper(fn):
-        def __wrapper(*args, **kwargs):
-            return job.get(fn, *args, **kwargs)
-        # Assign reference to unwrapped function so that we can access it
-        # later without descending into infinite regress.
-        __wrapper.fn = fn
-        return __wrapper
-    return _wrapper

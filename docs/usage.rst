@@ -8,7 +8,7 @@ As a decorator
 Simply wrap the function whose results you want to cache::
 
     import requests
-    from cacheback import cacheback
+    from cacheback.decorators import cacheback
 
     @cacheback()
     def fetch_tweets(username):
@@ -26,7 +26,7 @@ You can parameterise the decorator to cache items for longer and also to not blo
 cache miss::
 
     import requests
-    from cacheback import cacheback
+    from cacheback.decorators import cacheback
 
     @cacheback(lifetime=1200, fetch_on_miss=False)
     def fetch_tweets(username):
@@ -48,9 +48,9 @@ behaviour.  The only method that must be overridden is ``fetch`` which is
 responsible for fetching the data to be cached::
 
     import requests
-    import cacheback
+    from cacheback.base import Job
 
-    class UserTweets(cacheback.Job):
+    class UserTweets(Job):
         
         def fetch(self, username):
             url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
@@ -70,9 +70,9 @@ You can control the lifetime and behaviour on cache miss using either class
 attributes::
 
     import requests
-    import cacheback
+    from cacheback.base import Job
 
-    class UserTweets(cacheback.Job):
+    class UserTweets(Job):
         lifetime = 60*20
         fetch_on_miss = False
         
@@ -84,9 +84,9 @@ or by overriding methods::
 
     import time
     import requests
-    import cacheback
+    from cacheback.base import Job
 
-    class UserTweets(cacheback.Job):
+    class UserTweets(Job):
         
         def fetch(self, username):
             url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
@@ -103,4 +103,3 @@ or by overriding methods::
 
 In the above toy example, the cache behaviour will be different for usernames
 starting with 'a'.
-

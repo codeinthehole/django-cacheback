@@ -1,13 +1,14 @@
 from django.test import TestCase
 from django.core.cache import cache
 
-from cacheback import Job, QuerySetFilterJob, QuerySetGetJob
+from cacheback.base import Job
+from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob
 from tests.dummyapp import models
 
 
 class NoArgsJob(Job):
     def fetch(self):
-        return 1,2,3
+        return 1, 2, 3
 
 
 class TestNoArgsJob(TestCase):
@@ -19,7 +20,7 @@ class TestNoArgsJob(TestCase):
         cache.clear()
 
     def test_returns_result_on_first_call(self):
-        self.assertEqual((1,2,3), self.job.get())
+        self.assertEqual((1, 2, 3), self.job.get())
 
 
 class NoArgsUseEmptyJob(NoArgsJob):
@@ -39,7 +40,7 @@ class TestNoArgsUseEmptyJob(TestCase):
 
     def test_returns_value_on_second_call(self):
         self.assertIsNone(self.job.get())
-        self.assertEqual((1,2,3), self.job.get())
+        self.assertEqual((1, 2, 3), self.job.get())
 
 
 class SingleArgJob(Job):
@@ -140,5 +141,3 @@ class TestEchoJob(TestCase):
     def test_unhashable_kwarg_raises_exception(self):
         with self.assertRaises(RuntimeError):
             self.job.get(name={})
-
-

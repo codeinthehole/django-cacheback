@@ -1,4 +1,1 @@
-from cacheback.base import Job
-from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob
-from cacheback.function import FunctionJob
-from cacheback.decorators import cacheback
+__version__ = '0.2'

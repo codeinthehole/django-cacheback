@@ -2,17 +2,19 @@
 
 from setuptools import setup, find_packages
 import os
+from cacheback import __version__
 
 PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
 os.chdir(PACKAGE_DIR)
-print PACKAGE_DIR
+
 
 setup(name='django-cacheback',
-      version='0.1.1',
+      version=__version__,
       url='https://github.com/codeinthehole/django-cacheback',
       author="David Winterbottom",
       author_email="david.winterbottom@gmail.com",
-      description="Caching library for Django that uses Celery to refresh cache items asynchronously",
+      description=("Caching library for Django that uses Celery "
+                   "to refresh cache items asynchronously"),
       long_description=file(os.path.join(PACKAGE_DIR, 'README.rst')).read(),
       license='MIT',
       packages=find_packages(exclude=["sandbox*", "tests*"]),

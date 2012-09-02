@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from cacheback import FunctionJob
+from cacheback.function import FunctionJob
 
 
 def fetch():

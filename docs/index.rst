@@ -140,7 +140,7 @@ Here's the same functionality implemented using a django-cacheback decorator:
     from django.shortcuts import render
     from django.cache import cache
     from myproject.twitter import fetch_tweets
-    from cacheback import cacheback
+    from cacheback.decorators import cacheback
 
     def show_tweets(request, username):
         return render(request, 'tweets.html', 

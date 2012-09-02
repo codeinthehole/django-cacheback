@@ -1,4 +1,4 @@
-from cacheback import Job
+from cacheback.base import Job
 
 
 class QuerySetJob(Job):

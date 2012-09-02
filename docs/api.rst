@@ -2,10 +2,10 @@
 API
 ===
 
-The main class is ``cacheback.Job`` which provides several methods intended to
+The main class is ``cacheback.base.Job`` which provides several methods intended to
 be overridden and customised:
 
-.. autoclass:: cacheback.Job
+.. autoclass:: cacheback.base.Job
     :members: fetch, expiry, should_item_by_fetched_synchronously, empty, key, prepare_args, prepare_kwargs
 
 
@@ -15,17 +15,17 @@ Queryset jobs
 There are two classes for easy caching of ORM reads.  These don't need
 subclassing but rather take the model class as a ``__init__`` parameter.
 
-.. autoclass:: cacheback.QuerySetFilterJob
+.. autoclass:: cacheback.queryset.QuerySetFilterJob
     :members:
 
-.. autoclass:: cacheback.QuerySetGetJob
+.. autoclass:: cacheback.queryset.QuerySetGetJob
     :members:
 
 Example usage::
  
     from django.contrib.auth import models
     from django.shortcuts import render
-    from cacheback import QuerySetGetJob, QuerySetFilterJob
+    from cacheback.queryset import QuerySetGetJob, QuerySetFilterJob
 
     def user_detail(request, username):
         user = QuerySetGetJob(models.User).get(username=username)
