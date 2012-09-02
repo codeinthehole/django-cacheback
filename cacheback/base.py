@@ -54,7 +54,7 @@ class Job(object):
             # a) fetch the data immediately, blocking execution until
             #    the fetch has finished, or
             # b) trigger an async refresh and return an empty result
-            if self.fetch_on_miss:
+            if self.should_item_by_fetched_synchronously(*args, **kwargs):
                 logger.debug(("Job %s with key '%s' - cache MISS - running "
                               "synchronous refresh"),
                              self.class_path, key)
@@ -160,6 +160,12 @@ class Job(object):
         Return the expiry timestamp for this item.
         """
         return time.time() + self.lifetime
+
+    def should_item_by_fetched_synchronously(self, *args, **kwargs):
+        """
+        Return whether to refresh an item synchronously
+        """
+        return self.fetch_on_miss
 
     def key(self, *args, **kwargs):
         """
