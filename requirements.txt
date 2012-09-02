@@ -4,3 +4,4 @@ django-nose==1.1
 nose==1.1.2
 python-memcached==1.48
 django-debug-toolbar==0.9.4
+pinocchio==0.3.1

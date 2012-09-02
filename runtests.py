@@ -32,7 +32,7 @@ if not settings.configured:
             ],
         BROKER_URL = 'django://',
         CELERY_ALWAYS_EAGER=True,
-        NOSE_ARGS=['-s'],
+        NOSE_ARGS=['-s', '--with-spec'],
     )
     import djcelery
     djcelery.setup_loader()
