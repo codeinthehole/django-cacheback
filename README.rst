@@ -18,7 +18,7 @@ Using this library, you can rework your views so that all reads are from
 cache - which can be a significant performance boost.  
 
 A corollary of this technique is that cache hammering can be handled simply and
-elegantly, avoiding sudden surges of expensive reads when a cached items becomes stale.
+elegantly, avoiding sudden surges of expensive reads when a cached item becomes stale.
 
 Do you have good docs?
 ----------------------
@@ -38,3 +38,9 @@ Can I use this in my project?
 Probably - subject to the `MIT license`_.
 
 .. _`MIT license`: https://github.com/codeinthehole/django-cacheback/blob/master/LICENSE
+
+I want to contribute!
+---------------------
+Brilliant!  Here are the `contributing guidelines`_.
+
+.. _`contributing guidelines`: http://django-cacheback.readthedocs.org/en/latest/contributing.html
