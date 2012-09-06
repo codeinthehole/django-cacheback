@@ -144,7 +144,7 @@ Here's the same functionality implemented using a django-cacheback decorator:
 
     def show_tweets(request, username):
         return render(request, 'tweets.html', 
-                      {'tweets': cacheback(60*15, fetch_on_miss=False)(fetch_tweets(username))})
+                      {'tweets': cacheback(60*15, fetch_on_miss=False)(fetch_tweets)(username)})
 
 Here the decorator simply wraps the ``fetch_tweets`` function - nothing else is
 needed.  Cacheback ships with a flexible Celery task that can run any function
