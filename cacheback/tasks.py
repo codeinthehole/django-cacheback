@@ -36,9 +36,11 @@ def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
                 call_kwargs)
     start = time.time()
     try:
-        data = klass(*obj_args, **obj_kwargs).refresh(*call_args, **call_kwargs)
+        data = klass(*obj_args, **obj_kwargs).refresh(
+            *call_args, **call_kwargs)
     except Exception, e:
         logger.error("Error running job: '%s'", e)
+        logger.exception(e)
     else:
         duration = time.time() - start
         logger.info("Fetched %s item%s in %.6f seconds", len(data),
