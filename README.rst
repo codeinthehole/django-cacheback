@@ -31,6 +31,7 @@ Do you have tests?
 You betcha!  
 
 .. image:: https://secure.travis-ci.org/codeinthehole/django-cacheback.png
+    :target: https://travis-ci.org/#!/codeinthehole/django-cacheback
 
 
 Can I use this in my project?
