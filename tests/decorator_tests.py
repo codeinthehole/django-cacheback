@@ -4,7 +4,7 @@ from cacheback.function import FunctionJob
 
 
 def fetch():
-    return 1,2,3
+    return 1, 2, 3
 
 
 def fetch_with_args(*args):
@@ -14,16 +14,16 @@ def fetch_with_args(*args):
 class TestDecorator(TestCase):
 
     def setUp(self):
-        self.job = FunctionJob()
-        self.job.fetch_on_miss = False
+        self.job = FunctionJob(fetch_on_miss=False)
 
     def test_wrapping_argless_function(self):
         self.assertIsNone(self.job.get(fetch))
-        self.assertEqual((1,2,3), self.job.get(fetch))
+        self.assertEqual((1, 2, 3), self.job.get(fetch))
 
     def test_wrapping_function(self):
         self.assertIsNone(self.job.get(fetch_with_args, 'testing'))
-        self.assertEqual(('testing',), self.job.get(fetch_with_args, 'testing'))
+        self.assertEqual(('testing',),
+                         self.job.get(fetch_with_args, 'testing'))
 
 
 class TestUsingConstructorArgs(TestCase):

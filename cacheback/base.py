@@ -14,17 +14,22 @@ class Job(object):
     """
     A cached read job.
 
-    This is the core class for the package which is intended to be subclassed to
-    allow the caching behaviour to be customised.
+    This is the core class for the package which is intended to be subclassed
+    to allow the caching behaviour to be customised.
     """
-    # All items are stored in memcache as a tuple (expiry, data).  We don't use the
-    # TTL functionality within memcache but implement on own.  If the expiry value
-    # is None, this indicates that there is already a job created for refreshing
-    # this item.
+    # All items are stored in memcache as a tuple (expiry, data).  We don't use
+    # the TTL functionality within memcache but implement on own.  If the
+    # expiry value is None, this indicates that there is already a job created
+    # for refreshing this item.
 
-    #: Default cache lifetime is 5 minutes.  After this time, the result will be
-    #  considered stale and requests will trigger a job to refresh it.
+    #: Default cache lifetime is 5 minutes.  After this time, the result will
+    #  be considered stale and requests will trigger a job to refresh it.
     lifetime = 600
+
+    #: Timeout period during which no new Celery tasks will be created for a
+    #  single cache item.  This time should cover the normal time required to
+    #  refresh the cache.
+    refresh_timeout = 60
 
     #: Time to store items in the cache.  After this time, we will get a cache
     #  miss which can lead to synchronous refreshes if you have
@@ -41,8 +46,8 @@ class Job(object):
 
         This method is not intended to be overidden
         """
-        # We pass args and kwargs through a filter to allow them to be converted
-        # into values that can be picked.
+        # We pass args and kwargs through a filter to allow them to be
+        # converted into values that can be picked.
         args = self.prepare_args(*raw_args)
         kwargs = self.prepare_kwargs(**raw_kwargs)
 
@@ -63,29 +68,28 @@ class Job(object):
                 logger.debug(("Job %s with key '%s' - cache MISS - triggering "
                               "async refresh and returning empty result"),
                              self.class_path, key)
-                # Before triggering the async refresh, we fetch empty result and
-                # put it in the cache as a dead result to avoid cache hammering.
+                # To avoid cache hammering (ie lots of identical Celery tasks
+                # to refresh the same cache item), we reset the cache with an
+                # empty result which will be returned until the cache is
+                # refreshed.
                 empty = self.empty()
-                self.cache_set(key, None, empty)
+                self.cache_set(key, self.timeout(*args, **kwargs), empty)
                 self.async_refresh(*args, **kwargs)
                 return empty
 
         expiry, data = item
-        if expiry is None:
-            # Cache HIT but no expiry - ie the cache refresh job has already been
-            # triggered.  We return the stale result.
-            logger.debug(("Job %s with key '%s' - DEAD cache hit -  "
-                          "refresh already triggered - returning stale result"),
-                         self.class_path, key)
-        elif expiry < time.time():
-            # Cache HIT but STALE expiry - we trigger a refresh but allow the stale result
-            # to be returned this time.  This is normally acceptable.
-            logger.debug(("Job %s with key '%s' - STALE cache hit - triggering "
-                          "async refresh and returning stale result"),
-                         self.class_path, key)
-            # We replace the item in the cache with one without an expiry - this
-            # prevents cache hammering.
-            self.cache_set(key, None, data)
+        if expiry < time.time():
+            # Cache HIT but STALE expiry - we trigger a refresh but allow the
+            # stale result to be returned this time.  This is normally
+            # acceptable.
+            logger.debug(
+                ("Job %s with key '%s' - STALE cache hit - triggering "
+                 "async refresh and returning stale result"),
+                self.class_path, key)
+            # We replace the item in the cache with a 'timeout' expiry - this
+            # prevents cache hammering but guards against a 'limbo' situation
+            # where the refresh task fails for some reason.
+            self.cache_set(key, self.timeout(*args, **kwargs), data)
             self.async_refresh(*args, **kwargs)
         else:
             logger.debug(("Job %s with key '%s' - cache HIT"), self.class_path,
@@ -137,8 +141,8 @@ class Job(object):
 
     def get_constructor_kwargs(self):
         """
-        Return the kwargs that need to be passed to __init__ when reconstructing
-        this class.
+        Return the kwargs that need to be passed to __init__ when
+        reconstructing this class.
         """
         return {}
 
@@ -161,6 +165,12 @@ class Job(object):
         """
         return time.time() + self.lifetime
 
+    def timeout(self, *args, **kwargs):
+        """
+        Return the refresh timeout for this item
+        """
+        return time.time() + self.refresh_timeout
+
     def should_item_by_fetched_synchronously(self, *args, **kwargs):
         """
         Return whether to refresh an item synchronously
@@ -179,9 +189,9 @@ class Job(object):
         try:
             if args and not kwargs:
                 return hash(args)
-            # The line might break if your passed values are un-hashable.  If it
-            # does, you need to override this method and implement your own key
-            # algorithm.
+            # The line might break if your passed values are un-hashable.  If
+            # it does, you need to override this method and implement your own
+            # key algorithm.
             return "%s:%s:%s" % (hash(args),
                                 hash(tuple(kwargs.keys())),
                                 hash(tuple(kwargs.values())))
