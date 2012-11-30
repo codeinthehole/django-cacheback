@@ -16,7 +16,8 @@ def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
     The job class is instantiated with the passed constructor args and the
     refresh method is called with the passed call args.  That is::
 
-        data = klass(*obj_args, **obj_kwargs).refresh(*call_args, **call_kwargs)
+        data = klass(*obj_args, **obj_kwargs).refresh(
+            *call_args, **call_kwargs)
 
     :klass_str: String repr of class (eg 'apps.twitter.jobs:FetchTweetsJob')
     :obj_args: Constructor args
@@ -36,15 +37,14 @@ def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
                 call_kwargs)
     start = time.time()
     try:
-        data = klass(*obj_args, **obj_kwargs).refresh(
+        klass(*obj_args, **obj_kwargs).refresh(
             *call_args, **call_kwargs)
     except Exception, e:
         logger.error("Error running job: '%s'", e)
         logger.exception(e)
     else:
         duration = time.time() - start
-        logger.info("Fetched %s item%s in %.6f seconds", len(data),
-                    's' if len(data) > 1 else '', duration)
+        logger.info("Refreshed cache in %.6f seconds", duration)
 
 
 def _get_job_class(klass_str):
@@ -54,7 +54,7 @@ def _get_job_class(klass_str):
     mod_name, klass_name = klass_str.rsplit('.', 1)
     try:
         mod = importlib.import_module(mod_name)
-    except ImportError,e :
+    except ImportError, e:
         logger.error("Error importing job module %s: '%s'", mod_name, e)
         return
     try:

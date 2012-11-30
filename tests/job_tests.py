@@ -59,3 +59,23 @@ class TestSingleArgJob(TestCase):
     def test_returns_correct_result(self):
         self.assertEqual('ALAN', self.job.get('alan'))
         self.assertEqual('BARRY', self.job.get('barry'))
+
+
+class IntegerJob(Job):
+
+    def fetch(self, obj):
+        return 1
+
+
+class TestNonIterableCacheItem(TestCase):
+
+    def setUp(self):
+        self.job = IntegerJob()
+        self.job.fetch_on_miss = False
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_returns_correct_result(self):
+        self.assertIsNone(self.job.get(None))
+        self.assertEqual(1, self.job.get(None))
