@@ -59,7 +59,7 @@ class Job(object):
             # a) fetch the data immediately, blocking execution until
             #    the fetch has finished, or
             # b) trigger an async refresh and return an empty result
-            if self.should_item_by_fetched_synchronously(*args, **kwargs):
+            if self.should_item_be_fetched_synchronously(*args, **kwargs):
                 logger.debug(("Job %s with key '%s' - cache MISS - running "
                               "synchronous refresh"),
                              self.class_path, key)
@@ -179,7 +179,7 @@ class Job(object):
         """
         return time.time() + self.refresh_timeout
 
-    def should_item_by_fetched_synchronously(self, *args, **kwargs):
+    def should_item_be_fetched_synchronously(self, *args, **kwargs):
         """
         Return whether to refresh an item synchronously
         """
