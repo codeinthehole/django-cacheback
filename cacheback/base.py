@@ -111,11 +111,12 @@ class Job(object):
         :data: The data to cache
         """
         cache.set(key, (expiry, data), self.cache_ttl)
+
         # Warning - not all values save correctly to Memcache, some values
         # will fail silently.  It's tricky to test for this behaviour as cached
         # QuerySets aren't "equal" to the original.
-        __, cached_data = cache.get(key)
-        if data is not None and cached_data is None:
+        result = cache.get(key)
+        if not result:
             raise RuntimeError(
                 "Unable to save data of type %s to Memcache" % (
                     type(data)))
