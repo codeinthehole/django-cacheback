@@ -1,7 +1,7 @@
 import logging
 import time
 
-from celery import task
+from celery.task import task
 from django.utils import importlib
 
 

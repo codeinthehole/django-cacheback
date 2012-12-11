@@ -27,7 +27,6 @@ if not settings.configured:
             'django.contrib.flatpages',
             'cacheback',
             'djcelery',
-            'djcelery.transport',
             'tests.dummyapp',
             ],
         BROKER_URL = 'django://',
