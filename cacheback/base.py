@@ -148,7 +148,10 @@ class Job(object):
         except Exception, e:
             # Handle exceptions from talking to RabbitMQ - eg connection
             # refused.
+            logger.error("Unable to trigger task asynchronously - failing "
+                         "over to synchronous refresh")
             logger.exception(e)
+            return self.refresh(*args, **kwargs)
 
     def get_constructor_args(self):
         return ()
@@ -210,9 +213,10 @@ class Job(object):
                                 hash(tuple(kwargs.keys())),
                                 hash(tuple(kwargs.values())))
         except TypeError:
-            raise RuntimeError("Unable to generate cache key due to unhashable"
-                               "args or kwargs - you need to implement your own"
-                               "key generation method to avoid this problem")
+            raise RuntimeError(
+                "Unable to generate cache key due to unhashable"
+                "args or kwargs - you need to implement your own"
+                "key generation method to avoid this problem")
 
     def fetch(self, *args, **kwargs):
         """

@@ -1,14 +1,19 @@
 from functools import wraps
+
 from django.utils.decorators import available_attrs
 
 from cacheback.function import FunctionJob
 
+
 def cacheback(lifetime=None, fetch_on_miss=None, job_class=None):
     """
-    Decorate function to cache its return value using the CacheBack job class.
+    Decorate function to cache its return value.
 
     :lifetime: How long to cache items for
-    :fetch_on_miss: Whether to perform a synchronous
+    :fetch_on_miss: Whether to perform a synchronous fetch when no cached
+                    result is found
+    :job_class: The class to use for running the cache refresh job.  Defaults
+                using the FunctionJob.
     """
     if job_class is None:
         job_class = FunctionJob
