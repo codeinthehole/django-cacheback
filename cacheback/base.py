@@ -138,12 +138,17 @@ class Job(object):
         # We trigger the task with the class path to import as well as the
         # (a) args and kwargs for instantiating the class
         # (b) args and kwargs for calling the 'refresh' method
-        tasks.refresh_cache.delay(
-            self.class_path,
-            obj_args=self.get_constructor_args(),
-            obj_kwargs=self.get_constructor_kwargs(),
-            call_args=args,
-            call_kwargs=kwargs)
+        try:
+            tasks.refresh_cache.delay(
+                self.class_path,
+                obj_args=self.get_constructor_args(),
+                obj_kwargs=self.get_constructor_kwargs(),
+                call_args=args,
+                call_kwargs=kwargs)
+        except Exception, e:
+            # Handle exceptions from talking to RabbitMQ - eg connection
+            # refused.
+            logger.exception(e)
 
     def get_constructor_args(self):
         return ()
