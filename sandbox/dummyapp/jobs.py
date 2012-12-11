@@ -1,10 +1,11 @@
-import cacheback
+from cacheback.base import Job
 
 from dummyapp import models
 
 
-class VanillaJob(cacheback.Job):
+class VanillaJob(Job):
     fetch_on_miss = False
+    refresh_timeout = 5
 
     def fetch(self):
         import time
@@ -12,7 +13,8 @@ class VanillaJob(cacheback.Job):
         return models.DummyModel.objects.all()
 
 
-class KeyedJob(cacheback.Job):
+class KeyedJob(Job):
+    lifetime = 5
 
     def key(self, name):
         return name
