@@ -115,10 +115,10 @@ class Job(object):
         # Warning - not all values save correctly to Memcache, some values
         # will fail silently.  It's tricky to test for this behaviour as cached
         # QuerySets aren't "equal" to the original.
-        result = cache.get(key)
-        if not result:
+        __, cached_data = cache.get(key, (None, None))
+        if data is not None and cached_data is None:
             raise RuntimeError(
-                "Unable to save data of type %s to Memcache" % (
+                "Unable to save data of type %s to cache" % (
                     type(data)))
 
     def refresh(self, *args, **kwargs):
