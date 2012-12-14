@@ -40,6 +40,10 @@ class Job(object):
     # Stale results are generally ok, but not no results.
     fetch_on_miss = True
 
+    # --------
+    # MAIN API
+    # --------
+
     def get(self, *raw_args, **raw_kwargs):
         """
         Return the data for this function (using the cache if possible).
@@ -96,6 +100,24 @@ class Job(object):
                          key)
         return data
 
+    def invalidate(self, *raw_args, **raw_kwargs):
+        """
+        Mark a cached item invalid and trigger an asynchronous
+        job to refresh the cache
+        """
+        args = self.prepare_args(*raw_args)
+        kwargs = self.prepare_kwargs(**raw_kwargs)
+        key = self.key(*args, **kwargs)
+        item = cache.get(key)
+        if item is not None:
+            expiry, data = item
+            self.cache_set(key, self.timeout(*args, **kwargs), data)
+            self.async_refresh(*args, **kwargs)
+
+    # --------------
+    # HELPER METHODS
+    # --------------
+
     def prepare_args(self, *args):
         return args
 
@@ -120,20 +142,6 @@ class Job(object):
             raise RuntimeError(
                 "Unable to save data of type %s to cache" % (
                     type(data)))
-
-    def invalidate(self, *raw_args, **raw_kwargs):
-        """
-        Mark the cache as invalid and trigger an asynchronous
-        job to refresh the cache
-        """
-        args = self.prepare_args(*raw_args)
-        kwargs = self.prepare_kwargs(**raw_kwargs)
-        key = self.key(*args, **kwargs)
-        item = cache.get(key)
-        if item is not None:
-            expiry, data = item
-            self.cache_set(key, self.timeout(*args, **kwargs), data)
-            self.async_refresh(*args, **kwargs)
 
     def refresh(self, *args, **kwargs):
         """
