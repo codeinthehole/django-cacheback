@@ -4,10 +4,10 @@ Advanced usage
 Two thresholds for cache invalidation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's possible to employ two threshold times for cache behaviour:
+It's possible to employ three threshold times to control cache behaviour:
 
 1.  A time after which the cached item is considered 'stale'.  When a stale item
-    is returned, a async job is triggered to refresh the item but the stale item
+    is returned, an async job is triggered to refresh the item but the stale item
     is returned.  This is controlled by the ``lifetime`` attribute of the
     ``Job`` class - the default value is 600 seconds (5 minutes).
 
@@ -17,3 +17,7 @@ It's possible to employ two threshold times for cache behaviour:
     default value is 2592000 seconds, which is the maximum ttl that memcached
     supports.
 
+3.  A timeout value for the refresh job.  If the cached item is not refreshed
+    after this time, then another async refresh job will be triggered.  This is
+    controlled by the ``refresh_timeout`` attribute of the ``Job`` class and
+    defaults to 60 seconds.
