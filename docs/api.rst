@@ -2,11 +2,15 @@
 API
 ===
 
-The main class is ``cacheback.base.Job`` which provides several methods intended to
-be overridden and customised:
+The main class is ``cacheback.base.Job``.  The two methods that are intended to be called from client code are:
 
 .. autoclass:: cacheback.base.Job
-    :members: fetch, expiry, should_item_by_fetched_synchronously, empty, key, prepare_args, prepare_kwargs
+    :members: get, invalidate
+
+There are also several methods intended to be overridden and customised:
+
+.. autoclass:: cacheback.base.Job
+    :members: fetch, expiry, should_item_be_fetched_synchronously, empty, key, prepare_args, prepare_kwargs
 
 
 Queryset jobs
