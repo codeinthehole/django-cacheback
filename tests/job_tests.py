@@ -1,5 +1,8 @@
 from django.test import TestCase
+import cacheback.base
+from django.core.cache.backends.dummy import DummyCache
 from django.core.cache import cache
+
 
 from cacheback.base import Job
 
@@ -79,3 +82,18 @@ class TestNonIterableCacheItem(TestCase):
     def test_returns_correct_result(self):
         self.assertIsNone(self.job.get(None))
         self.assertEqual(1, self.job.get(None))
+
+
+class DummyCacheTest(TestCase):
+
+    def setUp(self):
+        self.cache = cache
+        cacheback.base.cache = DummyCache('unique-snowflake', {})
+        self.job = SingleArgJob()
+
+    def tearDown(self):
+        cacheback.base.cache  = self.cache
+    
+    def test_dummy_cache_does_not_raise_error(self):
+        self.assertEqual('ALAN', self.job.get('alan'))
+        self.assertEqual('BARRY', self.job.get('barry'))
