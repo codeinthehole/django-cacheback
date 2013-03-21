@@ -2,6 +2,7 @@ import time
 import logging
 
 from django.core.cache import cache
+from django.core.cache.backends.dummy import DummyCache
 
 from cacheback import tasks
 
@@ -139,7 +140,8 @@ class Job(object):
         # will fail silently.  It's tricky to test for this behaviour as cached
         # QuerySets aren't "equal" to the original.
         __, cached_data = cache.get(key, (None, None))
-        if data is not None and cached_data is None:
+        if data is not None and cached_data is None and \
+            not isinstance(cache, DummyCache):
             raise RuntimeError(
                 "Unable to save data of type %s to cache" % (
                     type(data)))
