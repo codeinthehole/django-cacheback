@@ -1,11 +1,11 @@
-import logging
 import time
 
 from celery.task import task
+from celery.utils.log import get_task_logger
 from django.utils import importlib
 
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 @task()
