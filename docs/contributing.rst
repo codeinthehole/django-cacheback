@@ -34,9 +34,11 @@ development server::
     vagrant ssh
     cd /vagrant/sandbox
     source /var/www/virtual/bin/activate
+    ./manage.py loaddata/fixture.json
     ./manage.py runserver 0.0.0.0:8000
 
-The dummy site will be available at ``localhost:8080``.
+The dummy site will be available at ``localhost:8080``.  There are some sample
+views in ``sandbox/dummyapp/views.py`` that exercise django-cacheback.
 
 Run a Celery worker using::
 

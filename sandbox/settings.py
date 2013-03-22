@@ -173,10 +173,13 @@ import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost/'
 
+# This doesn't seem to work.  If you stop rabbit and attempt to connect, it
+# takes 60 seconds even though this value is correctly passed to the socked.
+BROKER_CONNECTION_TIMEOUT = 5
+
 CACHES = {
     'default': {
-        'BACKEND':
-        'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
     }
 }
