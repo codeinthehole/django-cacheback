@@ -1,7 +1,8 @@
-Django==1.4
-django-celery==3.0.1
+# Sandbox reqs
+python-memcached==1.48
+
+# Testing reqs
 django-nose==1.1
 nose==1.1.2
-python-memcached==1.48
 django-debug-toolbar==0.9.4
 pinocchio==0.3.1
