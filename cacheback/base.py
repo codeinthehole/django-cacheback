@@ -2,6 +2,7 @@ import time
 import logging
 
 from django.core.cache import cache
+from django.conf import settings
 
 from cacheback import tasks
 
@@ -135,14 +136,15 @@ class Job(object):
         """
         cache.set(key, (expiry, data), self.cache_ttl)
 
-        # Warning - not all values save correctly to Memcache, some values
-        # will fail silently.  It's tricky to test for this behaviour as cached
-        # QuerySets aren't "equal" to the original.
-        __, cached_data = cache.get(key, (None, None))
-        if data is not None and cached_data is None:
-            raise RuntimeError(
-                "Unable to save data of type %s to cache" % (
-                    type(data)))
+        if getattr(settings, 'CACHEBACK_VERIFY_CACHE_WRITE', True):
+            # We verify that the item was cached correctly.  This is to avoid a
+            # Memcache problem where some values aren't cached correctly
+            # without warning.
+            __, cached_data = cache.get(key, (None, None))
+            if data is not None and cached_data is None:
+                raise RuntimeError(
+                    "Unable to save data of type %s to cache" % (
+                        type(data)))
 
     def refresh(self, *args, **kwargs):
         """
