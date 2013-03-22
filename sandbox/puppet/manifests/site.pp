@@ -4,6 +4,7 @@ Exec {
 }
 
 node precise64 {
+    package {"git-core": ensure => installed }
 	include userconfig
 	class {"memcached": max_memory => 64 }
 	# Rabbitmq - see https://github.com/puppetlabs/puppetlabs-rabbitmq
