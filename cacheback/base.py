@@ -94,11 +94,11 @@ class Job(object):
             # We replace the item in the cache with a 'timeout' expiry - this
             # prevents cache hammering but guards against a 'limbo' situation
             # where the refresh task fails for some reason.
-            self.cache_set(key, self.timeout(*args, **kwargs), data)
+            timeout = self.timeout(*args, **kwargs)
+            self.cache_set(key, timeout, data)
             self.async_refresh(*args, **kwargs)
         else:
-            logger.debug(("Job %s with key '%s' - cache HIT"), self.class_path,
-                         key)
+            logger.debug("Job %s with key '%s' - cache HIT", self.class_path, key)
         return data
 
     def invalidate(self, *raw_args, **raw_kwargs):
@@ -170,11 +170,19 @@ class Job(object):
                 call_kwargs=kwargs)
         except Exception, e:
             # Handle exceptions from talking to RabbitMQ - eg connection
-            # refused.
+            # refused.  When this happens, we try to run the task
+            # synchronously.
             logger.error("Unable to trigger task asynchronously - failing "
                          "over to synchronous refresh")
             logger.exception(e)
-            return self.refresh(*args, **kwargs)
+            try:
+                return self.refresh(*args, **kwargs)
+            except Exception, e:
+                # Something went wrong while running the task
+                logger.error("Unable to refresh data synchronously: %s", e)
+                logger.exception(e)
+            else:
+                logger.debug("Failover synchronous refresh completed successfully")
 
     def get_constructor_args(self):
         return ()
