@@ -15,6 +15,7 @@ class VanillaJob(Job):
 
 class KeyedJob(Job):
     lifetime = 5
+    fetch_on_stale_threshold = 10
 
     def key(self, name):
         return name

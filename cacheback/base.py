@@ -38,9 +38,15 @@ class Job(object):
     #  fetch_on_miss=True.
     cache_ttl = MEMCACHE_MAX_EXPIRATION
 
-    # Default behaviour is to do a synchronous fetch when the cache is empty.
+    #: Whether to perform a synchronous refresh when a result is missing from
+    # the cache.  Default behaviour is to do a synchronous fetch when the cache is empty.
     # Stale results are generally ok, but not no results.
     fetch_on_miss = True
+
+    #: Whether to perform a synchronous refresh when a result is in the cache
+    # but stale from. Default behaviour is never to do a synchronous fetch but
+    # there will be times when an item is _too_ stale to be returned.
+    fetch_on_stale_threshold = None
 
     # --------
     # MAIN API
@@ -53,10 +59,11 @@ class Job(object):
         This method is not intended to be overidden
         """
         # We pass args and kwargs through a filter to allow them to be
-        # converted into values that can be picked.
+        # converted into values that can be pickled.
         args = self.prepare_args(*raw_args)
         kwargs = self.prepare_kwargs(**raw_kwargs)
 
+        # Build the cache key and attempt to fetch the cached item
         key = self.key(*args, **kwargs)
         item = cache.get(key)
 
@@ -65,7 +72,7 @@ class Job(object):
             # a) fetch the data immediately, blocking execution until
             #    the fetch has finished, or
             # b) trigger an async refresh and return an empty result
-            if self.should_item_be_fetched_synchronously(*args, **kwargs):
+            if self.should_missing_item_be_fetched_synchronously(*args, **kwargs):
                 logger.debug(("Job %s with key '%s' - cache MISS - running "
                               "synchronous refresh"),
                              self.class_path, key)
@@ -84,20 +91,31 @@ class Job(object):
                 return empty
 
         expiry, data = item
-        if expiry < time.time():
-            # Cache HIT but STALE expiry - we trigger a refresh but allow the
-            # stale result to be returned this time.  This is normally
-            # acceptable.
-            logger.debug(
-                ("Job %s with key '%s' - STALE cache hit - triggering "
-                 "async refresh and returning stale result"),
-                self.class_path, key)
-            # We replace the item in the cache with a 'timeout' expiry - this
-            # prevents cache hammering but guards against a 'limbo' situation
-            # where the refresh task fails for some reason.
-            timeout = self.timeout(*args, **kwargs)
-            self.cache_set(key, timeout, data)
-            self.async_refresh(*args, **kwargs)
+        delta = time.time() - expiry
+        if delta > 0:
+            # Cache HIT but STALE expiry - we can either:
+            # a) fetch the data immediately, blocking execution until
+            #    the fetch has finished, or
+            # b) trigger a refresh but allow the stale result to be
+            #    returned this time.  This is normally acceptable.
+            if self.should_stale_item_be_fetched_synchronously(
+                    delta, *args, **kwargs):
+                logger.debug(
+                    ("Job %s with key '%s' - STALE cache hit - running "
+                    "synchronous refresh"),
+                    self.class_path, key)
+                return self.refresh(*args, **kwargs)
+            else:
+                logger.debug(
+                    ("Job %s with key '%s' - STALE cache hit - triggering "
+                    "async refresh and returning stale result"),
+                    self.class_path, key)
+                # We replace the item in the cache with a 'timeout' expiry - this
+                # prevents cache hammering but guards against a 'limbo' situation
+                # where the refresh task fails for some reason.
+                timeout = self.timeout(*args, **kwargs)
+                self.cache_set(key, timeout, data)
+                self.async_refresh(*args, **kwargs)
         else:
             logger.debug("Job %s with key '%s' - cache HIT", self.class_path, key)
         return data
@@ -221,11 +239,31 @@ class Job(object):
         """
         return time.time() + self.refresh_timeout
 
-    def should_item_be_fetched_synchronously(self, *args, **kwargs):
+    def should_missing_item_be_fetched_synchronously(self, *args, **kwargs):
         """
-        Return whether to refresh an item synchronously
+        Return whether to refresh an item synchronously when it is missing from
+        the cache
         """
         return self.fetch_on_miss
+
+    def should_item_be_fetched_synchronously(self, *args, **kwargs):
+        import warnings
+        warnings.warn(
+            "The method 'should_item_be_fetched_synchronously' is deprecated "
+            "and will be removed in 0.5.  Use "
+            "'should_missing_item_be_fetched_synchronously' instead.",
+            DeprecationWarning)
+        return self.should_missing_item_be_fetched_synchronously(
+            *args, **kwargs)
+
+    def should_stale_item_be_fetched_synchronously(self, delta, *args, **kwargs):
+        """
+        Return whether to refresh an item synchronously when it is found in the
+        cache but stale
+        """
+        if self.fetch_on_stale_threshold is None:
+            return False
+        return delta > (self.fetch_on_stale_threshold - self.lifetime)
 
     def key(self, *args, **kwargs):
         """
