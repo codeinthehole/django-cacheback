@@ -134,6 +134,17 @@ class Job(object):
             self.cache_set(key, self.timeout(*args, **kwargs), data)
             self.async_refresh(*args, **kwargs)
 
+    def clear(self, *raw_args, **raw_kwargs):
+        """
+        Remove an item from the cache
+        """
+        args = self.prepare_args(*raw_args)
+        kwargs = self.prepare_kwargs(**raw_kwargs)
+        key = self.key(*args, **kwargs)
+        item = cache.get(key)
+        if item is not None:
+            cache.delete(key)
+
     # --------------
     # HELPER METHODS
     # --------------

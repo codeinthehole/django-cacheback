@@ -71,7 +71,7 @@ shortcomings of this approach are:
 
 * This in turn exposes exposes the view to a '`cache stampede`_' where
   multiple expensive reads run simultaneously when the cached item expires.
-  Under heavy load, this can bring your site down.
+  Under heavy load, this can bring your site down and make you sad.
 
 .. _`cache stampede`: http://en.wikipedia.org/wiki/Cache_stampede
 

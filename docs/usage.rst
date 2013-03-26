@@ -103,3 +103,19 @@ or by overriding methods::
 
 In the above toy example, the cache behaviour will be different for usernames
 starting with 'a'.
+
+Invalidation
+~~~~~~~~~~~~
+
+If you want to programmatically invalidate a cached item, use the ``invalidate``
+method on a job instance::
+
+    job = UserTweets()
+    job.invalidate(username)
+
+This will trigger a new asynchronous refresh of the item.
+
+You can also simply remove an item from the cache so that the next request will
+trigger the refresh::
+
+    job.clear(username)

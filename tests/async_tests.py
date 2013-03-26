@@ -8,7 +8,6 @@ import mock
 from cacheback.base import Job
 
 
-
 class StaleSyncJob(Job):
     # Cache items for 5 seconds.
     # -> trigger an async refresh if item is 5 < x < 10 seconds old
