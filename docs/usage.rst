@@ -118,4 +118,4 @@ This will trigger a new asynchronous refresh of the item.
 You can also simply remove an item from the cache so that the next request will
 trigger the refresh::
 
-    job.clear(username)
+    job.delete(username)

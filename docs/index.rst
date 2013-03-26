@@ -187,6 +187,7 @@ Contents
    installation
    usage
    api
+   advanced
    contributing
 
 

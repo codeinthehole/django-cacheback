@@ -25,27 +25,27 @@ class Job(object):
     # for refreshing this item.
 
     #: Default cache lifetime is 5 minutes.  After this time, the result will
-    #  be considered stale and requests will trigger a job to refresh it.
+    #: be considered stale and requests will trigger a job to refresh it.
     lifetime = 600
 
     #: Timeout period during which no new Celery tasks will be created for a
-    #  single cache item.  This time should cover the normal time required to
-    #  refresh the cache.
+    #: single cache item.  This time should cover the normal time required to
+    #: refresh the cache.
     refresh_timeout = 60
 
     #: Time to store items in the cache.  After this time, we will get a cache
-    #  miss which can lead to synchronous refreshes if you have
-    #  fetch_on_miss=True.
+    #: miss which can lead to synchronous refreshes if you have
+    #: fetch_on_miss=True.
     cache_ttl = MEMCACHE_MAX_EXPIRATION
 
     #: Whether to perform a synchronous refresh when a result is missing from
-    # the cache.  Default behaviour is to do a synchronous fetch when the cache is empty.
-    # Stale results are generally ok, but not no results.
+    #: the cache.  Default behaviour is to do a synchronous fetch when the cache is empty.
+    #: Stale results are generally ok, but not no results.
     fetch_on_miss = True
 
     #: Whether to perform a synchronous refresh when a result is in the cache
-    # but stale from. Default behaviour is never to do a synchronous fetch but
-    # there will be times when an item is _too_ stale to be returned.
+    #: but stale from. Default behaviour is never to do a synchronous fetch but
+    #: there will be times when an item is _too_ stale to be returned.
     fetch_on_stale_threshold = None
 
     # --------
@@ -134,7 +134,7 @@ class Job(object):
             self.cache_set(key, self.timeout(*args, **kwargs), data)
             self.async_refresh(*args, **kwargs)
 
-    def clear(self, *raw_args, **raw_kwargs):
+    def delete(self, *raw_args, **raw_kwargs):
         """
         Remove an item from the cache
         """
