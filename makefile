@@ -10,5 +10,5 @@ puppet:
 	git clone git://github.com/codeinthehole/puppet-userconfig.git sandbox/puppet/modules/userconfig
 
 release:
-	python setup.up sdist upload
+	python setup.py sdist upload
 	git push --tags
