@@ -27,6 +27,8 @@ def cacheback(lifetime=None, fetch_on_miss=None, job_class=None):
         # Assign reference to unwrapped function so that we can access it
         # later without descending into infinite regress.
         __wrapper.fn = fn
+        # Assign reference to job so we can use the full Job API
+        __wrapper.job = job
         return __wrapper
 
     return _wrapper
