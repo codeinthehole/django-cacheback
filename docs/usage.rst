@@ -59,7 +59,7 @@ responsible for fetching the data to be cached::
 Client code only needs to be aware of the ``get`` method which returns the
 cached data.  For example::
 
-    from djang.shortcuts import render
+    from django.shortcuts import render
 
     def tweets(request, username):
         return render(request,
