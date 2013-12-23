@@ -8,11 +8,13 @@ class FunctionJob(Job):
     Job for executing a function and caching the result
     """
 
-    def __init__(self, lifetime=None, fetch_on_miss=None):
+    def __init__(self, lifetime=None, fetch_on_miss=None, task_options=None):
         if lifetime is not None:
             self.lifetime = int(lifetime)
         if fetch_on_miss is not None:
             self.fetch_on_miss = fetch_on_miss
+        if task_options is not None:
+            self.task_options = task_options
 
     def prepare_args(self, fn, *args):
         # Convert function into "module:name" form so that is can be pickled and

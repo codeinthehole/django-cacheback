@@ -48,6 +48,9 @@ class Job(object):
     #: there will be times when an item is _too_ stale to be returned.
     fetch_on_stale_threshold = None
 
+    #: Overrides options for `refresh_cache.apply_async` (e.g. `queue`).
+    task_options = {}
+
     # --------
     # MAIN API
     # --------
@@ -193,12 +196,16 @@ class Job(object):
         # (a) args and kwargs for instantiating the class
         # (b) args and kwargs for calling the 'refresh' method
         try:
-            tasks.refresh_cache.delay(
-                self.class_path,
-                obj_args=self.get_constructor_args(),
-                obj_kwargs=self.get_constructor_kwargs(),
-                call_args=args,
-                call_kwargs=kwargs)
+            tasks.refresh_cache.apply_async(
+                kwargs=dict(
+                    klass_str=self.class_path,
+                    obj_args=self.get_constructor_args(),
+                    obj_kwargs=self.get_constructor_kwargs(),
+                    call_args=args,
+                    call_kwargs=kwargs
+                ),
+                **self.task_options
+            )
         except Exception, e:
             # Handle exceptions from talking to RabbitMQ - eg connection
             # refused.  When this happens, we try to run the task
