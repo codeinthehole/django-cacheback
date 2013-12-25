@@ -2,6 +2,15 @@
 Changelog
 =========
 
+0.6
+~~~
+* Celery task arguments can now be passed (`#20`_).
+* Include reference to job instance on decorator function (`#17`_).  This allows
+  caches to be invalidated using the decorator function instance.
+
+.. _`#17`: https://github.com/codeinthehole/django-cacheback/pull/17
+.. _`#20`: https://github.com/codeinthehole/django-cacheback/pull/20
+
 0.5
 ~~~
 * Added hook for performing a synchronous refresh of stale items
@@ -17,6 +26,9 @@ Changelog
 * Fixed nasty bug where caching could find it's way into a limbo state (#5)
 * Remove bug where it was assumed that cached items would be iterable (#4)
 * Added handling of uncacheable types
+
+.. _`#5`: https://github.com/codeinthehole/django-cacheback/pull/5
+.. _`#4`: https://github.com/codeinthehole/django-cacheback/pull/4
 
 0.2
 ~~~
