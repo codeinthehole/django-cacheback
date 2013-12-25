@@ -2,3 +2,4 @@
 sandbox/puppet/modules
 docs/_build
 dist/*
+.coverage
