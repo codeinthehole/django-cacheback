@@ -294,11 +294,12 @@ class Job(object):
             return self.class_path
         try:
             if args and not kwargs:
-                return hash(args)
+                return "%s:%s" % (self.class_path, hash(args))
             # The line might break if your passed values are un-hashable.  If
             # it does, you need to override this method and implement your own
             # key algorithm.
-            return "%s:%s:%s" % (hash(args),
+            return "%s:%s:%s:%s" % (self.class_path,
+                                hash(args),
                                 hash(tuple(kwargs.keys())),
                                 hash(tuple(kwargs.values())))
         except TypeError:
