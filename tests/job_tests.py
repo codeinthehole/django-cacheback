@@ -51,15 +51,23 @@ class SingleArgJob(Job):
         return name.upper()
 
 
+class AnotherSingleArgJob(Job):
+
+    def fetch(self, name):
+        return '%s!' % name.upper()
+
+
 class TestSingleArgJob(TestCase):
 
     def setUp(self):
         self.job = SingleArgJob()
+        self.another_job = AnotherSingleArgJob()
 
     def tearDown(self):
         cache.clear()
 
     def test_returns_correct_result(self):
+        self.assertEqual('ALAN!', self.another_job.get('alan'))
         self.assertEqual('ALAN', self.job.get('alan'))
         self.assertEqual('BARRY', self.job.get('barry'))
 
