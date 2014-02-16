@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.7
+~~~
+* Include the class name and module path in the cache key by defauly (`#21`_)
+
+.. _`#21`: https://github.com/codeinthehole/django-cacheback/pull/21
+
 0.6
 ~~~
 * Celery task arguments can now be passed (`#20`_).
