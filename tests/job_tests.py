@@ -61,15 +61,18 @@ class TestSingleArgJob(TestCase):
 
     def setUp(self):
         self.job = SingleArgJob()
-        self.another_job = AnotherSingleArgJob()
 
     def tearDown(self):
         cache.clear()
 
     def test_returns_correct_result(self):
-        self.assertEqual('ALAN!', self.another_job.get('alan'))
         self.assertEqual('ALAN', self.job.get('alan'))
         self.assertEqual('BARRY', self.job.get('barry'))
+
+    def test_jobs_with_duplicate_args_dont_clash_on_cache_key(self):
+        another_job = AnotherSingleArgJob()
+        self.assertEqual('ALAN', self.job.get('alan'))
+        self.assertEqual('ALAN!', another_job.get('alan'))
 
 
 class IntegerJob(Job):

@@ -299,9 +299,9 @@ class Job(object):
             # it does, you need to override this method and implement your own
             # key algorithm.
             return "%s:%s:%s:%s" % (self.class_path,
-                                hash(args),
-                                hash(tuple(kwargs.keys())),
-                                hash(tuple(kwargs.values())))
+                                    hash(args),
+                                    hash(tuple(kwargs.keys())),
+                                    hash(tuple(kwargs.values())))
         except TypeError:
             raise RuntimeError(
                 "Unable to generate cache key due to unhashable"
