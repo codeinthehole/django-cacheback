@@ -98,7 +98,7 @@ or by overriding methods::
                 return now + 60*20
             return now + 60*10
 
-        def should_item_by_fetched_synchronously(self, username):
+        def should_item_be_fetched_synchronously(self, username):
             return username.startswith(a)
 
 In the above toy example, the cache behaviour will be different for usernames
