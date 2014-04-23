@@ -1,0 +1,5 @@
+django-nose==1.2
+nose==1.1.2
+django-debug-toolbar==0.9.4
+pinocchio==0.3.1
+mock==1.0.1

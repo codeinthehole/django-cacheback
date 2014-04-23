@@ -1,6 +1,11 @@
 develop:
 	python setup.py develop
-	pip install -r requirements.txt
+	pip install -r sandbox_requirements.txt
+	pip install -r test_requirements.txt
+
+test:
+	python setup.py develop
+	pip install -r test_requirements.txt
 
 puppet:
 	# Install puppet modules required to set-up sandbox server

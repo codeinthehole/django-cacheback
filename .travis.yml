@@ -4,6 +4,6 @@ python:
   - 3.3
 install:
 script:
-  - make develop
+  - make test
   - ./runtests.py
 
