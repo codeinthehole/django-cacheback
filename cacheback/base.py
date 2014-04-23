@@ -206,7 +206,7 @@ class Job(object):
                 ),
                 **self.task_options
             )
-        except Exception, e:
+        except Exception as e:
             # Handle exceptions from talking to RabbitMQ - eg connection
             # refused.  When this happens, we try to run the task
             # synchronously.
@@ -215,7 +215,7 @@ class Job(object):
             logger.exception(e)
             try:
                 return self.refresh(*args, **kwargs)
-            except Exception, e:
+            except Exception as e:
                 # Something went wrong while running the task
                 logger.error("Unable to refresh data synchronously: %s", e)
                 logger.exception(e)
