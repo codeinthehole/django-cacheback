@@ -15,7 +15,7 @@ setup(name='django-cacheback',
       author_email="david.winterbottom@gmail.com",
       description=("Caching library for Django that uses Celery "
                    "to refresh cache items asynchronously"),
-      long_description=file(os.path.join(PACKAGE_DIR, 'README.rst')).read(),
+      long_description=open(os.path.join(PACKAGE_DIR, 'README.rst')).read(),
       license='MIT',
       packages=find_packages(exclude=["sandbox*", "tests*"]),
       include_package_data=True,
