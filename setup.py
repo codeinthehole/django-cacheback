@@ -7,6 +7,12 @@ from cacheback import __version__
 PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
 os.chdir(PACKAGE_DIR)
 
+# To maintain the compatibility with Python3
+try:
+   file
+except NameError as e:
+   file = open
+
 
 setup(name='django-cacheback',
       version=__version__,
