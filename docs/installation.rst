@@ -21,7 +21,7 @@ will also need to complete the `djcelery installation process`_ by adding ``djce
 your ``INSTALLED_APPS`` and including::
 
     import djcelery
-    dlcelery.setup_loader()
+    djcelery.setup_loader()
 
 .. _`djcelery installation process`: http://pypi.python.org/pypi/django-celery/3.0.9
 
