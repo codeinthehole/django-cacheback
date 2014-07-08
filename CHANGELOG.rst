@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.8
+~~~
+* Add support for Python 3 (`#24`_)
+
+.. _`#24`: https://github.com/codeinthehole/django-cacheback/pull/24
+
 0.7
 ~~~
 * Include the class name and module path in the cache key by defauly (`#21`_)

@@ -10,7 +10,7 @@ What does this library do?
 It's an extensible caching library that refreshes stale cache items
 asynchronously using a Celery_ task.  The key idea being that it's
 better to serve a stale item (and populate the cache asynchronously) than block
-the user in order to populate the cache synchronously.
+the response process in order to populate the cache synchronously.
 
 .. _Celery: http://celeryproject.org/
 
@@ -26,13 +26,16 @@ Yup - `over on readthedocs.org`_.
 
 .. _`over on readthedocs.org`: http://django-cacheback.readthedocs.org/en/latest/
 
+Do you support Python 3?
+------------------------
+Pythons 2.7, 3.3 and 3.4 are supported.
+
 Do you have tests?
 ------------------
 You betcha!  
 
 .. image:: https://secure.travis-ci.org/codeinthehole/django-cacheback.png
     :target: https://travis-ci.org/#!/codeinthehole/django-cacheback
-
 
 Can I use this in my project?
 -----------------------------
