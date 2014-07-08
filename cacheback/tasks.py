@@ -39,7 +39,7 @@ def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
     try:
         klass(*obj_args, **obj_kwargs).refresh(
             *call_args, **call_kwargs)
-    except Exception, e:
+    except Exception as e:
         logger.error("Error running job: '%s'", e)
         logger.exception(e)
     else:
@@ -54,7 +54,7 @@ def _get_job_class(klass_str):
     mod_name, klass_name = klass_str.rsplit('.', 1)
     try:
         mod = importlib.import_module(mod_name)
-    except ImportError, e:
+    except ImportError as e:
         logger.error("Error importing job module %s: '%s'", mod_name, e)
         return
     try:

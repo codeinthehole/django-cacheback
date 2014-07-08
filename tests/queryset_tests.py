@@ -29,7 +29,7 @@ class TestManualQuerySetJob(TestCase):
 
     def test_makes_only_one_database_query(self):
         with self.assertNumQueries(1):
-            for _ in xrange(10):
+            for _ in range(10):
                 self.job.get('Alan')
 
 

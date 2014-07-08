@@ -1,0 +1,2 @@
+django-debug-toolbar==0.9.4
+python-memcached==1.53
