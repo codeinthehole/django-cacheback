@@ -1,10 +1,12 @@
 language: python
+
 python:
   - 2.7
   - 3.3
   - 3.4
-install:
-script:
-  - make test
-  - ./runtests.py
 
+install:
+  - make test
+
+script:
+  - ./runtests.py
