@@ -28,7 +28,7 @@ Yup - `over on readthedocs.org`_.
 
 Do you support Python 3?
 ------------------------
-Pythons 2.7, 3.3 and 3.4 are supported.
+Pythons 2.7, 3.3, 3.4 and PyPy are supported.
 
 Do you have tests?
 ------------------
