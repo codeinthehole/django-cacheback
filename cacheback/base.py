@@ -6,7 +6,6 @@ from django.conf import settings
 
 from cacheback import tasks
 
-logging.basicConfig()
 logger = logging.getLogger('cacheback')
 
 MEMCACHE_MAX_EXPIRATION = 2592000
