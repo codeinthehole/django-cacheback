@@ -210,14 +210,13 @@ class Job(object):
             # refused.  When this happens, we try to run the task
             # synchronously.
             logger.error("Unable to trigger task asynchronously - failing "
-                         "over to synchronous refresh")
-            logger.exception(e)
+                         "over to synchronous refresh", exc_info=True)
             try:
                 return self.refresh(*args, **kwargs)
             except Exception as e:
                 # Something went wrong while running the task
-                logger.error("Unable to refresh data synchronously: %s", e)
-                logger.exception(e)
+                logger.error("Unable to refresh data synchronously: %s", e,
+                             exc_info=True)
             else:
                 logger.debug("Failover synchronous refresh completed successfully")
 
