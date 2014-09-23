@@ -96,7 +96,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -123,7 +122,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'dummyapp',
     'cacheback',
-    'debug_toolbar',
     'djcelery',
 )
 
@@ -171,11 +169,12 @@ LOGGING = {
 
 import djcelery
 djcelery.setup_loader()
+
 BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost/'
 
 # This doesn't seem to work.  If you stop rabbit and attempt to connect, it
-# takes 60 seconds even though this value is correctly passed to the socked.
-BROKER_CONNECTION_TIMEOUT = 5
+# takes 60 seconds even though this value is correctly passed to the socket
+BROKER_CONNECTION_TIMEOUT = 2
 
 CACHES = {
     'default': {
