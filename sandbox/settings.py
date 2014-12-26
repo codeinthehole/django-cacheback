@@ -10,7 +10,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/vagrant/sandbox/db.sqlite3',                      # Or path to database file if using sqlite3.
+        'NAME': 'db.sqlite3',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -170,7 +170,8 @@ LOGGING = {
 import djcelery
 djcelery.setup_loader()
 
-BROKER_URL = 'amqp://cb_rabbit_user:somepasswordhere@localhost/'
+BROKER_URL = 'amqp://guest:guest@localhost/'
+CELERY_RESULT_BACKEND = 'amqp://'
 
 # This doesn't seem to work.  If you stop rabbit and attempt to connect, it
 # takes 60 seconds even though this value is correctly passed to the socket
