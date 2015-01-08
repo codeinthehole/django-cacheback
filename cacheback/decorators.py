@@ -6,7 +6,7 @@ from cacheback.function import FunctionJob
 
 
 def cacheback(lifetime=None, fetch_on_miss=None, job_class=None,
-              task_options=None):
+              task_options=None, **job_class_kwargs):
     """
     Decorate function to cache its return value.
 
@@ -15,11 +15,13 @@ def cacheback(lifetime=None, fetch_on_miss=None, job_class=None,
                     result is found
     :job_class: The class to use for running the cache refresh job.  Defaults
                 using the FunctionJob.
+    :job_class_kwargs: Any extra kwargs to pass to job_class constructor.
+                       Useful with custom job_class implementations.
     """
     if job_class is None:
         job_class = FunctionJob
     job = job_class(lifetime=lifetime, fetch_on_miss=fetch_on_miss,
-                    task_options=task_options)
+                    task_options=task_options, **job_class_kwargs)
 
     def _wrapper(fn):
         # using available_attrs to work around http://bugs.python.org/issue3445
