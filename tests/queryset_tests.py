@@ -77,11 +77,3 @@ class TestEdgeCases(TestCase):
 
     def tearDown(self):
         cache.clear()
-
-    def test_unhashable_arg_raises_exception(self):
-        with self.assertRaises(RuntimeError):
-            self.job.get({})
-
-    def test_unhashable_kwarg_raises_exception(self):
-        with self.assertRaises(RuntimeError):
-            self.job.get(name={})

@@ -1,5 +1,6 @@
 import time
 import logging
+import hashlib
 
 from django.core.cache import cache
 from django.conf import settings
@@ -292,19 +293,27 @@ class Job(object):
             return self.class_path
         try:
             if args and not kwargs:
-                return "%s:%s" % (self.class_path, hash(args))
+                return "%s:%s" % (self.class_path, self.hash(args))
             # The line might break if your passed values are un-hashable.  If
             # it does, you need to override this method and implement your own
             # key algorithm.
             return "%s:%s:%s:%s" % (self.class_path,
-                                    hash(args),
-                                    hash(tuple(kwargs.keys())),
-                                    hash(tuple(kwargs.values())))
+                                    self.hash(args),
+                                    self.hash(tuple(kwargs.keys())),
+                                    self.hash(tuple(kwargs.values())))
         except TypeError:
             raise RuntimeError(
                 "Unable to generate cache key due to unhashable"
                 "args or kwargs - you need to implement your own"
                 "key generation method to avoid this problem")
+
+    def hash(self, value):
+        """
+        Generate a hash of the given tuple.
+
+        This is for use in a cache key.
+        """
+        return hashlib.md5(unicode(value)).hexdigest()
 
     def fetch(self, *args, **kwargs):
         """
