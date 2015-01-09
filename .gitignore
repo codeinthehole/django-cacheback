@@ -4,3 +4,4 @@ docs/_build
 dist/*
 .coverage
 TODO
+.tox
