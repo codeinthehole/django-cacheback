@@ -4,12 +4,27 @@ import hashlib
 
 from django.core.cache import cache
 from django.conf import settings
+import six
 
 from cacheback import tasks
 
 logger = logging.getLogger('cacheback')
 
 MEMCACHE_MAX_EXPIRATION = 2592000
+
+
+def to_bytestring(value):
+    """
+    Encode a string as a UTF8 bytestring.  This function could be passed a
+    bytestring or unicode string so must distinguish between the two.
+    """
+    if isinstance(value, six.text_type):
+        return string.encode('utf8')
+    if isinstance(value, six.binary_type):
+        return value
+    if six.PY2:
+        return str(value)
+    return bytes(str(value), 'utf8')
 
 
 class Job(object):
@@ -313,7 +328,7 @@ class Job(object):
 
         This is for use in a cache key.
         """
-        return hashlib.md5(unicode(value)).hexdigest()
+        return hashlib.md5(to_bytestring(value)).hexdigest()
 
     def fetch(self, *args, **kwargs):
         """

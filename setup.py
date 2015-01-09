@@ -23,6 +23,7 @@ setup(name='django-cacheback',
           'django>=1.3,<1.7',
           'django-celery>=3.0',
           'celery<3.2',
+          'six',
           ],
       # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=['Environment :: Web Environment',
