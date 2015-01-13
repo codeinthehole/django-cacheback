@@ -1,7 +1,7 @@
 import time
 import logging
 
-from django.core.cache import caches, DEFAULT_CACHE_ALIAS
+from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.conf import settings
 
 from cacheback import tasks
@@ -52,7 +52,7 @@ class Job(object):
 
     def __init__(self):
         self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
-        self.cache = caches[self.cache_alias]
+        self.cache = get_cache(self.cache_alias)
 
     # --------
     # MAIN API
