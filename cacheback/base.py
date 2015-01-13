@@ -1,7 +1,7 @@
 import time
 import logging
 
-from django.core.cache import cache
+from django.core.cache import caches, DEFAULT_CACHE_ALIAS
 from django.conf import settings
 
 from cacheback import tasks
@@ -50,6 +50,10 @@ class Job(object):
     #: Overrides options for `refresh_cache.apply_async` (e.g. `queue`).
     task_options = {}
 
+    def __init__(self):
+        self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
+        self.cache = caches[self.cache_alias]
+
     # --------
     # MAIN API
     # --------
@@ -67,7 +71,7 @@ class Job(object):
 
         # Build the cache key and attempt to fetch the cached item
         key = self.key(*args, **kwargs)
-        item = cache.get(key)
+        item = self.cache.get(key)
 
         if item is None:
             # Cache MISS - we can either:
@@ -130,7 +134,7 @@ class Job(object):
         args = self.prepare_args(*raw_args)
         kwargs = self.prepare_kwargs(**raw_kwargs)
         key = self.key(*args, **kwargs)
-        item = cache.get(key)
+        item = self.cache.get(key)
         if item is not None:
             expiry, data = item
             self.cache_set(key, self.timeout(*args, **kwargs), data)
@@ -143,9 +147,9 @@ class Job(object):
         args = self.prepare_args(*raw_args)
         kwargs = self.prepare_kwargs(**raw_kwargs)
         key = self.key(*args, **kwargs)
-        item = cache.get(key)
+        item = self.cache.get(key)
         if item is not None:
-            cache.delete(key)
+            self.cache.delete(key)
 
     # --------------
     # HELPER METHODS
@@ -165,13 +169,13 @@ class Job(object):
         :expiry: The expiry timestamp after which the result is stale
         :data: The data to cache
         """
-        cache.set(key, (expiry, data), self.cache_ttl)
+        self.cache.set(key, (expiry, data), self.cache_ttl)
 
         if getattr(settings, 'CACHEBACK_VERIFY_CACHE_WRITE', True):
             # We verify that the item was cached correctly.  This is to avoid a
             # Memcache problem where some values aren't cached correctly
             # without warning.
-            __, cached_data = cache.get(key, (None, None))
+            __, cached_data = self.cache.get(key, (None, None))
             if data is not None and cached_data is None:
                 raise RuntimeError(
                     "Unable to save data of type %s to cache" % (
