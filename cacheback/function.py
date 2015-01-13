@@ -9,6 +9,7 @@ class FunctionJob(Job):
     """
 
     def __init__(self, lifetime=None, fetch_on_miss=None, task_options=None):
+        super(FunctionJob, self).__init__()
         if lifetime is not None:
             self.lifetime = int(lifetime)
         if fetch_on_miss is not None:

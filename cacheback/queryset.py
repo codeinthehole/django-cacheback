@@ -10,6 +10,7 @@ class QuerySetJob(Job):
         """
         :model: The model class to use
         """
+        super(QuerySetJob, self).__init__()
         self.model = model
         if lifetime is not None:
             self.lifetime = lifetime
