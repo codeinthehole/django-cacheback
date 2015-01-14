@@ -4,8 +4,8 @@ Installation
 
 You need to do four things:
 
-1. Install Cacheback
-~~~~~~~~~~~~~~~~~~~~
+1. Install django-cacheback
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Run::
 

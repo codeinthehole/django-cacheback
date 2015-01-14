@@ -76,7 +76,9 @@ shortcomings of this approach are:
 .. _`cache stampede`: http://en.wikipedia.org/wiki/Cache_stampede
 
 Now, consider an alternative implementation that uses a Celery task to repopulate the
-cache asynchronously instead of during the request/response cycle::
+cache asynchronously instead of during the request/response cycle:
+
+.. sourcecode:: python
 
     import datetime
     from django.shortcuts import render
@@ -187,6 +189,7 @@ Contents
    installation
    usage
    api
+   settings
    advanced
    contributing
 

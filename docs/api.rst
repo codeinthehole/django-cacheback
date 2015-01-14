@@ -30,7 +30,9 @@ subclassing but rather take the model class as a ``__init__`` parameter.
 .. autoclass:: cacheback.queryset.QuerySetGetJob
     :members:
 
-Example usage::
+Example usage:
+
+.. sourcecode:: python
  
     from django.contrib.auth import models
     from django.shortcuts import render
