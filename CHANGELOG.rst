@@ -2,6 +2,16 @@
 Changelog
 =========
 
+0.9
+~~~
+* Add support for other caches (`#32`_) 
+* Fix inconsistent hasing issue in Python 3.x (`#28`_)
+* Allow ``job_class_kwargs`` to be passed to ``cacheback`` decorator (`#31`_)
+
+.. _`#32`: https://github.com/codeinthehole/django-cacheback/pull/32
+.. _`#28`: https://github.com/codeinthehole/django-cacheback/pull/28
+.. _`#31`: https://github.com/codeinthehole/django-cacheback/pull/31
+
 0.8
 ~~~
 * Add support for Python 3 (`#24`_)
