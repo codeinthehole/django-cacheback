@@ -143,6 +143,7 @@ class Job(object):
                 timeout = self.timeout(*args, **kwargs)
                 self.cache_set(key, timeout, data)
                 self.async_refresh(*args, **kwargs)
+                fetched = data
                 return self.got_stale(fetched, True, *raw_args, **raw_kwargs)
         else:
             logger.debug("Job %s with key '%s' - cache HIT", self.class_path, key)
