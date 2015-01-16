@@ -98,7 +98,9 @@ class Job(object):
                 logger.debug(("Job %s with key '%s' - cache MISS - running "
                               "synchronous refresh"),
                              self.class_path, key)
-                return self.refresh(*args, **kwargs)
+                fetched = self.refresh(*args, **kwargs)
+                return self.got_miss(fetched, False, *raw_args, **raw_kwargs)
+
             else:
                 logger.debug(("Job %s with key '%s' - cache MISS - triggering "
                               "async refresh and returning empty result"),
@@ -110,7 +112,8 @@ class Job(object):
                 empty = self.empty()
                 self.cache_set(key, self.timeout(*args, **kwargs), empty)
                 self.async_refresh(*args, **kwargs)
-                return empty
+                fetched = empty
+                return self.got_miss(fetched, True, *raw_args, **raw_kwargs)
 
         expiry, data = item
         delta = time.time() - expiry
@@ -126,7 +129,9 @@ class Job(object):
                     ("Job %s with key '%s' - STALE cache hit - running "
                     "synchronous refresh"),
                     self.class_path, key)
-                return self.refresh(*args, **kwargs)
+                fetched = self.refresh(*args, **kwargs)
+                return self.got_stale(fetched, False, *raw_args, **raw_kwargs)
+
             else:
                 logger.debug(
                     ("Job %s with key '%s' - STALE cache hit - triggering "
@@ -138,9 +143,12 @@ class Job(object):
                 timeout = self.timeout(*args, **kwargs)
                 self.cache_set(key, timeout, data)
                 self.async_refresh(*args, **kwargs)
+                fetched = data
+                return self.got_stale(fetched, True, *raw_args, **raw_kwargs)
         else:
             logger.debug("Job %s with key '%s' - cache HIT", self.class_path, key)
-        return data
+            fetched = data
+            return self.got_hit(fetched, *raw_args, **raw_kwargs)
 
     def invalidate(self, *raw_args, **raw_kwargs):
         """
@@ -340,3 +348,29 @@ class Job(object):
         be done.
         """
         raise NotImplementedError()
+
+    def got_miss(self, fetched, async, *raw_args, **raw_kwargs):
+        """
+        Transforms the fetched data right before returning from .get(...)
+        Only runs if data is MISS.
+
+        'async' is False for synchronous refreshes. True otherwise.
+        """
+        return fetched
+
+    def got_hit(self, fetched, *raw_args, **raw_kwargs):
+        """
+        Transforms the fetched data right before returning from .get(...)
+        Only runs if data is fresh HIT.
+        """
+        return fetched
+
+    def got_stale(self, fetched, async, *raw_args, **raw_kwargs):
+        """
+        Transforms the fetched data right before returning from .get(...)
+        Only runs if data is STALE.
+
+        'async' is False for synchronous refreshes. True otherwise.
+        """
+        return fetched
+
