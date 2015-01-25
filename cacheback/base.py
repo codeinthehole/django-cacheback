@@ -1,6 +1,7 @@
 import time
 import logging
 import hashlib
+import collections
 
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
 from django.conf import settings
@@ -11,6 +12,10 @@ from cacheback import tasks
 logger = logging.getLogger('cacheback')
 
 MEMCACHE_MAX_EXPIRATION = 2592000
+
+
+# Container for call args (which makes things simpler to pass around)
+Call = collections.namedtuple("Call", ['args', 'kwargs'])
 
 
 def to_bytestring(value):
@@ -66,6 +71,9 @@ class Job(object):
     #: Overrides options for `refresh_cache.apply_async` (e.g. `queue`).
     task_options = {}
 
+    #: Cache statuses
+    MISS, HIT, STALE = range(3)
+
     def __init__(self):
         self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
         self.cache = get_cache(self.cache_alias)
@@ -89,6 +97,8 @@ class Job(object):
         key = self.key(*args, **kwargs)
         item = self.cache.get(key)
 
+        call = Call(args=raw_args, kwargs=raw_kwargs)
+
         if item is None:
             # Cache MISS - we can either:
             # a) fetch the data immediately, blocking execution until
@@ -98,8 +108,9 @@ class Job(object):
                 logger.debug(("Job %s with key '%s' - cache MISS - running "
                               "synchronous refresh"),
                              self.class_path, key)
-                fetched = self.refresh(*args, **kwargs)
-                return self.got_miss(fetched, False, *raw_args, **raw_kwargs)
+                result = self.refresh(*args, **kwargs)
+                return self.process_result(
+                    result, call=call, cache_status=self.MISS, sync_fetch=True)
 
             else:
                 logger.debug(("Job %s with key '%s' - cache MISS - triggering "
@@ -109,11 +120,12 @@ class Job(object):
                 # to refresh the same cache item), we reset the cache with an
                 # empty result which will be returned until the cache is
                 # refreshed.
-                empty = self.empty()
-                self.cache_set(key, self.timeout(*args, **kwargs), empty)
+                result = self.empty()
+                self.cache_set(key, self.timeout(*args, **kwargs), result)
                 self.async_refresh(*args, **kwargs)
-                fetched = empty
-                return self.got_miss(fetched, True, *raw_args, **raw_kwargs)
+                return self.process_result(
+                    result, call=call, cache_status=self.MISS,
+                    sync_fetch=False)
 
         expiry, data = item
         delta = time.time() - expiry
@@ -129,8 +141,10 @@ class Job(object):
                     ("Job %s with key '%s' - STALE cache hit - running "
                     "synchronous refresh"),
                     self.class_path, key)
-                fetched = self.refresh(*args, **kwargs)
-                return self.got_stale(fetched, False, *raw_args, **raw_kwargs)
+                result = self.refresh(*args, **kwargs)
+                return self.process_result(
+                    result, call=call, cache_status=self.STALE,
+                    sync_fetch=True)
 
             else:
                 logger.debug(
@@ -143,12 +157,11 @@ class Job(object):
                 timeout = self.timeout(*args, **kwargs)
                 self.cache_set(key, timeout, data)
                 self.async_refresh(*args, **kwargs)
-                fetched = data
-                return self.got_stale(fetched, True, *raw_args, **raw_kwargs)
+                return self.process_result(
+                    data, call=call, cache_status=self.STALE, sync_fetch=False)
         else:
             logger.debug("Job %s with key '%s' - cache HIT", self.class_path, key)
-            fetched = data
-            return self.got_hit(fetched, *raw_args, **raw_kwargs)
+            return self.process_result(data, call=call, cache_status=self.HIT)
 
     def invalidate(self, *raw_args, **raw_kwargs):
         """
@@ -349,28 +362,8 @@ class Job(object):
         """
         raise NotImplementedError()
 
-    def got_miss(self, fetched, async, *raw_args, **raw_kwargs):
+    def process_result(self, result, call, cache_status, sync_fetch=None):
         """
         Transforms the fetched data right before returning from .get(...)
-        Only runs if data is MISS.
-
-        'async' is False for synchronous refreshes. True otherwise.
         """
-        return fetched
-
-    def got_hit(self, fetched, *raw_args, **raw_kwargs):
-        """
-        Transforms the fetched data right before returning from .get(...)
-        Only runs if data is fresh HIT.
-        """
-        return fetched
-
-    def got_stale(self, fetched, async, *raw_args, **raw_kwargs):
-        """
-        Transforms the fetched data right before returning from .get(...)
-        Only runs if data is STALE.
-
-        'async' is False for synchronous refreshes. True otherwise.
-        """
-        return fetched
-
+        return result

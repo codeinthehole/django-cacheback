@@ -119,3 +119,10 @@ You can also simply remove an item from the cache so that the next request will
 trigger the refresh::
 
     job.delete(username)
+
+Post-processing
+~~~~~~~~~~~~~~~
+
+The ``cacheback.Job`` instance provides a `process_result` method that can be
+overridden to modify the result value being returned. You can use this to append
+information about whether the result is being returned from cache or not.
