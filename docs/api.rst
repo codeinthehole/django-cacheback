@@ -15,7 +15,7 @@ It has some class properties than can be used to configure simple behaviour:
 There are also several methods intended to be overridden and customised:
 
 .. autoclass:: cacheback.base.Job
-    :members: key, fetch, expiry, should_missing_item_be_fetched_synchronously, should_stale_item_be_fetched_synchronously, empty, key, prepare_args, prepare_kwargs, timeout
+    :members: key, fetch, expiry, should_missing_item_be_fetched_synchronously, should_stale_item_be_fetched_synchronously, empty, key, prepare_args, prepare_kwargs, timeout, process_result 
 
 
 Queryset jobs

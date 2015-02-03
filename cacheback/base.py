@@ -364,6 +364,15 @@ class Job(object):
 
     def process_result(self, result, call, cache_status, sync_fetch=None):
         """
-        Transforms the fetched data right before returning from .get(...)
+        Transform the fetched data right before returning from .get(...)
+
+        :param result: The result to be returned
+        :param call: A named tuple with properties 'args' and 'kwargs that
+                     holds the call args and kwargs
+        :param cache_status: A status integrer, accessible as class constants
+                             self.MISS, self.HIT, self.STALE
+        :param sync_fetch: A boolean indicating whether a synchronous fetch was
+                           performed. A value of None indicates that no fetch
+                           was required (ie the result was a cache hit).
         """
         return result
