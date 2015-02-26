@@ -20,7 +20,7 @@ setup(name='django-cacheback',
       packages=find_packages(exclude=["sandbox*", "tests*"]),
       include_package_data=True,
       install_requires=[
-          'django>=1.3,<1.7',
+          'django>=1.3,<1.8',
           'django-celery>=3.0',
           'celery<3.2',
           'six',
