@@ -19,7 +19,7 @@ def to_bytestring(value):
     bytestring or unicode string so must distinguish between the two.
     """
     if isinstance(value, six.text_type):
-        return string.encode('utf8')
+        return value.encode('utf8')
     if isinstance(value, six.binary_type):
         return value
     if six.PY2:
