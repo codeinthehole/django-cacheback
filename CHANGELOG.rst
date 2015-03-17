@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.9.1
+~~~~~
+* Fix silly ``NameError`` introduced in 0.9 (`#39`)
+
+.. _`#39`: https://github.com/codeinthehole/django-cacheback/pull/39
+
 0.9
 ~~~
 * Add support for other caches (`#32`_) 
