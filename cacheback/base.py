@@ -139,7 +139,7 @@ class Job(object):
                     delta, *args, **kwargs):
                 logger.debug(
                     ("Job %s with key '%s' - STALE cache hit - running "
-                    "synchronous refresh"),
+                     "synchronous refresh"),
                     self.class_path, key)
                 result = self.refresh(*args, **kwargs)
                 return self.process_result(
@@ -149,7 +149,7 @@ class Job(object):
             else:
                 logger.debug(
                     ("Job %s with key '%s' - STALE cache hit - triggering "
-                    "async refresh and returning stale result"),
+                     "async refresh and returning stale result"),
                     self.class_path, key)
                 # We replace the item in the cache with a 'timeout' expiry - this
                 # prevents cache hammering but guards against a 'limbo' situation
@@ -353,7 +353,9 @@ class Job(object):
 
         This is for use in a cache key.
         """
-        return hashlib.md5(to_bytestring(value)).hexdigest()
+        if isinstance(value, tuple):
+            value = tuple(to_bytestring(v) for v in value)
+        return hashlib.md5(six.b(':').join(value)).hexdigest()
 
     def fetch(self, *args, **kwargs):
         """

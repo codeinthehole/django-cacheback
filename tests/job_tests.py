@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.cache import cache
 from django.core.cache.backends.dummy import DummyCache
+import six
 
 import cacheback.base
 from cacheback.base import Job
@@ -104,9 +105,29 @@ class TestDummyCache(TestCase):
         self.job = SingleArgJob()
 
     def tearDown(self):
-        cacheback.base.cache  = self.cache
+        cacheback.base.cache = self.cache
 
     @override_settings(CACHEBACK_VERIFY_CACHE_WRITE=False)
     def test_dummy_cache_does_not_raise_error(self):
         self.assertEqual('ALAN', self.job.get('alan'))
         self.assertEqual('BARRY', self.job.get('barry'))
+
+
+class EncodingJob(Job):
+
+    def fetch(self, spam):
+        return spam
+
+
+class TestCacheKeyWithDifferentEncoding(TestCase):
+
+    def setUp(self):
+        self.job = EncodingJob()
+
+    def test_unicode_and_bytestring_args(self):
+        self.assertEqual(self.job.key(six.b('eggs')),
+                         self.job.key(six.u('eggs')))
+
+    def test_unicode_and_bytestring_kwargs(self):
+        self.assertEqual(self.job.key(spam=six.b('eggs')),
+                         self.job.key(spam=six.u('eggs')))
