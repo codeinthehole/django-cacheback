@@ -1,4 +1,7 @@
-from django.utils import importlib
+try:
+    import importlib
+except ImportError:
+    import django.utils.importlib as importlib
 
 from cacheback.base import Job
 
