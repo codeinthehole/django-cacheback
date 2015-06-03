@@ -4,7 +4,7 @@ Contributing
 
 Get set up by cloning, creating a virtualenv and running::
 
-    $ make develop
+    $ make 
 
 to install the testing dependencies.
 

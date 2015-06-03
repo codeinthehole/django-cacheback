@@ -1,11 +1,12 @@
 install:
 	python setup.py develop
-	pip install -r sandbox_requirements.txt
-	pip install -r test_requirements.txt
+	pip install -r requirements.txt
 
-test:
-	python setup.py develop
-	pip install -r test_requirements.txt
+sandbox: install
+	pip install -r sandbox/requirements.txt
+
+test: install 
+	./runtests.py
 
 release:
 	python setup.py sdist upload
