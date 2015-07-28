@@ -26,10 +26,3 @@ install:
 
 script:
   - tox -e $TOX_ENV
-
-matrix:
-  allow_failures:
-    - env: TOX_ENV=py27-django18
-    - env: TOX_ENV=py33-django18
-    - env: TOX_ENV=py34-django18
-    - env: TOX_ENV=pypy-django18
