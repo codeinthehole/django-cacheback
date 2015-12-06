@@ -3,11 +3,12 @@ import logging
 import hashlib
 import collections
 
-from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
+from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.conf import settings
 import six
 
 from cacheback import tasks
+from cacheback.utils import get_cache
 
 logger = logging.getLogger('cacheback')
 
