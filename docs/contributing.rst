@@ -4,7 +4,7 @@ Contributing
 
 Get set up by cloning, creating a virtualenv and running::
 
-    $ make develop
+    $ make
 
 to install the testing dependencies.
 
@@ -15,18 +15,23 @@ Use::
 
     $ ./runtests.py
 
+or use Tox with::
+
+    $ tox
+
+to test all Python/Django combinations.
+
 Sandbox VM
 ==========
 
-There is a VagrantFile for setting up a sandbox VM where you can play around
+There is a ``VagrantFile`` for setting up a sandbox VM where you can play around
 with the functionality.  Bring up the Vagrant box::
 
     $ vagrant up
 
 then provision::
 
-    $ cd /vagrant/sandbox
-    $ ./provision.sh
+    $ vagrant ssh -- sudo /vagrant/sandbox/provision.sh
 
 This may take a while but will set up a Ubuntu Precise64 VM with RabbitMQ
 installed and configured.  You can then SSH into the machine and run the Django
