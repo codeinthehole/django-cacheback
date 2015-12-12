@@ -28,7 +28,9 @@ Yup - `over on readthedocs.org`_.
 
 Do you support Python 3?
 ------------------------
-Pythons 2.7, 3.3, 3.4 and PyPy are supported.
+Pythons 2.7, 3.3, 3.4, 3.5 and PyPy are supported.
+
+Django versions 1.4 to 1.9 are also supported.
 
 Do you have tests?
 ------------------

@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.0
+~~~
+* Support Django versions >= 1.7
+* Update sandbox to work with Django 1.9
+
 0.9.1
 ~~~~~
 * Fix silly ``NameError`` introduced in 0.9 (`#39`)
