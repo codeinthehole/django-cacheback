@@ -2,7 +2,7 @@
 Installation
 ============
 
-You need to do four things:
+You need to do three things:
 
 1. Install django-cacheback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -13,21 +13,7 @@ Run::
 
 and add ``cacheback`` to your ``INSTALLED_APPS``.  
 
-2. Add djcelery
-~~~~~~~~~~~~~~~
-
-The 'django-celery' package will be installed by pip as part of step 1, but you
-will also need to complete the `djcelery installation process`_ by adding ``djcelery`` to
-your ``INSTALLED_APPS`` and including::
-
-    import djcelery
-    djcelery.setup_loader()
-
-.. _`djcelery installation process`: http://pypi.python.org/pypi/django-celery/3.0.9
-
-in your settings.  
-
-3. Install a message broker
+2. Install a message broker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    
 Celery requires a message broker.  Use `Celery's tutorial`_ to help set one up.
@@ -35,7 +21,7 @@ I recommend rabbitmq.
 
 .. _`Celery's tutorial`: http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html
 
-4. Set up a cache
+3. Set up a cache
 ~~~~~~~~~~~~~~~~~
 
 You also need to ensure you have `a cache set up`_.  Most likely, you'll be using
