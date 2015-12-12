@@ -1,7 +1,7 @@
 import time
 
-from celery.task import task
 from celery.utils.log import get_task_logger
+from celery import shared_task
 try:
     import importlib
 except ImportError:
@@ -10,7 +10,7 @@ except ImportError:
 logger = get_task_logger(__name__)
 
 
-@task()
+@shared_task
 def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
     """
     Re-populate cache using the given job class.

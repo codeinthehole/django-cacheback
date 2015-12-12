@@ -21,10 +21,9 @@ setup(name='django-cacheback',
       include_package_data=True,
       install_requires=[
           'django>=1.3',
-          'django-celery>=3.0',
           'celery<3.2',
           'six',
-          ],
+      ],
       # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=['Environment :: Web Environment',
                    'Framework :: Django',
