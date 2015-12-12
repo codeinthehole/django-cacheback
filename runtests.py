@@ -26,15 +26,12 @@ if not settings.configured:
             'django.contrib.sites',
             'django.contrib.flatpages',
             'cacheback',
-            'djcelery',
             'tests.dummyapp',
             ],
         BROKER_URL = 'django://',
         CELERY_ALWAYS_EAGER=True,
         NOSE_ARGS=['-s', '--with-spec'],
     )
-    import djcelery
-    djcelery.setup_loader()
 
 from django_nose import NoseTestSuiteRunner
 
