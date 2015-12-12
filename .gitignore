@@ -2,6 +2,7 @@
 sandbox/puppet/modules
 docs/_build
 dist/*
+build/*
 .coverage
 TODO
 .tox

@@ -7,7 +7,9 @@ test:
 	pip install -r requirements.txt
 
 release:
-	python setup.py sdist upload
+	python setup.py sdist 
+	python setup.py bdist_wheel --universal
+	python setup.py upload
 	git push --tags
 
 clean:
