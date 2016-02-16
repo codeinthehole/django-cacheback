@@ -7,8 +7,7 @@ from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.conf import settings
 import six
 
-from cacheback import tasks
-from cacheback.utils import get_cache
+from cacheback.utils import get_cache, get_job_class, enqueue_task
 
 logger = logging.getLogger('cacheback')
 
@@ -49,7 +48,7 @@ class Job(object):
     #: be considered stale and requests will trigger a job to refresh it.
     lifetime = 600
 
-    #: Timeout period during which no new Celery tasks will be created for a
+    #: Timeout period during which no new tasks will be created for a
     #: single cache item.  This time should cover the normal time required to
     #: refresh the cache.
     refresh_timeout = 60
@@ -70,7 +69,7 @@ class Job(object):
     fetch_on_stale_threshold = None
 
     #: Overrides options for `refresh_cache.apply_async` (e.g. `queue`).
-    task_options = {}
+    task_options = None
 
     #: Cache statuses
     MISS, HIT, STALE = range(3)
@@ -117,7 +116,7 @@ class Job(object):
                 logger.debug(("Job %s with key '%s' - cache MISS - triggering "
                               "async refresh and returning empty result"),
                              self.class_path, key)
-                # To avoid cache hammering (ie lots of identical Celery tasks
+                # To avoid cache hammering (ie lots of identical tasks
                 # to refresh the same cache item), we reset the cache with an
                 # empty result which will be returned until the cache is
                 # refreshed.
@@ -236,8 +235,9 @@ class Job(object):
         # We trigger the task with the class path to import as well as the
         # (a) args and kwargs for instantiating the class
         # (b) args and kwargs for calling the 'refresh' method
+
         try:
-            tasks.refresh_cache.apply_async(
+            enqueue_task(
                 kwargs=dict(
                     klass_str=self.class_path,
                     obj_args=self.get_constructor_args(),
@@ -245,7 +245,7 @@ class Job(object):
                     call_args=args,
                     call_kwargs=kwargs
                 ),
-                **self.task_options
+                **self.task_options or {}
             )
         except Exception as e:
             # Handle exceptions from talking to RabbitMQ - eg connection
@@ -379,3 +379,44 @@ class Job(object):
                            was required (ie the result was a cache hit).
         """
         return result
+
+    # --------------------
+    # ASYNC HELPER METHODS
+    # --------------------
+
+    def job_refresh(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
+        """
+        Re-populate cache using the given job class.
+
+        The job class is instantiated with the passed constructor args and the
+        refresh method is called with the passed call args.  That is::
+
+            data = klass(*obj_args, **obj_kwargs).refresh(
+                *call_args, **call_kwargs)
+
+        :klass_str: String repr of class (eg 'apps.twitter.jobs.FetchTweetsJob')
+        :obj_args: Constructor args
+        :obj_kwargs: Constructor kwargs
+        :call_args: Refresh args
+        :call_kwargs: Refresh kwargs
+        """
+        klass = get_job_class(klass_str)
+        if klass is None:
+            logger.error("Unable to construct %s with args %r and kwargs %r",
+                         klass_str, obj_args, obj_kwargs)
+            return
+
+        logger.info("Using %s with constructor args %r and kwargs %r",
+                    klass_str, obj_args, obj_kwargs)
+        logger.info("Calling refresh with args %r and kwargs %r", call_args,
+                    call_kwargs)
+        start = time.time()
+        try:
+            klass(*obj_args, **obj_kwargs).refresh(
+                *call_args, **call_kwargs)
+        except Exception as e:
+            logger.error("Error running job: '%s'", e)
+            logger.exception(e)
+        else:
+            duration = time.time() - start
+            logger.info("Refreshed cache in %.6f seconds", duration)
