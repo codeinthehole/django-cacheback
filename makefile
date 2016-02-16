@@ -1,9 +1,9 @@
 install:
-	python setup.py develop
+	pip install -e .[celery]
 	pip install -r requirements.txt -r sandbox/requirements.txt
 
 test:
-	python setup.py develop
+	pip install -e .[celery]
 	pip install -r requirements.txt
 
 release:

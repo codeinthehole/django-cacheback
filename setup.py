@@ -21,10 +21,13 @@ setup(
     packages=find_packages(exclude=["sandbox*", "tests*"]),
     include_package_data=True,
     install_requires=[
-        'django>=1.3',
-        'celery',
+        'django>=1.4,<1.10',
         'six',
     ],
+    extras_require={
+        'celery': ['celery'],
+        'rq': ['django-rq>=0.9'],
+    },
     # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 5 - Production/Stable',
