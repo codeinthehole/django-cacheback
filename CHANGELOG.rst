@@ -2,6 +2,11 @@
 Changelog
 =========
 
+TDB
+~~~
+
+* Added support for multiple background workers (currently Celery and rq)
+
 1.0
 ~~~
 * Support Django versions >= 1.7

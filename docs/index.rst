@@ -8,11 +8,13 @@ Django Cacheback
 ================
 
 Cacheback is an extensible caching library that refreshes stale cache items
-asynchronously using a Celery_ task.  The key idea being that it's
-better to serve a stale item (and populate the cache asynchronously) than block
-the user in order to repopulate the cache synchronously.
+asynchronously using a Celery_ or rq_ task (utilizing django-rq).  The key
+idea being that it's better to serve a stale item (and populate the cache
+asynchronously) than block the response process in order to populate the cache
+synchronously.
 
 .. _Celery: http://celeryproject.org/
+.. _rq: http://python-rq.org/
 
 Using this library, you can rework your views so that all reads are from
 cache - which can be a significant performance boost.  
@@ -179,6 +181,9 @@ To be clear, the behaviour of this implementation is as follows:
 Much of this behaviour can be configured by using a subclass of
 ``cacheback.Job``.  The decorator is only intended for simple use-cases.  See
 the :doc:`usage` and :doc:`api` documentation for more information.
+
+All of the worker related things above an also be done using rq instead of
+Celery.
 
 Contents
 ========
