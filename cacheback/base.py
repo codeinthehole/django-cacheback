@@ -384,7 +384,8 @@ class Job(object):
     # ASYNC HELPER METHODS
     # --------------------
 
-    def job_refresh(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
+    @classmethod
+    def job_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
         """
         Re-populate cache using the given job class.
 
