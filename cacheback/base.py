@@ -77,6 +77,7 @@ class Job(object):
     def __init__(self):
         self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
         self.cache = get_cache(self.cache_alias)
+        self.task_options = self.task_options or {}
 
     # --------
     # MAIN API
@@ -245,7 +246,7 @@ class Job(object):
                     call_args=args,
                     call_kwargs=kwargs
                 ),
-                **self.task_options or {}
+                **self.task_options
             )
         except Exception as e:
             # Handle exceptions from talking to RabbitMQ - eg connection
