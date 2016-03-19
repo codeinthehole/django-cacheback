@@ -417,8 +417,7 @@ class Job(object):
             klass(*obj_args, **obj_kwargs).refresh(
                 *call_args, **call_kwargs)
         except Exception as e:
-            logger.error("Error running job: '%s'", e)
-            logger.exception(e)
+            logger.exception("Error running job: '%s'", e)
         else:
             duration = time.time() - start
             logger.info("Refreshed cache in %.6f seconds", duration)
