@@ -27,7 +27,8 @@ def get_cache(backend, **kwargs):
     """
     Compatibilty wrapper for getting Django's cache backend instance
 
-    original source: https://github.com/vstoykov/django-imagekit/commit/c26f8a0538778969a64ee471ce99b25a04865a8e
+    original source:
+    https://github.com/vstoykov/django-imagekit/commit/c26f8a0538778969a64ee471ce99b25a04865a8e
     """
     try:
         from django.core.cache import _create_cache
@@ -57,8 +58,7 @@ def get_job_class(klass_str):
     try:
         klass = getattr(mod, klass_name)
     except AttributeError:
-        logger.error("Module '%s' does not define a '%s' class", mod_name,
-                              klass_name)
+        logger.error("Module '%s' does not define a '%s' class", mod_name, klass_name)
         return
     return klass
 

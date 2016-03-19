@@ -1,8 +1,8 @@
-from django.test import TestCase
-from django.test.utils import override_settings
 from django.core.cache import cache
 from django.core.cache.backends.dummy import DummyCache
-import six
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils import six
 
 import cacheback.base
 from cacheback.base import Job

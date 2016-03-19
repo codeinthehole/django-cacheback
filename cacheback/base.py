@@ -1,13 +1,14 @@
-import time
-import logging
-import hashlib
 import collections
+import hashlib
+import logging
+import time
 
-from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.conf import settings
-import six
+from django.core.cache import DEFAULT_CACHE_ALIAS
+from django.utils import six
 
-from cacheback.utils import get_cache, get_job_class, enqueue_task
+from cacheback.utils import enqueue_task, get_cache, get_job_class
+
 
 logger = logging.getLogger('cacheback')
 

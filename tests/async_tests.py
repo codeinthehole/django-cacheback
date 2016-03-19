@@ -1,9 +1,9 @@
 import time
 
+import mock
 from django.core.cache import cache
 from django.test import TestCase
 from django.test.utils import override_settings
-import mock
 
 from cacheback.base import Job
 

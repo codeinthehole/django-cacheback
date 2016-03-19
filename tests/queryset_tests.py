@@ -1,5 +1,5 @@
-from django.test import TestCase
 from django.core.cache import cache
+from django.test import TestCase
 
 from cacheback.base import Job
 from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob
