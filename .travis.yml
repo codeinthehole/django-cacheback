@@ -1,38 +1,33 @@
 language: python
 sudo: false
 
-python:
-  - '2.7'
-  - '3.3'
-  - '3.4'
-  - '3.5'
-  - 'pypy'
-
 env:
-  - DJANGO_VERSION=1.5.x
-  - DJANGO_VERSION=1.6.x
-  - DJANGO_VERSION=1.7.x
-  - DJANGO_VERSION=1.8.x
-  - DJANGO_VERSION=1.9.x
-
-matrix:
-  exclude:
-  - python: '2.6'
-    env: DJANGO_VERSION=1.7.x
-  - python: '2.6'
-    env: DJANGO_VERSION=1.8.x
-  - python: '2.6'
-    env: DJANGO_VERSION=1.9.x
-  - python: '3.3'
-    env: DJANGO_VERSION=1.9.x
-  - python: '3.5'
-    env: DJANGO_VERSION=1.8.x
+  - TOXENV=py27-django15
+  - TOXENV=py27-django16
+  - TOXENV=py27-django17
+  - TOXENV=py27-django18
+  - TOXENV=py33-django15
+  - TOXENV=py33-django16
+  - TOXENV=py33-django17
+  - TOXENV=py33-django18
+  - TOXENV=py34-django15
+  - TOXENV=py34-django16
+  - TOXENV=py34-django17
+  - TOXENV=py34-django18
+  - TOXENV=pypy-django15
+  - TOXENV=pypy-django16
+  - TOXENV=pypy-django17
+  - TOXENV=pypy-django18
+  - TOXENV=py27-django19
+  - TOXENV=py34-django19
+  - TOXENV=py35-django19
+  - TOXENV=pypy-django19
 
 install:
   - pip install tox
 
 script:
-  - tox -e "$TRAVIS_PYTHON_VERSION-$DJANGO_VERSION"
+  - tox
 
 after_success:
   - pip install coverage
