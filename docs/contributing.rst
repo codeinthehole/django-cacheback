@@ -4,7 +4,7 @@ Contributing
 
 Start by cloning the repo, creating a virtualenv and running::
 
-    $ make
+    $ make install
 
 to install the testing dependencies.
 
@@ -13,7 +13,11 @@ Running tests
 
 Use::
 
-    $ ./runtests.py
+    $ py.test
+
+or generate coverage report::
+
+    $ py.test --cov
 
 or use Tox with::
 

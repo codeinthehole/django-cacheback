@@ -1,10 +1,8 @@
-install:
-	pip install -e .[celery]
-	pip install -r requirements.txt -r sandbox/requirements.txt
+.PHONY = install lint test release clean
 
-test:
-	pip install -e .[celery]
-	pip install -r requirements.txt
+install:
+	pip install -e .[tests]
+	pip install -r sandbox/requirements.txt
 
 release:
 	python setup.py sdist upload
@@ -12,5 +10,6 @@ release:
 	git push --tags
 
 clean:
-	find . -name "*.pyc" -delete
+	find . -name '*.pyc' -delete
+	find . -name '__pycache__' -exec xargs rm -r
 	rm -rf *.egg-info dist

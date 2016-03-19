@@ -1,11 +1,31 @@
-#!/usr/bin/env python
-
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
+
 from cacheback import __version__
 
+
 PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
-os.chdir(PACKAGE_DIR)
+
+
+celery_requirements = [
+    'celery',
+]
+
+rq_requirements = [
+    'django-rq>=0.9',
+]
+
+test_requirements = [
+    'tox',
+    'tox-pyenv',
+    'mock',
+    'pytest',
+    'pytest-cov',
+    'pytest-flakes',
+    'pytest-pep8',
+    'pytest-django',
+    'pytest-isort',
+] + celery_requirements + rq_requirements
 
 
 setup(
@@ -13,22 +33,23 @@ setup(
     version=__version__,
     url='https://github.com/codeinthehole/django-cacheback',
     author="David Winterbottom",
-    author_email="david.winterbottom@gmail.com",
-    description=("Caching library for Django that uses Celery "
-                 "to refresh cache items asynchronously"),
+    author_email='david.winterbottom@gmail.com',
+    description=(
+        'Caching library for Django that uses Celery or '
+        'RQ to refresh cache items asynchronously'
+    ),
     long_description=open(os.path.join(PACKAGE_DIR, 'README.rst')).read(),
     license='MIT',
-    packages=find_packages(exclude=["sandbox*", "tests*"]),
+    packages=find_packages(exclude=['sandbox*', 'tests*']),
     include_package_data=True,
     install_requires=[
-        'django>=1.4,<1.10',
-        'six',
+        'django>=1.5,<1.10',
     ],
     extras_require={
-        'celery': ['celery'],
-        'rq': ['django-rq>=0.9'],
+        'celery': celery_requirements,
+        'rq': rq_requirements,
+        'tests': test_requirements,
     },
-    # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
