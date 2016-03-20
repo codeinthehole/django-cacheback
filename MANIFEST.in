@@ -1,1 +1,3 @@
-include *.rst LICENSE setup.cfg
+include README.rst LICENSE setup.cfg
+prune .tox
+prune sandbox
