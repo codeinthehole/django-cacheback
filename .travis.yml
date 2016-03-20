@@ -31,3 +31,6 @@ script:
 after_success:
   - pip install coverage
   - coverage report
+
+services:
+  - redis-server
