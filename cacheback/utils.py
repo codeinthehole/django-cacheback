@@ -41,8 +41,9 @@ def get_cache(backend, **kwargs):
     cache = _create_cache(backend, **kwargs)
     # Some caches -- python-memcached in particular -- need to do a cleanup at the
     # end of a request cycle. If not implemented in a particular backend
-    # cache.close is a no-op
-    signals.request_finished.connect(cache.close)
+    # cache.close is a no-op. Not available in Django 1.5
+    if hasattr(cache, 'close'):
+        signals.request_finished.connect(cache.close)
     return cache
 
 
