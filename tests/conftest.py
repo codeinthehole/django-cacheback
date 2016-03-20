@@ -6,12 +6,17 @@ from django.core.cache import cache
 
 
 def skip_if_no_redis():
-    try:
-        redis.StrictRedis(
-            settings.RQ_QUEUES['default'].get('HOST', 'localhost'),
-            settings.RQ_QUEUES['default'].get('POST', 6379)
-        ).ping()
-    except redis.ConnectionError:
+    if not hasattr(skip_if_no_redis, '_test_result'):
+        try:
+            redis.StrictRedis(
+                settings.RQ_QUEUES['default'].get('HOST', 'localhost'),
+                settings.RQ_QUEUES['default'].get('POST', 6379)
+            ).ping()
+            skip_if_no_redis._redis_available = True
+        except redis.ConnectionError:
+            skip_if_no_redis._redis_available = False
+
+    if not skip_if_no_redis._redis_available:
         pytest.skip('Redis server not available.')
 
 
