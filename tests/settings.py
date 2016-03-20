@@ -1,3 +1,6 @@
+import tempfile
+
+
 SECRET_KEY = 'testing'
 
 DATABASES = {
@@ -8,7 +11,8 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': tempfile.mkdtemp(),
     }
 }
 
@@ -24,7 +28,6 @@ INSTALLED_APPS = [
 ]
 
 BROKER_URL = 'django://'
-CELERY_ALWAYS_EAGER = True
 
 RQ_QUEUES = {
     'default': {
@@ -33,3 +36,5 @@ RQ_QUEUES = {
         'DB': 1,
     }
 }
+
+CACHEBACK_TASK_QUEUE = 'rq'

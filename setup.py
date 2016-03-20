@@ -7,6 +7,22 @@ from cacheback import __version__
 PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
+# TEMPORARY FIX FOR
+# https://bitbucket.org/pypa/setuptools/issues/450/egg_info-command-is-very-slow-if-there-are
+TO_OMIT = ['.git', '.tox']
+orig_os_walk = os.walk
+def patched_os_walk(path, *args, **kwargs):
+    for (dirpath, dirnames, filenames) in orig_os_walk(path, *args, **kwargs):
+        if '.git' in dirnames:
+            # We're probably in our own root directory.
+            print("MONKEY PATCH: omitting a few directories like .git and .tox...")
+            dirnames[:] = list(set(dirnames) - set(TO_OMIT))
+        yield (dirpath, dirnames, filenames)
+
+os.walk = patched_os_walk
+# END IF TEMPORARY FIX.
+
+
 celery_requirements = [
     'celery',
 ]
@@ -19,6 +35,7 @@ test_requirements = [
     'tox',
     'tox-pyenv',
     'mock',
+    'freezegun',
     'pytest',
     'pytest-cov',
     'pytest-flakes',
