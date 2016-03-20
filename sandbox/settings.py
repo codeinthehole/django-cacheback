@@ -1,3 +1,6 @@
+import os
+
+
 DEBUG = True
 
 DATABASES = {
@@ -113,6 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dummyapp',
+    'django_rq',
     'cacheback',
 )
 
@@ -162,9 +166,20 @@ BROKER_URL = 'amqp://guest:guest@localhost/'
 CELERY_RESULT_BACKEND = 'amqp://'
 CELERY_TASK_SERIALIZER = 'json'
 
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+    },
+}
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
     }
 }
+
+CACHEBACK_TASK_QUEUE = dict([(q, q) for q in ('celery', 'rq')]).get(
+    os.environ.get('QUEUE', ''), 'celery')

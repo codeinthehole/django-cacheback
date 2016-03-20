@@ -1,1 +1,3 @@
-include *.rst LICENSE 
+include README.rst LICENSE
+prune .tox
+prune sandbox
