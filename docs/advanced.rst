@@ -1,7 +1,7 @@
 Advanced usage
 --------------
 
-Two thresholds for cache invalidation
+Three thresholds for cache invalidation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's possible to employ three threshold times to control cache behaviour:
