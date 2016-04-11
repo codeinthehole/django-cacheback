@@ -208,8 +208,8 @@ class Job(object):
         :data: The data to cache
         """
         self.cache.set(key, (expiry, data), self.cache_ttl)
-
-        if getattr(settings, 'CACHEBACK_VERIFY_CACHE_WRITE', True):
+        if getattr(settings, 'CACHEBACK_VERIFY_CACHE_WRITE', True) or \
+                'memcache' in self.cache.master_client.__class__.__name__.lower():
             # We verify that the item was cached correctly.  This is to avoid a
             # Memcache problem where some values aren't cached correctly
             # without warning.
