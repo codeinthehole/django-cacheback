@@ -1,28 +1,36 @@
 language: python
-python: 2.7
 sudo: false
 
 env:
-    - TOX_ENV=py27-django15
-    - TOX_ENV=py27-django16
-    - TOX_ENV=py27-django17
-    - TOX_ENV=py27-django18
-    - TOX_ENV=py33-django15
-    - TOX_ENV=py33-django16
-    - TOX_ENV=py33-django17
-    - TOX_ENV=py33-django18
-    - TOX_ENV=py34-django15
-    - TOX_ENV=py34-django16
-    - TOX_ENV=py34-django17
-    - TOX_ENV=py34-django18
-    - TOX_ENV=pypy-django15
-    - TOX_ENV=pypy-django16
-    - TOX_ENV=pypy-django17
-    - TOX_ENV=pypy-django18
-    - TOX_ENV=py27-django14
+  - TOXENV=py27-django15
+  - TOXENV=py27-django16
+  - TOXENV=py27-django17
+  - TOXENV=py27-django18
+  - TOXENV=py33-django15
+  - TOXENV=py33-django16
+  - TOXENV=py33-django17
+  - TOXENV=py33-django18
+  - TOXENV=py34-django15
+  - TOXENV=py34-django16
+  - TOXENV=py34-django17
+  - TOXENV=py34-django18
+  - TOXENV=pypy-django15
+  - TOXENV=pypy-django16
+  - TOXENV=pypy-django17
+  - TOXENV=pypy-django18
+  - TOXENV=py27-django19
+  - TOXENV=py34-django19
+  - TOXENV=pypy-django19
 
 install:
   - pip install tox
 
 script:
-  - tox -e $TOX_ENV
+  - tox
+
+after_success:
+  - pip install coverage
+  - coverage report
+
+services:
+  - redis-server

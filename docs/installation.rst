@@ -7,19 +7,30 @@ You need to do three things:
 1. Install django-cacheback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Run::
+To install with Celery support, run::
 
-    pip install django-cacheback
+    $ pip install django-cacheback[celery]
 
-and add ``cacheback`` to your ``INSTALLED_APPS``.  
+If you want to install with RQ support, just use::
+
+    $ pip install django-cacheback[rq]
+
+After installing the package and dependencies, add ``cacheback`` to your ``INSTALLED_APPS``.
+If you want to use RQ as your task queue, you need to set ``CACHEBACK_TASK_QUEUE``
+in your settings to ``rq``.
 
 2. Install a message broker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
+
 Celery requires a message broker.  Use `Celery's tutorial`_ to help set one up.
 I recommend rabbitmq.
 
+
+For RQ you need to set up a redis-server and configure ``django-rq``. Please look
+up the `django-rq installation guide`_ for more details.
+
 .. _`Celery's tutorial`: http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html
+.. _`django-rq installation guide`: https://github.com/ui/django-rq#installation
 
 3. Set up a cache
 ~~~~~~~~~~~~~~~~~

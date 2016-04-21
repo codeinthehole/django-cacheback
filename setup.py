@@ -1,11 +1,48 @@
-#!/usr/bin/env python
-
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
+
 from cacheback import __version__
 
+
 PACKAGE_DIR = os.path.abspath(os.path.dirname(__file__))
-os.chdir(PACKAGE_DIR)
+
+
+# TEMPORARY FIX FOR
+# https://bitbucket.org/pypa/setuptools/issues/450/egg_info-command-is-very-slow-if-there-are
+TO_OMIT = ['.git', '.tox']
+orig_os_walk = os.walk
+def patched_os_walk(path, *args, **kwargs):
+    for (dirpath, dirnames, filenames) in orig_os_walk(path, *args, **kwargs):
+        if '.git' in dirnames:
+            # We're probably in our own root directory.
+            print("MONKEY PATCH: omitting a few directories like .git and .tox...")
+            dirnames[:] = list(set(dirnames) - set(TO_OMIT))
+        yield (dirpath, dirnames, filenames)
+
+os.walk = patched_os_walk
+# END IF TEMPORARY FIX.
+
+
+celery_requirements = [
+    'celery',
+]
+
+rq_requirements = [
+    'django-rq>=0.9',
+]
+
+test_requirements = [
+    'tox',
+    'tox-pyenv',
+    'mock',
+    'freezegun',
+    'pytest',
+    'pytest-cov',
+    'pytest-flakes',
+    'pytest-pep8',
+    'pytest-django',
+    'pytest-isort',
+] + celery_requirements + rq_requirements
 
 
 setup(
@@ -13,19 +50,23 @@ setup(
     version=__version__,
     url='https://github.com/codeinthehole/django-cacheback',
     author="David Winterbottom",
-    author_email="david.winterbottom@gmail.com",
-    description=("Caching library for Django that uses Celery "
-                 "to refresh cache items asynchronously"),
+    author_email='david.winterbottom@gmail.com',
+    description=(
+        'Caching library for Django that uses Celery or '
+        'RQ to refresh cache items asynchronously'
+    ),
     long_description=open(os.path.join(PACKAGE_DIR, 'README.rst')).read(),
     license='MIT',
-    packages=find_packages(exclude=["sandbox*", "tests*"]),
+    packages=find_packages(exclude=['sandbox*', 'tests*']),
     include_package_data=True,
     install_requires=[
-        'django>=1.3',
-        'celery',
-        'six',
+        'django>=1.5,<1.10',
     ],
-    # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    extras_require={
+        'celery': celery_requirements,
+        'rq': rq_requirements,
+        'tests': test_requirements,
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',

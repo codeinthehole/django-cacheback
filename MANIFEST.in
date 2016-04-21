@@ -1,1 +1,1 @@
-include *.rst LICENSE 
+include README.rst LICENSE setup.cfg

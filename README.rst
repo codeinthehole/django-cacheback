@@ -8,11 +8,13 @@ Asynchronous cache refreshing for Django
 What does this library do?
 --------------------------
 It's an extensible caching library that refreshes stale cache items
-asynchronously using a Celery_ task.  The key idea being that it's
-better to serve a stale item (and populate the cache asynchronously) than block
-the response process in order to populate the cache synchronously.
+asynchronously using a Celery_ or rq_ task (utilizing django-rq). The key
+idea being that it's better to serve a stale item (and populate the cache
+asynchronously) than block the response process in order to populate the cache
+synchronously.
 
 .. _Celery: http://celeryproject.org/
+.. _rq: http://python-rq.org/
 
 Using this library, you can rework your views so that all reads are from
 cache - which can be a significant performance boost.  
@@ -30,11 +32,11 @@ Do you support Python 3?
 ------------------------
 Pythons 2.7, 3.3, 3.4, 3.5 and PyPy are supported.
 
-Django versions 1.4 to 1.9 are also supported.
+Django versions 1.5 to 1.9 are also supported.
 
 Do you have tests?
 ------------------
-You betcha!  
+You betcha!
 
 .. image:: https://secure.travis-ci.org/codeinthehole/django-cacheback.png
     :target: https://travis-ci.org/#!/codeinthehole/django-cacheback
