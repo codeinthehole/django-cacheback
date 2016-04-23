@@ -2,10 +2,11 @@
 Changelog
 =========
 
-TDB
+1.1
 ~~~
 
 * Added support for multiple background workers (currently Celery and rq)
+* Add pytest support
 
 1.0
 ~~~
