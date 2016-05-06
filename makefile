@@ -2,6 +2,7 @@
 
 install:
 	pip install -e .[tests]
+	pip install django_nose spec
 	pip install -r sandbox/requirements.txt
 
 release:

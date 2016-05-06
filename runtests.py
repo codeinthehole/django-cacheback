@@ -30,7 +30,14 @@ if not settings.configured:
             ],
         BROKER_URL = 'django://',
         CELERY_ALWAYS_EAGER=True,
-        NOSE_ARGS=['-s', '--with-spec'],
+        NOSE_ARGS=['-s', '--with-specplugin'],
+        RQ_QUEUES = {
+            'default': {
+                'HOST': 'localhost',
+                'PORT': 6379,
+                'DB': 1,
+            }
+        },
     )
 
 from django_nose import NoseTestSuiteRunner
