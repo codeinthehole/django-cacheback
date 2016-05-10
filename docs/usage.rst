@@ -17,7 +17,7 @@ Simply wrap the function whose results you want to cache::
 
 The default behaviour of the ``cacheback`` decorator is to:
 
-* Cache items for 5 minutes.  
+* Cache items for 10 minutes.  
 
 * When the cache is empty for a given key, the data will be fetched
   synchronously.      

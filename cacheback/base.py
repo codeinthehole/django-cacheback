@@ -45,7 +45,7 @@ class Job(object):
     # expiry value is None, this indicates that there is already a job created
     # for refreshing this item.
 
-    #: Default cache lifetime is 5 minutes.  After this time, the result will
+    #: Default cache lifetime is 10 minutes.  After this time, the result will
     #: be considered stale and requests will trigger a job to refresh it.
     lifetime = 600
 
