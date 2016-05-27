@@ -32,7 +32,7 @@ def get_cache(backend, **kwargs):
     https://github.com/vstoykov/django-imagekit/commit/c26f8a0538778969a64ee471ce99b25a04865a8e
     """
     from django.core import cache
-    
+
     # Django < 1.7
     if not hasattr(cache, '_create_cache'):
         return cache.get_cache(backend, **kwargs)
