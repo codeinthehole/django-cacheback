@@ -38,6 +38,16 @@ class QuerySetGetJob(QuerySetJob):
         return self.model.objects.get(**kwargs)
 
 
+class QuerySetGetOrCreateJob(QuerySetJob):
+    """
+    for ORM reads that use ``get_or_create`` method.
+    """
+
+    def fetch(self, *args, **kwargs):
+        model_object, created = self.model.objects.get_or_create(**kwargs)
+        return model_object
+
+
 class QuerySetFilterJob(QuerySetJob):
     """
     For ORM reads that use the ``filter`` method.

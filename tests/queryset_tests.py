@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.test import TestCase
 
 from cacheback.base import Job
-from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob
+from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob, QuerySetGetOrCreateJob
 from tests.dummyapp import models
 
 
@@ -54,6 +54,21 @@ class TestGetQuerySetJob(TestCase):
     def setUp(self):
         self.job = QuerySetGetJob(models.DummyModel)
         models.DummyModel.objects.create(name="Alan")
+        models.DummyModel.objects.create(name="Barry")
+
+    def tearDown(self):
+        models.DummyModel.objects.all().delete()
+        cache.clear()
+
+    def test_returns_result_on_first_call(self):
+        result = self.job.get(name='Alan')
+        self.assertEqual('Alan', result.name)
+
+
+class TestGetOrCreateQuerySetJob(TestCase):
+
+    def setUp(self):
+        self.job = QuerySetGetOrCreateJob(models.DummyModel)
         models.DummyModel.objects.create(name="Barry")
 
     def tearDown(self):
