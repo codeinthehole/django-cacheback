@@ -2,18 +2,16 @@ from django.core.cache import cache
 from django.test import TestCase
 
 from cacheback.base import Job
-from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob, QuerySetGetOrCreateJob
+from cacheback.queryset import QuerySetFilterJob, QuerySetGetOrCreateJob, QuerySetGetJob
 from tests.dummyapp import models
 
 
 class ManualQuerySetJob(Job):
-
     def fetch(self, name):
         return models.DummyModel.objects.filter(name=name)
 
 
 class TestManualQuerySetJob(TestCase):
-
     def setUp(self):
         self.job = ManualQuerySetJob()
         models.DummyModel.objects.create(name="Alan")
@@ -34,7 +32,6 @@ class TestManualQuerySetJob(TestCase):
 
 
 class TestFilterQuerySetJob(TestCase):
-
     def setUp(self):
         self.job = QuerySetFilterJob(models.DummyModel)
         models.DummyModel.objects.create(name="Alan")
@@ -50,7 +47,6 @@ class TestFilterQuerySetJob(TestCase):
 
 
 class TestGetQuerySetJob(TestCase):
-
     def setUp(self):
         self.job = QuerySetGetJob(models.DummyModel)
         models.DummyModel.objects.create(name="Alan")
@@ -66,7 +62,6 @@ class TestGetQuerySetJob(TestCase):
 
 
 class TestGetOrCreateQuerySetJob(TestCase):
-
     def setUp(self):
         self.job = QuerySetGetOrCreateJob(models.DummyModel)
         models.DummyModel.objects.create(name="Barry")
@@ -86,7 +81,6 @@ class EchoJob(Job):
 
 
 class TestEdgeCases(TestCase):
-
     def setUp(self):
         self.job = EchoJob()
 
