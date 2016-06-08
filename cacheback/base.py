@@ -5,6 +5,7 @@ import time
 
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS
+from django.db.models import Model as DjangoModel
 from django.utils import six
 
 from cacheback.utils import enqueue_task, get_cache, get_job_class
@@ -21,9 +22,14 @@ Call = collections.namedtuple("Call", ['args', 'kwargs'])
 
 def to_bytestring(value):
     """
-    Encode a string as a UTF8 bytestring.  This function could be passed a
-    bytestring or unicode string so must distinguish between the two.
+    Encode an object as a UTF8 bytestring.  This function could be passed a
+    bytestring, unicode string or object so must distinguish between them.
+
+    :param value: object we want to transform into a bytestring
+    :returns: a bytestring
     """
+    if isinstance(value, DjangoModel):
+        return ('%s:%s' % (value.__class__, hash(value))).encode('utf-8')
     if isinstance(value, six.text_type):
         return value.encode('utf8')
     if isinstance(value, six.binary_type):
