@@ -17,7 +17,6 @@ def decorated_dummy_function(param):
 
 @pytest.mark.usefixtures('cleared_cache', scope='function')
 class TestFunctionJob:
-
     def test_init_defaults(self):
         job = FunctionJob()
         assert job.lifetime == 600
@@ -52,7 +51,6 @@ class TestFunctionJob:
 
 @pytest.mark.django_db
 class TestQuerySetJob:
-
     def test_init_defaults(self):
         job = QuerySetJob(DummyModel)
         assert job.lifetime == 600
@@ -78,8 +76,17 @@ class TestQuerySetJob:
 
 
 @pytest.mark.django_db
-class TestQuerySetGetJob:
+class TestDjangoModelJobKey:
+    def test_key_django_model(self):
+        alan = DummyModel.objects.create(name="Alan")
+        john = DummyModel.objects.create(name="John")
+        assert FunctionJob().key(alan) == \
+            'cacheback.function.FunctionJob:9df82067f944cc95795bc89ec0aa65df'
+        assert FunctionJob().key(alan) != FunctionJob().key(john)
 
+
+@pytest.mark.django_db
+class TestQuerySetGetJob:
     def test_fetch(self):
         dummy1 = DummyModel.objects.create(name='Foo')
         assert QuerySetGetJob(DummyModel).fetch(name='Foo') == dummy1
@@ -87,7 +94,6 @@ class TestQuerySetGetJob:
 
 @pytest.mark.django_db
 class TestQuerySetGetFilterJob:
-
     def test_fetch(self):
         dummy1 = DummyModel.objects.create(name='Foo')
         dummy2 = DummyModel.objects.create(name='Bar')
