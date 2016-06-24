@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.db.models import Model as DjangoModel
 from django.utils import six
+from django.utils.itercompat import is_iterable
 
 from .utils import enqueue_task, get_cache, get_job_class
 
@@ -362,11 +363,11 @@ class Job(object):
 
     def hash(self, value):
         """
-        Generate a hash of the given tuple.
+        Generate a hash of the given iterable.
 
         This is for use in a cache key.
         """
-        if isinstance(value, tuple):
+        if is_iterable(value):
             value = tuple(to_bytestring(v) for v in value)
         return hashlib.md5(six.b(':').join(value)).hexdigest()
 
