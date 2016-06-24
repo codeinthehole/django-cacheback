@@ -68,7 +68,7 @@ class TestQuerySetJob:
 
     def test_key(self):
         assert QuerySetJob(DummyModel).key('foo') == (
-            'DummyModel-cacheback.queryset.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8')
+            'DummyModel-cacheback.jobs.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8')
 
     def test_init_kwargs(self):
         assert QuerySetJob(DummyModel).get_constructor_kwargs() == {
