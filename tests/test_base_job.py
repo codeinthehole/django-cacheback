@@ -5,6 +5,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from cacheback.base import Job
+from tests.dummyapp.models import DummyModel
 
 
 class DummyJob(Job):
@@ -203,6 +204,14 @@ class TestJob:
             'tests.test_base_job.DummyJob:def474a313bffa002eae8941b2e12620:'
             '8856328b99ee7881e9bf7205296e056d:c9ebc77141c29f6d619cf8498631343d'
         )
+
+    @pytest.mark.django_db
+    def test_key_django_model(self):
+        alan = DummyModel.objects.create(name="Alan")
+        john = DummyModel.objects.create(name="John")
+        assert DummyJob().key(alan) == \
+            'tests.test_base_job.DummyJob:9df82067f944cc95795bc89ec0aa65df'
+        assert DummyJob().key(alan) != DummyJob().key(john)
 
     @mock.patch('cacheback.base.logger')
     def test_job_refresh_unkown_jobclass(self, logger_mock):

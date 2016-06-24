@@ -78,17 +78,6 @@ class TestQuerySetJob:
 
 
 @pytest.mark.django_db
-class TestDjangoModelJobKey:
-
-    def test_key_django_model(self):
-        alan = DummyModel.objects.create(name="Alan")
-        john = DummyModel.objects.create(name="John")
-        assert FunctionJob().key(alan) == \
-            'cacheback.function.FunctionJob:9df82067f944cc95795bc89ec0aa65df'
-        assert FunctionJob().key(alan) != FunctionJob().key(john)
-
-
-@pytest.mark.django_db
 class TestQuerySetGetJob:
 
     def test_fetch(self):
