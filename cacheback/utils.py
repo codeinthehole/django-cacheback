@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 from django.conf import settings
 from django.core import signals
@@ -22,6 +23,14 @@ except ImportError as exc:
 
 
 logger = logging.getLogger('cacheback')
+
+
+class RemovedInCacheback13Warning(DeprecationWarning):
+    pass
+
+
+def warn_deprecation(message, exc=RemovedInCacheback13Warning):
+    warnings.warn(message, exc)
 
 
 def get_cache(backend, **kwargs):
