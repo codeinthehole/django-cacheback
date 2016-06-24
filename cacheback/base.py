@@ -8,7 +8,7 @@ from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.db.models import Model as DjangoModel
 from django.utils import six
 
-from cacheback.utils import enqueue_task, get_cache, get_job_class
+from .utils import enqueue_task, get_cache, get_job_class
 
 
 logger = logging.getLogger('cacheback')
