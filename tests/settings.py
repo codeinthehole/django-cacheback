@@ -1,3 +1,4 @@
+import logging
 import tempfile
 
 
@@ -39,3 +40,6 @@ RQ_QUEUES = {
 }
 
 CACHEBACK_TASK_QUEUE = 'rq'
+
+
+logging.disable(logging.CRITICAL)
