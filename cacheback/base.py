@@ -81,10 +81,28 @@ class Job(object):
     #: Cache statuses
     MISS, HIT, STALE = range(3)
 
+    @property
+    def class_path(self):
+        return '%s.%s' % (self.__module__, self.__class__.__name__)
+
     def __init__(self):
         self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
         self.cache = get_cache(self.cache_alias)
         self.task_options = self.task_options or {}
+
+    def get_constructor_args(self):
+        """
+        Return the args that need to be passed to __init__ when
+        reconstructing this class.
+        """
+        return ()
+
+    def get_constructor_kwargs(self):
+        """
+        Return the kwargs that need to be passed to __init__ when
+        reconstructing this class.
+        """
+        return {}
 
     # --------
     # MAIN API
@@ -269,20 +287,6 @@ class Job(object):
                              exc_info=True)
             else:
                 logger.debug("Failover synchronous refresh completed successfully")
-
-    def get_constructor_args(self):
-        return ()
-
-    def get_constructor_kwargs(self):
-        """
-        Return the kwargs that need to be passed to __init__ when
-        reconstructing this class.
-        """
-        return {}
-
-    @property
-    def class_path(self):
-        return '%s.%s' % (self.__module__, self.__class__.__name__)
 
     # Override these methods
 
