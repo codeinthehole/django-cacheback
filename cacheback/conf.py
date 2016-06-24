@@ -1,7 +1,8 @@
-from django.apps import AppConfig
-from django.utils.translation import ugettext_lazy as _
+from .apps import CachebackConfig  # noqa
+from .utils import warn_deprecation
 
 
-class CachebackConfig(AppConfig):
-    name = 'cacheback'
-    verbose_name = _('Cacheback')
+warn_deprecation(
+    '`cacheback.conf.CachebackConfig` is deprecated, '
+    'use `cacheback.apps.CachebackConfig` instead.'
+)
