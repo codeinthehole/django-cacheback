@@ -2,6 +2,7 @@ import collections
 import hashlib
 import logging
 import time
+import warnings
 
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS
@@ -407,7 +408,15 @@ class Job(six.with_metaclass(JobBase)):
     # --------------------
 
     @classmethod
-    def job_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
+    def job_refresh(cls, *args, **kwargs):
+        warnings.warn(
+            '`Job.job_refresh` is deprecated, use `perform_async_refresh` instead.',
+            RemovedInCacheback13Warning
+        )
+        return cls.perform_async_refresh(*args, **kwargs)
+
+    @classmethod
+    def perform_async_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
         """
         Re-populate cache using the given job class.
 
