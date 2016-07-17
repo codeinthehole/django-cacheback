@@ -47,6 +47,7 @@ class JobBase(RenameMethodsBase):
     renamed_methods = (
         ('get_constructor_args', 'get_init_args', RemovedInCacheback13Warning),
         ('get_constructor_kwargs', 'get_init_kwargs', RemovedInCacheback13Warning),
+        ('cache_set', 'store', RemovedInCacheback13Warning),
     )
 
 
@@ -158,7 +159,7 @@ class Job(six.with_metaclass(JobBase)):
                 # empty result which will be returned until the cache is
                 # refreshed.
                 result = self.empty()
-                self.cache_set(key, self.timeout(*args, **kwargs), result)
+                self.store(key, self.timeout(*args, **kwargs), result)
                 self.async_refresh(*args, **kwargs)
                 return self.process_result(
                     result, call=call, cache_status=self.MISS,
@@ -192,7 +193,7 @@ class Job(six.with_metaclass(JobBase)):
                 # prevents cache hammering but guards against a 'limbo' situation
                 # where the refresh task fails for some reason.
                 timeout = self.timeout(*args, **kwargs)
-                self.cache_set(key, timeout, data)
+                self.store(key, timeout, data)
                 self.async_refresh(*args, **kwargs)
                 return self.process_result(
                     data, call=call, cache_status=self.STALE, sync_fetch=False)
@@ -211,7 +212,7 @@ class Job(six.with_metaclass(JobBase)):
         item = self.cache.get(key)
         if item is not None:
             expiry, data = item
-            self.cache_set(key, self.timeout(*args, **kwargs), data)
+            self.store(key, self.timeout(*args, **kwargs), data)
             self.async_refresh(*args, **kwargs)
 
     def delete(self, *raw_args, **raw_kwargs):
@@ -235,7 +236,7 @@ class Job(six.with_metaclass(JobBase)):
     def prepare_kwargs(self, **kwargs):
         return kwargs
 
-    def cache_set(self, key, expiry, data):
+    def store(self, key, expiry, data):
         """
         Add a result to the cache
 
@@ -260,9 +261,7 @@ class Job(six.with_metaclass(JobBase)):
         Fetch the result SYNCHRONOUSLY and populate the cache
         """
         result = self.fetch(*args, **kwargs)
-        self.cache_set(self.key(*args, **kwargs),
-                       self.expiry(*args, **kwargs),
-                       result)
+        self.store(self.key(*args, **kwargs), self.expiry(*args, **kwargs), result)
         return result
 
     def async_refresh(self, *args, **kwargs):
