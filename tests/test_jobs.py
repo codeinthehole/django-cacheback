@@ -1,8 +1,8 @@
 import pytest
 
 from cacheback.decorators import cacheback
-from cacheback.function import FunctionJob
-from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob, QuerySetJob
+from cacheback.jobs import (
+    FunctionJob, QuerySetFilterJob, QuerySetGetJob, QuerySetJob)
 from tests.dummyapp.models import DummyModel
 
 
