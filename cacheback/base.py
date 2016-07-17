@@ -7,9 +7,11 @@ from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.db.models import Model as DjangoModel
 from django.utils import six
+from django.utils.deprecation import RenameMethodsBase
 from django.utils.itercompat import is_iterable
 
-from .utils import enqueue_task, get_cache, get_job_class
+from .utils import (
+    RemovedInCacheback13Warning, enqueue_task, get_cache, get_job_class)
 
 
 logger = logging.getLogger('cacheback')
@@ -40,7 +42,15 @@ def to_bytestring(value):
     return bytes(str(value), 'utf8')
 
 
-class Job(object):
+class JobBase(RenameMethodsBase):
+
+    renamed_methods = (
+        ('get_constructor_args', 'get_init_args', RemovedInCacheback13Warning),
+        ('get_constructor_kwargs', 'get_init_kwargs', RemovedInCacheback13Warning),
+    )
+
+
+class Job(six.with_metaclass(JobBase)):
     """
     A cached read job.
 
@@ -91,14 +101,14 @@ class Job(object):
         self.cache = get_cache(self.cache_alias)
         self.task_options = self.task_options or {}
 
-    def get_constructor_args(self):
+    def get_init_args(self):
         """
         Return the args that need to be passed to __init__ when
         reconstructing this class.
         """
         return ()
 
-    def get_constructor_kwargs(self):
+    def get_init_kwargs(self):
         """
         Return the kwargs that need to be passed to __init__ when
         reconstructing this class.
@@ -267,8 +277,8 @@ class Job(object):
             enqueue_task(
                 kwargs=dict(
                     klass_str=self.class_path,
-                    obj_args=self.get_constructor_args(),
-                    obj_kwargs=self.get_constructor_kwargs(),
+                    obj_args=self.get_init_args(),
+                    obj_kwargs=self.get_init_kwargs(),
                     call_args=args,
                     call_kwargs=kwargs
                 ),

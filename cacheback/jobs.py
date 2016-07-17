@@ -20,6 +20,15 @@ class FunctionJob(Job):
         if task_options is not None:
             self.task_options = task_options
 
+    def get_init_kwargs(self):
+        """
+        Return the kwargs that need to be passed to __init__ when reconstructing
+        this class.
+        """
+        # We don't need to pass fetch_on_miss as it isn't used by the refresh
+        # method.
+        return {'lifetime': self.lifetime}
+
     def prepare_args(self, fn, *args):
         # Convert function into "module:name" form so that is can be pickled and
         # then re-imported.
@@ -34,15 +43,6 @@ class FunctionJob(Job):
         if hasattr(fn, 'fn'):
             fn = fn.fn
         return fn(*args, **kwargs)
-
-    def get_constructor_kwargs(self):
-        """
-        Return the kwargs that need to be passed to __init__ when reconstructing
-        this class.
-        """
-        # We don't need to pass fetch_on_miss as it isn't used by the refresh
-        # method.
-        return {'lifetime': self.lifetime}
 
 
 class QuerySetJob(Job):
@@ -63,15 +63,14 @@ class QuerySetJob(Job):
         if task_options is not None:
             self.task_options = task_options
 
+    def get_init_kwargs(self):
+        return {'model': self.model, 'lifetime': self.lifetime}
+
     def key(self, *args, **kwargs):
         return "%s-%s" % (
             self.model.__name__,
             super(QuerySetJob, self).key(*args, **kwargs)
         )
-
-    def get_constructor_kwargs(self):
-        return {'model': self.model,
-                'lifetime': self.lifetime}
 
 
 class QuerySetGetJob(QuerySetJob):

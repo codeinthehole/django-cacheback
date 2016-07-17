@@ -44,9 +44,9 @@ class TestFunctionJob:
             'JOB-EXECUTED:foo')
 
     def test_init_kwargs(self):
-        assert FunctionJob().get_constructor_kwargs() == {
+        assert FunctionJob().get_init_kwargs() == {
             'lifetime': 600}
-        assert FunctionJob(lifetime=30).get_constructor_kwargs() == {
+        assert FunctionJob(lifetime=30).get_init_kwargs() == {
             'lifetime': 30}
 
 
@@ -71,9 +71,9 @@ class TestQuerySetJob:
             'DummyModel-cacheback.jobs.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8')
 
     def test_init_kwargs(self):
-        assert QuerySetJob(DummyModel).get_constructor_kwargs() == {
+        assert QuerySetJob(DummyModel).get_init_kwargs() == {
             'model': DummyModel, 'lifetime': 600}
-        assert QuerySetJob(DummyModel, lifetime=30).get_constructor_kwargs() == {
+        assert QuerySetJob(DummyModel, lifetime=30).get_init_kwargs() == {
             'model': DummyModel, 'lifetime': 30}
 
 
