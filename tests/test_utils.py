@@ -1,4 +1,3 @@
-import django
 import mock
 import pytest
 from django.core import signals
@@ -17,7 +16,6 @@ class TestGetCache:
     def test_cache_instance(self):
         assert isinstance(get_cache('default'), BaseCache)
 
-    @pytest.mark.skipif(django.VERSION[:2] == (1, 5), reason='Not supported in Django 1.5')
     def test_signal(self):
         cache = get_cache('default')
         assert signals.request_finished.receivers[-1][1]() == cache.close
