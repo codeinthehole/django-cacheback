@@ -1,6 +1,10 @@
+import warnings
+
 from .jobs import FunctionJob  # noqa
-from .utils import warn_deprecation
+from .utils import RemovedInCacheback13Warning
 
 
-warn_deprecation(
-    '`cacheback.function` is deprecated, use `cacheback.jobs` instead.')
+warnings.warn(
+    '`cacheback.function` is deprecated, use `cacheback.jobs` instead.',
+    RemovedInCacheback13Warning
+)

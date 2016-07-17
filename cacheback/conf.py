@@ -1,8 +1,11 @@
+import warnings
+
 from .apps import CachebackConfig  # noqa
-from .utils import warn_deprecation
+from .utils import RemovedInCacheback13Warning
 
 
-warn_deprecation(
+warnings.warn(
     '`cacheback.conf.CachebackConfig` is deprecated, '
-    'use `cacheback.apps.CachebackConfig` instead.'
+    'use `cacheback.apps.CachebackConfig` instead.',
+    RemovedInCacheback13Warning
 )
