@@ -363,8 +363,8 @@ class Job(six.with_metaclass(JobBase)):
             # key algorithm.
             return "%s:%s:%s:%s" % (self.class_path,
                                     self.hash(args),
-                                    self.hash(tuple([k for k in sorted(kwargs)])),
-                                    self.hash(tuple([kwargs[k] for k in sorted(kwargs)])))
+                                    self.hash([k for k in sorted(kwargs)]),
+                                    self.hash([kwargs[k] for k in sorted(kwargs)]))
         except TypeError:
             raise RuntimeError(
                 "Unable to generate cache key due to unhashable"
