@@ -5,14 +5,13 @@ import time
 import warnings
 
 from django.conf import settings
-from django.core.cache import DEFAULT_CACHE_ALIAS
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.db.models import Model as DjangoModel
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.itercompat import is_iterable
 
-from .utils import (
-    RemovedInCacheback13Warning, enqueue_task, get_cache, get_job_class)
+from .utils import RemovedInCacheback13Warning, enqueue_task, get_job_class
 
 
 logger = logging.getLogger('cacheback')
@@ -100,7 +99,7 @@ class Job(six.with_metaclass(JobBase)):
 
     def __init__(self):
         self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
-        self.cache = get_cache(self.cache_alias)
+        self.cache = caches[self.cache_alias]
         self.task_options = self.task_options or {}
 
     def get_init_args(self):

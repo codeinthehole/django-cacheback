@@ -120,9 +120,9 @@ class TestJob:
         assert job.key('foo') in job.cache
 
     def test_store_verify_fail(self, settings):
-        settings.CACHES = {
-            'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+        settings.CACHEBACK_CACHE_ALIAS = 'dummy'
         settings.CACHEBACK_VERIFY_CACHE_WRITE = True
+
         job = DummyJob()
 
         with pytest.raises(RuntimeError) as exc:
@@ -131,9 +131,9 @@ class TestJob:
         assert 'Unable to save' in str(exc.value)
 
     def test_store_no_verify_fail(self, settings):
-        settings.CACHES = {
-            'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+        settings.CACHEBACK_CACHE_ALIAS = 'dummy'
         settings.CACHEBACK_VERIFY_CACHE_WRITE = False
+
         job = DummyJob()
         job.store(job.key('foo'), job.expiry(), True)
         assert job.key('foo') not in job.cache

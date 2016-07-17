@@ -1,24 +1,12 @@
 import mock
 import pytest
-from django.core import signals
-from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 
-from cacheback.utils import enqueue_task, get_cache, get_job_class
+from cacheback.utils import enqueue_task, get_job_class
 
 
 class DummyClass:
     pass
-
-
-class TestGetCache:
-
-    def test_cache_instance(self):
-        assert isinstance(get_cache('default'), BaseCache)
-
-    def test_signal(self):
-        cache = get_cache('default')
-        assert signals.request_finished.receivers[-1][1]() == cache.close
 
 
 class TestGetJobClass:
