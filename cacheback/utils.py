@@ -16,8 +16,10 @@ except ImportError:
     celery_refresh_cache = None
 
 try:
+    import django_rq
     from .rq_tasks import refresh_cache as rq_refresh_cache
 except ImportError as exc:
+    django_rq = None
     rq_refresh_cache = None
 
 
@@ -68,13 +70,13 @@ def get_job_class(klass_str):
     return klass
 
 
-def enqueue_task(*args, **kwargs):
+def enqueue_task(kwargs, task_options=None):
     task_queue = getattr(settings, 'CACHEBACK_TASK_QUEUE', 'celery')
 
     if task_queue == 'rq' and rq_refresh_cache is not None:
-        return rq_refresh_cache.delay(**kwargs['kwargs'])
+        return django_rq.get_queue(**task_options or {}).enqueue(rq_refresh_cache, **kwargs)
 
     elif task_queue == 'celery' and celery_refresh_cache is not None:
-        return celery_refresh_cache.apply_async(*args, **kwargs)
+        return celery_refresh_cache.apply_async(kwargs=kwargs, **task_options or {})
 
     raise ImproperlyConfigured('Unkown task queue configured: {0}'.format(task_queue))

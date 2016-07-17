@@ -48,19 +48,22 @@ class TestEnqueueTask:
     @mock.patch('cacheback.utils.celery_refresh_cache')
     def test_celery(self, celery_mock, rq_mock, settings):
         settings.CACHEBACK_TASK_QUEUE = 'celery'
-        enqueue_task(kwargs={'bar': 'baz'})
+        enqueue_task({'bar': 'baz'}, task_options={'foo': 'bar'})
         assert celery_mock.apply_async.called is True
-        assert celery_mock.apply_async.call_args[1] == {'kwargs': {'bar': 'baz'}}
+        assert celery_mock.apply_async.call_args[1] == {
+            'kwargs': {'bar': 'baz'}, 'foo': 'bar'}
         assert rq_mock.delay.called is False
 
-    @mock.patch('cacheback.utils.rq_refresh_cache')
+    @mock.patch('django_rq.get_queue')
     @mock.patch('cacheback.utils.celery_refresh_cache')
     def test_rq(self, celery_mock, rq_mock, settings):
         settings.CACHEBACK_TASK_QUEUE = 'rq'
-        enqueue_task(kwargs={'bar': 'baz'})
+        enqueue_task({'bar': 'baz'}, task_options={'foo': 'bar'})
         assert celery_mock.apply_async.called is False
-        assert rq_mock.delay.called is True
-        assert rq_mock.delay.call_args[1] == {'bar': 'baz'}
+        assert rq_mock.called is True
+        assert rq_mock.call_args[1] == {'foo': 'bar'}
+        assert rq_mock.return_value.enqueue.called is True
+        assert rq_mock.return_value.enqueue.call_args[1] == {'bar': 'baz'}
 
     def test_unkown(self, settings):
         settings.CACHEBACK_TASK_QUEUE = 'unknown'

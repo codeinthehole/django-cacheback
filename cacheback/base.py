@@ -275,14 +275,14 @@ class Job(six.with_metaclass(JobBase)):
 
         try:
             enqueue_task(
-                kwargs=dict(
+                dict(
                     klass_str=self.class_path,
                     obj_args=self.get_init_args(),
                     obj_kwargs=self.get_init_kwargs(),
                     call_args=args,
                     call_kwargs=kwargs
                 ),
-                **self.task_options
+                task_options=self.task_options
             )
         except Exception as e:
             # Handle exceptions from talking to RabbitMQ - eg connection
