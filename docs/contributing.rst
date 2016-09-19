@@ -17,7 +17,7 @@ Use::
 
 or generate coverage report::
 
-    $ py.test --cov
+    $ py.test --cov=cacheback
 
 or use Tox with::
 
