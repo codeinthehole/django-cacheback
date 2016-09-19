@@ -1,6 +1,9 @@
 language: python
 sudo: false
 
+python:
+  - 3.5
+
 env:
   - TOXENV=py27-django18
   - TOXENV=py33-django18
@@ -8,7 +11,12 @@ env:
   - TOXENV=pypy-django18
   - TOXENV=py27-django19
   - TOXENV=py34-django19
+  - TOXENV=py35-django19
   - TOXENV=pypy-django19
+  - TOXENV=py27-django110
+  - TOXENV=py34-django110
+  - TOXENV=py35-django110
+  - TOXENV=pypy-django110
 
 install:
   - pip install tox

@@ -32,7 +32,7 @@ Do you support Python 3?
 ------------------------
 Pythons 2.7, 3.3, 3.4, 3.5 and PyPy are supported.
 
-Django versions 1.8 to 1.9 are supported.
+Django versions 1.8 to 1.10 are supported.
 
 Do you have tests?
 ------------------
