@@ -35,13 +35,13 @@ test_requirements = [
     'tox',
     'tox-pyenv',
     'mock',
-    'freezegun',
-    'pytest',
-    'pytest-cov',
-    'pytest-flakes',
-    'pytest-pep8',
-    'pytest-django',
-    'pytest-isort',
+    'freezegun>=0.3.7',
+    'pytest>=3.0.3',
+    'pytest-cov>=2.4.0',
+    'pytest-flakes>=1.0.1',
+    'pytest-pep8>=1.0.6',
+    'pytest-django>=3.0.0',
+    'pytest-isort>=0.1.0',
 ] + celery_requirements + rq_requirements
 
 
