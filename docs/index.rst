@@ -71,7 +71,7 @@ shortcomings of this approach are:
 * For a cache miss, the tweets are fetched synchronously, blocking code execution
   and leading to a slow response time.
 
-* This in turn exposes exposes the view to a '`cache stampede`_' where
+* This in turn exposes the view to a '`cache stampede`_' where
   multiple expensive reads run simultaneously when the cached item expires.
   Under heavy load, this can bring your site down and make you sad.
 
