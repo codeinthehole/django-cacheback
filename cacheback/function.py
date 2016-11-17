@@ -11,12 +11,15 @@ class FunctionJob(Job):
     Job for executing a function and caching the result
     """
 
-    def __init__(self, lifetime=None, fetch_on_miss=None, task_options=None):
+    def __init__(self, lifetime=None, fetch_on_miss=None, cache_alias=None,
+                 task_options=None):
         super(FunctionJob, self).__init__()
         if lifetime is not None:
             self.lifetime = int(lifetime)
         if fetch_on_miss is not None:
             self.fetch_on_miss = fetch_on_miss
+        if cache_alias is not None:
+            self.cache_alias = cache_alias
         if task_options is not None:
             self.task_options = task_options
 
@@ -42,4 +45,5 @@ class FunctionJob(Job):
         """
         # We don't need to pass fetch_on_miss as it isn't used by the refresh
         # method.
-        return {'lifetime': self.lifetime}
+        return {'lifetime': self.lifetime,
+                'cache_alias': self.cache_alias}

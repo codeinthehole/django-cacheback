@@ -60,6 +60,10 @@ class Job(object):
     #: refresh the cache.
     refresh_timeout = 60
 
+    #: Secifies which cache to use from your `CACHES` setting. It defaults to
+    #: `default`.
+    cache_alias = None
+
     #: Time to store items in the cache.  After this time, we will get a cache
     #: miss which can lead to synchronous refreshes if you have
     #: fetch_on_miss=True.
@@ -82,7 +86,8 @@ class Job(object):
     MISS, HIT, STALE = range(3)
 
     def __init__(self):
-        self.cache_alias = getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS)
+        self.cache_alias = (self.cache_alias or
+                            getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS))
         self.cache = get_cache(self.cache_alias)
         self.task_options = self.task_options or {}
 

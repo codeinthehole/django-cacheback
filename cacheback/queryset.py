@@ -6,7 +6,8 @@ class QuerySetJob(Job):
     Helper class for wrapping ORM reads
     """
 
-    def __init__(self, model, lifetime=None, fetch_on_miss=None, task_options=None):
+    def __init__(self, model, lifetime=None, fetch_on_miss=None, cache_alias=None,
+                 task_options=None):
         """
         :model: The model class to use
         """
@@ -16,6 +17,8 @@ class QuerySetJob(Job):
             self.lifetime = lifetime
         if fetch_on_miss is not None:
             self.fetch_on_miss = fetch_on_miss
+        if cache_alias is not None:
+            self.cache_alias = cache_alias
         if task_options is not None:
             self.task_options = task_options
 
@@ -27,7 +30,8 @@ class QuerySetJob(Job):
 
     def get_constructor_kwargs(self):
         return {'model': self.model,
-                'lifetime': self.lifetime}
+                'lifetime': self.lifetime,
+                'cache_alias': self.cache_alias}
 
 
 class QuerySetGetJob(QuerySetJob):

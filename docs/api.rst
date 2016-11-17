@@ -10,7 +10,7 @@ The main class is ``cacheback.base.Job``.  The methods that are intended to be c
 It has some class properties than can be used to configure simple behaviour:
 
 .. autoclass:: cacheback.base.Job
-    :members: lifetime, refresh_timeout, fetch_on_miss, fetch_on_stale_threshold
+    :members: lifetime, refresh_timeout, cache_alias, fetch_on_miss, fetch_on_stale_threshold
 
 There are also several methods intended to be overridden and customised:
 
