@@ -1,5 +1,5 @@
 import pytest
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from django.core.cache.backends.dummy import DummyCache
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -46,6 +46,26 @@ class TestJobWithFetchOnMissCalledWithNoArgs(TestCase):
     def test_returns_result_on_second_call(self):
         self.assertIsNone(self.job.get())
         self.assertEqual((1, 2, 3), self.job.get())
+
+
+class NoArgsSecondaryCacheJob(NoArgsJob):
+    cache_alias = 'secondary'
+
+
+class TestJobWithCacheAliasCalledWithNoArgs(TestCase):
+
+    def setUp(self):
+        self.job = NoArgsSecondaryCacheJob()
+
+    def tearDown(self):
+        caches['secondary'].clear()
+
+    def test_returns_result_from_correct_cache(self):
+        self.assertEqual((1, 2, 3), self.job.get())
+
+        key = self.job.key()
+        self.assertNotIn(key, cache)
+        self.assertIn(key, caches['secondary'])
 
 
 class SingleArgJob(Job):

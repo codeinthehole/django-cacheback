@@ -35,6 +35,10 @@ class TestUsingConstructorArgs(TestCase):
         job = FunctionJob(300)
         self.assertEqual(300, job.lifetime)
 
+    def test_passing_cache_alias(self):
+        job = FunctionJob(cache_alias='secondary')
+        self.assertEqual('secondary', job.cache_alias)
+
 
 class CustomFunctionJob(FunctionJob):
     def __init__(self, custom_param=None, *args, **kwargs):
