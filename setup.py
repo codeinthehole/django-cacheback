@@ -40,7 +40,7 @@ test_requirements = [
     'pytest-cov',
     'pytest-flakes',
     'pytest-pep8',
-    'pytest-django',
+    'pytest-django>=2.9,<3.0',
     'pytest-isort',
 ] + celery_requirements + rq_requirements
 
