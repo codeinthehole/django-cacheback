@@ -40,6 +40,7 @@ test_requirements = [
     'pytest-cov',
     'pytest-flakes',
     'pytest-pep8',
+    # pytest-django < 3.0 required for Django 1.5 and 1.6 support.
     'pytest-django>=2.9,<3.0',
     'pytest-isort',
 ] + celery_requirements + rq_requirements
