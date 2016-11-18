@@ -1,5 +1,5 @@
 import pytest
-from django.core.cache import cache, caches
+from django.core.cache import cache
 from django.core.cache.backends.dummy import DummyCache
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -7,6 +7,7 @@ from django.utils import six
 
 import cacheback.base
 from cacheback.base import Job
+from cacheback.utils import get_cache
 
 
 class NoArgsJob(Job):
@@ -58,14 +59,14 @@ class TestJobWithCacheAliasCalledWithNoArgs(TestCase):
         self.job = NoArgsSecondaryCacheJob()
 
     def tearDown(self):
-        caches['secondary'].clear()
+        get_cache('secondary').clear()
 
     def test_returns_result_from_correct_cache(self):
         self.assertEqual((1, 2, 3), self.job.get())
 
         key = self.job.key()
         self.assertNotIn(key, cache)
-        self.assertIn(key, caches['secondary'])
+        self.assertIn(key, get_cache('secondary'))
 
 
 class SingleArgJob(Job):
