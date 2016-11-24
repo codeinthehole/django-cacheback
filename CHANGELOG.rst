@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.2
+~~~
+
+* Add support for Django 1.10 (and drop support for Django < 1.8)
+* Refactored codebase, cleaned up method naming and module structure. Old imports
+  and methods will work at least for this release. RemovedInCacheback13Warning is
+  set if old methods or imports are used.
+
 1.1
 ~~~
 
