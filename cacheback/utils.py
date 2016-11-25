@@ -1,9 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.core import signals
 from django.core.exceptions import ImproperlyConfigured
-
 
 try:
     import importlib
@@ -16,34 +14,18 @@ except ImportError:
     celery_refresh_cache = None
 
 try:
+    import django_rq
     from .rq_tasks import refresh_cache as rq_refresh_cache
 except ImportError as exc:
+    django_rq = None
     rq_refresh_cache = None
 
 
 logger = logging.getLogger('cacheback')
 
 
-def get_cache(backend, **kwargs):
-    """
-    Compatibilty wrapper for getting Django's cache backend instance
-
-    original source:
-    https://github.com/vstoykov/django-imagekit/commit/c26f8a0538778969a64ee471ce99b25a04865a8e
-    """
-    from django.core import cache
-
-    # Django < 1.7
-    if not hasattr(cache, '_create_cache'):
-        return cache.get_cache(backend, **kwargs)
-
-    cache = cache._create_cache(backend, **kwargs)
-    # Some caches -- python-memcached in particular -- need to do a cleanup at the
-    # end of a request cycle. If not implemented in a particular backend
-    # cache.close is a no-op. Not available in Django 1.5
-    if hasattr(cache, 'close'):
-        signals.request_finished.connect(cache.close)
-    return cache
+class RemovedInCacheback13Warning(DeprecationWarning):
+    pass
 
 
 def get_job_class(klass_str):
@@ -64,13 +46,13 @@ def get_job_class(klass_str):
     return klass
 
 
-def enqueue_task(*args, **kwargs):
+def enqueue_task(kwargs, task_options=None):
     task_queue = getattr(settings, 'CACHEBACK_TASK_QUEUE', 'celery')
 
     if task_queue == 'rq' and rq_refresh_cache is not None:
-        return rq_refresh_cache.delay(**kwargs['kwargs'])
+        return django_rq.get_queue(**task_options or {}).enqueue(rq_refresh_cache, **kwargs)
 
     elif task_queue == 'celery' and celery_refresh_cache is not None:
-        return celery_refresh_cache.apply_async(*args, **kwargs)
+        return celery_refresh_cache.apply_async(kwargs=kwargs, **task_options or {})
 
     raise ImproperlyConfigured('Unkown task queue configured: {0}'.format(task_queue))

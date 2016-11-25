@@ -116,26 +116,26 @@ class TestJob:
 
     def test_store(self):
         job = DummyJob()
-        job.cache_set(job.key('foo'), job.expiry(), True)
+        job.store(job.key('foo'), job.expiry(), True)
         assert job.key('foo') in job.cache
 
     def test_store_verify_fail(self, settings):
-        settings.CACHES = {
-            'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+        settings.CACHEBACK_CACHE_ALIAS = 'dummy'
         settings.CACHEBACK_VERIFY_CACHE_WRITE = True
+
         job = DummyJob()
 
         with pytest.raises(RuntimeError) as exc:
-            job.cache_set(job.key('foo'), job.expiry(), True)
+            job.store(job.key('foo'), job.expiry(), True)
 
         assert 'Unable to save' in str(exc.value)
 
     def test_store_no_verify_fail(self, settings):
-        settings.CACHES = {
-            'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+        settings.CACHEBACK_CACHE_ALIAS = 'dummy'
         settings.CACHEBACK_VERIFY_CACHE_WRITE = False
+
         job = DummyJob()
-        job.cache_set(job.key('foo'), job.expiry(), True)
+        job.store(job.key('foo'), job.expiry(), True)
         assert job.key('foo') not in job.cache
 
     def test_refresh(self):
@@ -215,16 +215,16 @@ class TestJob:
 
     @mock.patch('cacheback.base.logger')
     def test_job_refresh_unkown_jobclass(self, logger_mock):
-        Job.job_refresh('foomodule.BarJob', (), {}, (), {})
+        Job.perform_async_refresh('foomodule.BarJob', (), {}, (), {})
         assert 'Unable to construct %s with' in (logger_mock.error.call_args[0][0])
         assert logger_mock.error.call_args[0][1] == 'foomodule.BarJob'
 
     @mock.patch('cacheback.base.logger')
     def test_job_refresh_perform_error(self, logger_mock):
-        Job.job_refresh('tests.test_base_job.FailJob', (), {}, (), {})
+        Job.perform_async_refresh('tests.test_base_job.FailJob', (), {}, (), {})
         assert 'Error running job' in (logger_mock.exception.call_args[0][0])
         assert isinstance(logger_mock.exception.call_args[0][1], Exception)
 
     def test_job_refresh(self):
-        Job.job_refresh('tests.test_base_job.EmptyDummyJob', (), {}, ('foo',), {})
+        Job.perform_async_refresh('tests.test_base_job.EmptyDummyJob', (), {}, ('foo',), {})
         assert EmptyDummyJob().get('foo') is not None

@@ -35,14 +35,13 @@ test_requirements = [
     'tox',
     'tox-pyenv',
     'mock',
-    'freezegun',
-    'pytest',
-    'pytest-cov',
-    'pytest-flakes',
-    'pytest-pep8',
-    # pytest-django < 3.0 required for Django 1.5 and 1.6 support.
-    'pytest-django>=2.9,<3.0',
-    'pytest-isort',
+    'freezegun>=0.3.7',
+    'pytest>=3.0.3',
+    'pytest-cov>=2.4.0',
+    'pytest-flakes>=1.0.1',
+    'pytest-pep8>=1.0.6',
+    'pytest-django>=3.0.0',
+    'pytest-isort>=0.1.0',
 ] + celery_requirements + rq_requirements
 
 
@@ -61,7 +60,7 @@ setup(
     packages=find_packages(exclude=['sandbox*', 'tests*']),
     include_package_data=True,
     install_requires=[
-        'django>=1.5,<1.10',
+        'django>=1.8,<1.11',
     ],
     extras_require={
         'celery': celery_requirements,

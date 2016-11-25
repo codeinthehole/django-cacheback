@@ -17,7 +17,7 @@ synchronously.
 .. _rq: http://python-rq.org/
 
 Using this library, you can rework your views so that all reads are from
-cache - which can be a significant performance boost.  
+cache - which can be a significant performance boost.
 
 A corollary of this technique is that cache hammering can be handled simply and
 elegantly, avoiding sudden surges of expensive reads when a cached item becomes stale.
@@ -32,7 +32,7 @@ Do you support Python 3?
 ------------------------
 Pythons 2.7, 3.3, 3.4, 3.5 and PyPy are supported.
 
-Django versions 1.5 to 1.9 are also supported.
+Django versions 1.8 to 1.10 are supported.
 
 Do you have tests?
 ------------------

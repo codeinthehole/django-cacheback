@@ -1,7 +1,7 @@
 import pytest
 
 from cacheback.decorators import cacheback
-from cacheback.function import FunctionJob
+from cacheback.jobs import FunctionJob
 
 
 class OtherFunctionJob(FunctionJob):

@@ -24,10 +24,10 @@ Queryset jobs
 There are two classes for easy caching of ORM reads.  These don't need
 subclassing but rather take the model class as a ``__init__`` parameter.
 
-.. autoclass:: cacheback.queryset.QuerySetFilterJob
+.. autoclass:: cacheback.jobs.QuerySetFilterJob
     :members:
 
-.. autoclass:: cacheback.queryset.QuerySetGetJob
+.. autoclass:: cacheback.jobs.QuerySetGetJob
     :members:
 
 Example usage:
@@ -36,7 +36,7 @@ Example usage:
  
     from django.contrib.auth import models
     from django.shortcuts import render
-    from cacheback.queryset import QuerySetGetJob, QuerySetFilterJob
+    from cacheback.jobs import QuerySetGetJob, QuerySetFilterJob
 
     def user_detail(request, username):
         user = QuerySetGetJob(models.User).get(username=username)
@@ -44,7 +44,7 @@ Example usage:
                       {'user': user})
 
     def staff(request):
-        staff = QuerySetFilterJob(models.User).filter(is_staff=True)
+        staff = QuerySetFilterJob(models.User).get(is_staff=True)
         return render(request, 'staff.html',
                       {'users': staff})
 

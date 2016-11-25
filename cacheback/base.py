@@ -2,13 +2,16 @@ import collections
 import hashlib
 import logging
 import time
+import warnings
 
 from django.conf import settings
-from django.core.cache import DEFAULT_CACHE_ALIAS
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.db.models import Model as DjangoModel
 from django.utils import six
+from django.utils.deprecation import RenameMethodsBase
+from django.utils.itercompat import is_iterable
 
-from cacheback.utils import enqueue_task, get_cache, get_job_class
+from .utils import RemovedInCacheback13Warning, enqueue_task, get_job_class
 
 
 logger = logging.getLogger('cacheback')
@@ -39,7 +42,16 @@ def to_bytestring(value):
     return bytes(str(value), 'utf8')
 
 
-class Job(object):
+class JobBase(RenameMethodsBase):
+
+    renamed_methods = (
+        ('get_constructor_args', 'get_init_args', RemovedInCacheback13Warning),
+        ('get_constructor_kwargs', 'get_init_kwargs', RemovedInCacheback13Warning),
+        ('cache_set', 'store', RemovedInCacheback13Warning),
+    )
+
+
+class Job(six.with_metaclass(JobBase)):
     """
     A cached read job.
 
@@ -85,11 +97,29 @@ class Job(object):
     #: Cache statuses
     MISS, HIT, STALE = range(3)
 
+    @property
+    def class_path(self):
+        return '%s.%s' % (self.__module__, self.__class__.__name__)
+
     def __init__(self):
         self.cache_alias = (self.cache_alias or
                             getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS))
-        self.cache = get_cache(self.cache_alias)
+        self.cache = caches[self.cache_alias]
         self.task_options = self.task_options or {}
+
+    def get_init_args(self):
+        """
+        Return the args that need to be passed to __init__ when
+        reconstructing this class.
+        """
+        return ()
+
+    def get_init_kwargs(self):
+        """
+        Return the kwargs that need to be passed to __init__ when
+        reconstructing this class.
+        """
+        return {}
 
     # --------
     # MAIN API
@@ -134,7 +164,7 @@ class Job(object):
                 # empty result which will be returned until the cache is
                 # refreshed.
                 result = self.empty()
-                self.cache_set(key, self.timeout(*args, **kwargs), result)
+                self.store(key, self.timeout(*args, **kwargs), result)
                 self.async_refresh(*args, **kwargs)
                 return self.process_result(
                     result, call=call, cache_status=self.MISS,
@@ -168,7 +198,7 @@ class Job(object):
                 # prevents cache hammering but guards against a 'limbo' situation
                 # where the refresh task fails for some reason.
                 timeout = self.timeout(*args, **kwargs)
-                self.cache_set(key, timeout, data)
+                self.store(key, timeout, data)
                 self.async_refresh(*args, **kwargs)
                 return self.process_result(
                     data, call=call, cache_status=self.STALE, sync_fetch=False)
@@ -187,7 +217,7 @@ class Job(object):
         item = self.cache.get(key)
         if item is not None:
             expiry, data = item
-            self.cache_set(key, self.timeout(*args, **kwargs), data)
+            self.store(key, self.timeout(*args, **kwargs), data)
             self.async_refresh(*args, **kwargs)
 
     def delete(self, *raw_args, **raw_kwargs):
@@ -211,7 +241,7 @@ class Job(object):
     def prepare_kwargs(self, **kwargs):
         return kwargs
 
-    def cache_set(self, key, expiry, data):
+    def store(self, key, expiry, data):
         """
         Add a result to the cache
 
@@ -236,9 +266,7 @@ class Job(object):
         Fetch the result SYNCHRONOUSLY and populate the cache
         """
         result = self.fetch(*args, **kwargs)
-        self.cache_set(self.key(*args, **kwargs),
-                       self.expiry(*args, **kwargs),
-                       result)
+        self.store(self.key(*args, **kwargs), self.expiry(*args, **kwargs), result)
         return result
 
     def async_refresh(self, *args, **kwargs):
@@ -251,14 +279,14 @@ class Job(object):
 
         try:
             enqueue_task(
-                kwargs=dict(
+                dict(
                     klass_str=self.class_path,
-                    obj_args=self.get_constructor_args(),
-                    obj_kwargs=self.get_constructor_kwargs(),
+                    obj_args=self.get_init_args(),
+                    obj_kwargs=self.get_init_kwargs(),
                     call_args=args,
                     call_kwargs=kwargs
                 ),
-                **self.task_options
+                task_options=self.task_options
             )
         except Exception as e:
             # Handle exceptions from talking to RabbitMQ - eg connection
@@ -274,20 +302,6 @@ class Job(object):
                              exc_info=True)
             else:
                 logger.debug("Failover synchronous refresh completed successfully")
-
-    def get_constructor_args(self):
-        return ()
-
-    def get_constructor_kwargs(self):
-        """
-        Return the kwargs that need to be passed to __init__ when
-        reconstructing this class.
-        """
-        return {}
-
-    @property
-    def class_path(self):
-        return '%s.%s' % (self.__module__, self.__class__.__name__)
 
     # Override these methods
 
@@ -353,8 +367,8 @@ class Job(object):
             # key algorithm.
             return "%s:%s:%s:%s" % (self.class_path,
                                     self.hash(args),
-                                    self.hash(tuple([k for k in sorted(kwargs)])),
-                                    self.hash(tuple([kwargs[k] for k in sorted(kwargs)])))
+                                    self.hash([k for k in sorted(kwargs)]),
+                                    self.hash([kwargs[k] for k in sorted(kwargs)]))
         except TypeError:
             raise RuntimeError(
                 "Unable to generate cache key due to unhashable"
@@ -363,11 +377,11 @@ class Job(object):
 
     def hash(self, value):
         """
-        Generate a hash of the given tuple.
+        Generate a hash of the given iterable.
 
         This is for use in a cache key.
         """
-        if isinstance(value, tuple):
+        if is_iterable(value):
             value = tuple(to_bytestring(v) for v in value)
         return hashlib.md5(six.b(':').join(value)).hexdigest()
 
@@ -398,7 +412,15 @@ class Job(object):
     # --------------------
 
     @classmethod
-    def job_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
+    def job_refresh(cls, *args, **kwargs):
+        warnings.warn(
+            '`Job.job_refresh` is deprecated, use `perform_async_refresh` instead.',
+            RemovedInCacheback13Warning
+        )
+        return cls.perform_async_refresh(*args, **kwargs)
+
+    @classmethod
+    def perform_async_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
         """
         Re-populate cache using the given job class.
 

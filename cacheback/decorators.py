@@ -2,7 +2,7 @@ from functools import wraps
 
 from django.utils.decorators import available_attrs
 
-from cacheback.function import FunctionJob
+from .jobs import FunctionJob
 
 
 def cacheback(lifetime=None, fetch_on_miss=None, cache_alias=None,

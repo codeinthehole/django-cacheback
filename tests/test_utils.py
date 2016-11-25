@@ -1,26 +1,12 @@
-import django
 import mock
 import pytest
-from django.core import signals
-from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 
-from cacheback.utils import enqueue_task, get_cache, get_job_class
+from cacheback.utils import enqueue_task, get_job_class
 
 
 class DummyClass:
     pass
-
-
-class TestGetCache:
-
-    def test_cache_instance(self):
-        assert isinstance(get_cache('default'), BaseCache)
-
-    @pytest.mark.skipif(django.VERSION[:2] == (1, 5), reason='Not supported in Django 1.5')
-    def test_signal(self):
-        cache = get_cache('default')
-        assert signals.request_finished.receivers[-1][1]() == cache.close
 
 
 class TestGetJobClass:
@@ -48,19 +34,22 @@ class TestEnqueueTask:
     @mock.patch('cacheback.utils.celery_refresh_cache')
     def test_celery(self, celery_mock, rq_mock, settings):
         settings.CACHEBACK_TASK_QUEUE = 'celery'
-        enqueue_task(kwargs={'bar': 'baz'})
+        enqueue_task({'bar': 'baz'}, task_options={'foo': 'bar'})
         assert celery_mock.apply_async.called is True
-        assert celery_mock.apply_async.call_args[1] == {'kwargs': {'bar': 'baz'}}
+        assert celery_mock.apply_async.call_args[1] == {
+            'kwargs': {'bar': 'baz'}, 'foo': 'bar'}
         assert rq_mock.delay.called is False
 
-    @mock.patch('cacheback.utils.rq_refresh_cache')
+    @mock.patch('django_rq.get_queue')
     @mock.patch('cacheback.utils.celery_refresh_cache')
     def test_rq(self, celery_mock, rq_mock, settings):
         settings.CACHEBACK_TASK_QUEUE = 'rq'
-        enqueue_task(kwargs={'bar': 'baz'})
+        enqueue_task({'bar': 'baz'}, task_options={'foo': 'bar'})
         assert celery_mock.apply_async.called is False
-        assert rq_mock.delay.called is True
-        assert rq_mock.delay.call_args[1] == {'bar': 'baz'}
+        assert rq_mock.called is True
+        assert rq_mock.call_args[1] == {'foo': 'bar'}
+        assert rq_mock.return_value.enqueue.called is True
+        assert rq_mock.return_value.enqueue.call_args[1] == {'bar': 'baz'}
 
     def test_unkown(self, settings):
         settings.CACHEBACK_TASK_QUEUE = 'unknown'

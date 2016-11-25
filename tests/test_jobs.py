@@ -1,8 +1,8 @@
 import pytest
 
 from cacheback.decorators import cacheback
-from cacheback.function import FunctionJob
-from cacheback.queryset import QuerySetFilterJob, QuerySetGetJob, QuerySetJob
+from cacheback.jobs import (
+    FunctionJob, QuerySetFilterJob, QuerySetGetJob, QuerySetJob)
 from tests.dummyapp.models import DummyModel
 
 
@@ -47,11 +47,11 @@ class TestFunctionJob:
             'JOB-EXECUTED:foo')
 
     def test_init_kwargs(self):
-        assert FunctionJob().get_constructor_kwargs() == {
+        assert FunctionJob().get_init_kwargs() == {
             'lifetime': 600, 'cache_alias': 'default'}
-        assert FunctionJob(lifetime=30).get_constructor_kwargs() == {
+        assert FunctionJob(lifetime=30).get_init_kwargs() == {
             'lifetime': 30, 'cache_alias': 'default'}
-        assert FunctionJob(cache_alias='secondary').get_constructor_kwargs() == {
+        assert FunctionJob(cache_alias='secondary').get_init_kwargs() == {
             'lifetime': 600, 'cache_alias': 'secondary'}
 
 
@@ -75,14 +75,14 @@ class TestQuerySetJob:
 
     def test_key(self):
         assert QuerySetJob(DummyModel).key('foo') == (
-            'DummyModel-cacheback.queryset.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8')
+            'DummyModel-cacheback.jobs.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8')
 
     def test_init_kwargs(self):
-        assert QuerySetJob(DummyModel).get_constructor_kwargs() == {
+        assert QuerySetJob(DummyModel).get_init_kwargs() == {
             'model': DummyModel, 'lifetime': 600, 'cache_alias': 'default'}
-        assert QuerySetJob(DummyModel, lifetime=30).get_constructor_kwargs() == {
+        assert QuerySetJob(DummyModel, lifetime=30).get_init_kwargs() == {
             'model': DummyModel, 'lifetime': 30, 'cache_alias': 'default'}
-        assert QuerySetJob(DummyModel, cache_alias='secondary').get_constructor_kwargs() == {
+        assert QuerySetJob(DummyModel, cache_alias='secondary').get_init_kwargs() == {
             'model': DummyModel, 'lifetime': 600, 'cache_alias': 'secondary'}
 
 

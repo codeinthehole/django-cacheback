@@ -1,3 +1,4 @@
+import logging
 import tempfile
 
 
@@ -18,6 +19,9 @@ CACHES = {
     'secondary': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': tempfile.mkdtemp(),
+    },
+    'dummy': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 
@@ -43,3 +47,6 @@ RQ_QUEUES = {
 }
 
 CACHEBACK_TASK_QUEUE = 'rq'
+
+
+logging.disable(logging.CRITICAL)
