@@ -9,6 +9,7 @@ Changelog
 * Refactored codebase, cleaned up method naming and module structure. Old imports
   and methods will work at least for this release. RemovedInCacheback13Warning is
   set if old methods or imports are used.
+* Add option to have a different cache per cacheback job
 
 1.1
 ~~~
