@@ -1,5 +1,6 @@
 import mock
 import pytest
+from django.core.cache import cache, caches
 from django.core.cache.backends.base import BaseCache
 from django.utils import timezone
 from freezegun import freeze_time
@@ -12,6 +13,10 @@ class DummyJob(Job):
 
     def fetch(self, param):
         return ('JOB-EXECUTED:{0}'.format(param), timezone.now())
+
+
+class CacheAliasDummyJob(DummyJob):
+    cache_alias = 'secondary'
 
 
 class EmptyDummyJob(DummyJob):
@@ -38,6 +43,12 @@ class TestJob:
 
     def test_get_miss_sync(self):
         assert DummyJob().get('foo')[0] == 'JOB-EXECUTED:foo'
+
+    def test_get_uses_cache_alias(self):
+        job = CacheAliasDummyJob()
+        assert job.get('foo')[0] == 'JOB-EXECUTED:foo'
+        assert job.key('foo') not in cache
+        assert job.key('foo') in caches[CacheAliasDummyJob.cache_alias]
 
     @pytest.mark.redis_required
     def test_get_miss_empty_async(self, rq_burst):
