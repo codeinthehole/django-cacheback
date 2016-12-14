@@ -13,15 +13,15 @@ register = Library()
 
 class CacheJob(Job):
     """Class to handle asynchronous loading of all cacheback template tags"""
-    
+
     def fetch(self, nodelist, context, expire_time, fragment_name, vary_on):
         """Render the node"""
         return self.nodelist.render(context)
-    
+
     def expiry(self, nodelist, context, expire_time, fragment_name, vary_on):
         """When to expire"""
         return time.time() + expire_time
-    
+
     def key(self, nodelist, context, expire_time, fragment_name, vary_on):
         """Make the cache key"""
         return make_template_fragment_key(fragment_name, vary_on)
