@@ -12,7 +12,7 @@ class FunctionJob(Job):
     """
 
     def __init__(self, lifetime=None, fetch_on_miss=None, cache_alias=None,
-                 task_options=None):
+                 task_options=None, cache_payload_label=None):
         super(FunctionJob, self).__init__()
         if lifetime is not None:
             self.lifetime = int(lifetime)
@@ -22,6 +22,8 @@ class FunctionJob(Job):
             self.cache_alias = cache_alias
         if task_options is not None:
             self.task_options = task_options
+        if cache_payload_label is not None:
+            self.cache_payload_label = cache_payload_label
 
     def get_init_kwargs(self):
         """

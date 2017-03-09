@@ -91,6 +91,11 @@ class Job(six.with_metaclass(JobBase)):
     #: there will be times when an item is _too_ stale to be returned.
     fetch_on_stale_threshold = None
 
+    #: parameter name to pass in the data which is to be cached in the set method. Data can
+    #: also be passed as last positional argument in set method, but using a kw arg may be
+    #: clearer or even necessary. Defaults to 'cache_payload'
+    cache_payload_label = 'cache_payload'
+
     #: Overrides options for `refresh_cache.apply_async` (e.g. `queue`).
     task_options = None
 
@@ -230,6 +235,26 @@ class Job(six.with_metaclass(JobBase)):
         item = self.cache.get(key)
         if item is not None:
             self.cache.delete(key)
+
+    def set(self, *raw_args, **raw_kwargs):
+        if raw_kwargs.get(self.cache_payload_label):
+            data = raw_kwargs[self.cache_payload_label]
+            del raw_kwargs[self.cache_payload_label]
+        else:
+            raw_args = list(raw_args)
+            data = raw_args.pop()
+
+        args = self.prepare_args(*raw_args)
+        kwargs = self.prepare_kwargs(**raw_kwargs)
+
+        key = self.key(*args, **kwargs)
+
+        timeout = self.timeout(*args, **kwargs)
+
+        logger.debug("Setting %s cache with key '%s', args '%r', kwargs '%r', timeout '%r'",
+                     self.class_path, key, args, kwargs, timeout)
+
+        self.store(key, timeout, data)
 
     # --------------
     # HELPER METHODS

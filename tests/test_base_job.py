@@ -33,6 +33,10 @@ class FailJob(Job):
         raise Exception('JOB-FAILED')
 
 
+class CustomPayloadLabelJob(Job):
+    cache_payload_label = 'my_cache_data'
+
+
 @pytest.mark.usefixtures('cleared_cache', scope='function')
 class TestJob:
 
@@ -215,6 +219,36 @@ class TestJob:
             'tests.test_base_job.DummyJob:def474a313bffa002eae8941b2e12620:'
             '8856328b99ee7881e9bf7205296e056d:c9ebc77141c29f6d619cf8498631343d'
         )
+
+    def test_set(self):
+        job = DummyJob()
+        job.set('foo', 'MANUALLY_SET')
+        assert job.get('foo') == 'MANUALLY_SET'
+
+    def test_set_preset_cache(self):
+        job = DummyJob()
+        assert job.get('foo')[0] == 'JOB-EXECUTED:foo'
+
+        # It is cached
+        assert job.key('foo') in job.cache
+
+        job.set('foo', 'MANUALLY_SET')
+
+        assert job.get('foo') == 'MANUALLY_SET'
+
+    def test_set_default_kw_arg(self):
+
+        job = DummyJob()
+        job.set('foo', cache_payload='MANUALLY_SET_WITH_KW_ARG')
+
+        assert job.get('foo') == 'MANUALLY_SET_WITH_KW_ARG'
+
+    def test_set_default_custom_kw_arg(self):
+
+        job = CustomPayloadLabelJob()
+        job.set('foo', my_cache_data='MANUALLY_SET_WITH_CUSTOM_KW_ARG')
+
+        assert job.get('foo') == 'MANUALLY_SET_WITH_CUSTOM_KW_ARG'
 
     @pytest.mark.django_db
     def test_key_django_model(self):

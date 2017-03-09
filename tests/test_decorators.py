@@ -23,6 +23,11 @@ def fetch_cache_alias_function(param):
     return 'JOB-EXECUTED:{0}'.format(param)
 
 
+@cacheback(cache_payload_label='my_data')
+def custom_payload_label_function(param):
+    return 'JOB-EXECUTED:{0}'.format(param)
+
+
 @pytest.mark.usefixtures('cleared_cache', scope='function')
 class TestCachebackDecorator:
 
@@ -46,6 +51,24 @@ class TestCachebackDecorator:
 
     def test_cache_alias(self):
         assert fetch_cache_alias_function('foo') == 'JOB-EXECUTED:foo'
+
+    def test_set(self):
+        no_fetch_miss_function.job.set(
+            no_fetch_miss_function, 'foo', 'MANUALLY_SET')
+
+        assert no_fetch_miss_function('foo') == 'MANUALLY_SET'
+
+    def test_set_kwarg(self):
+        no_fetch_miss_function.job.set(
+            no_fetch_miss_function, 'foo', cache_payload='MANUALLY_SET_WITH_KWARG')
+
+        assert no_fetch_miss_function('foo') == 'MANUALLY_SET_WITH_KWARG'
+
+    def test_set_custom_kwarg(self):
+        custom_payload_label_function.job.set(
+            custom_payload_label_function, 'foo', my_data='MANUALLY_SET_WITH_CUSTOM_KWARG')
+
+        assert custom_payload_label_function('foo') == 'MANUALLY_SET_WITH_CUSTOM_KWARG'
 
     @pytest.mark.redis_required
     def test_hit(self, rq_burst):
