@@ -17,10 +17,10 @@ Simply wrap the function whose results you want to cache::
 
 The default behaviour of the ``cacheback`` decorator is to:
 
-* Cache items for 10 minutes.  
+* Cache items for 10 minutes.
 
 * When the cache is empty for a given key, the data will be fetched
-  synchronously.      
+  synchronously.
 
 You can parameterise the decorator to cache items for longer and also to not block on a
 cache miss::
@@ -39,7 +39,7 @@ Now:
 
 * For a cache miss, ``None`` will be returned and the cache refreshed
   asynchronously.
-    
+
 As an instance of ``cacheback.Job``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -51,7 +51,7 @@ responsible for fetching the data to be cached::
     from cacheback.base import Job
 
     class UserTweets(Job):
-        
+
         def fetch(self, username):
             url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
             return requests.get(url % username).json
@@ -75,7 +75,7 @@ attributes::
     class UserTweets(Job):
         lifetime = 60*20
         fetch_on_miss = False
-        
+
         def fetch(self, username):
             url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
             return requests.get(url % username).json
@@ -87,7 +87,7 @@ or by overriding methods::
     from cacheback.base import Job
 
     class UserTweets(Job):
-        
+
         def fetch(self, username):
             url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
             return requests.get(url % username).json
@@ -119,6 +119,69 @@ You can also simply remove an item from the cache so that the next request will
 trigger the refresh::
 
     job.delete(username)
+
+Setting cache values
+~~~~~~~~~~~~~~~~~~~~
+
+If you want to update the cache programmatically use the ``set`` method on
+a job instance (this can be useful when your program can discover updates through a
+separate mechanism for example, or for caching partial or derived data)::
+
+    tweets_job = UserTweets()
+
+    user_tweets = tweets_job.get(username)
+
+    new_tweet = PostTweet(username, 'Trying out Cacheback!')
+
+    # Naive example, assuming no other process would have updated the tweets
+    tweets_job.set(username, user_tweets + [new_tweet])
+
+The data to be cached can be specified in a few ways. Firstly it can be the last
+positional argument, as above. If that is unclear, you can also use the keyword ``data``::
+
+    tweets_job.set(username, data=(current_tweets + [new_tweet]))
+
+And if your cache method already uses a keyword argument called ``data`` you can specify
+the name of a different parameter as a class variable called ``set_data_kw``::
+
+    class CustomKwUserTweets(UserTweets):
+        set_data_kw = 'my_cache_data'
+
+    custom_tweets_job = CustomKwUserTweets()
+
+    custom_tweets_job.set(username, my_cache_data=(user_tweets + [new_tweet]))
+
+This also works with a decorated function::
+
+    @cacheback()
+    def fetch_tweets(username):
+        url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
+        return requests.get(url % username).json
+
+    user_tweets = fetch_tweets(username)
+
+    new_tweet = PostTweet(username, 'Trying out Cacheback!')
+
+    fetch_tweets.job.set(fetch_tweets, username, (user_tweets + [new_tweet])))
+
+or::
+
+    fetch_tweets.job.set(fetch_tweets, username, data=(current_tweets + [new_tweet])))
+
+And you can specify the ``set_data_kw`` in the decorator params as you'd expect::
+
+    @cacheback(set_data_kw='my_cache_data')
+    def fetch_tweets(username):
+        url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
+        return requests.get(url % username).json
+
+    fetch_tweets.job.set(fetch_tweets, username, my_cache_data=(user_tweets + [new_tweet])))
+
+**NOTE:** If your ``fetch`` method, or cacheback-decorated function takes a named parameter
+of ``data`` and you wish to use the ``set`` method, you **must** provide a new value for the
+``set_data_kw`` parameter, and not pass in the data to cache as the last positional argument.
+Otherwise the value of the ``data`` parameter will be used as the data to cache.
+
 
 Post-processing
 ~~~~~~~~~~~~~~~
