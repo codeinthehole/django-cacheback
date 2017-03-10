@@ -23,7 +23,7 @@ def fetch_cache_alias_function(param):
     return 'JOB-EXECUTED:{0}'.format(param)
 
 
-@cacheback(cache_payload_label='my_data')
+@cacheback(set_data_kwarg='my_data')
 def custom_payload_label_function(param):
     return 'JOB-EXECUTED:{0}'.format(param)
 
@@ -60,7 +60,7 @@ class TestCachebackDecorator:
 
     def test_set_kwarg(self):
         no_fetch_miss_function.job.set(
-            no_fetch_miss_function, 'foo', cache_payload='MANUALLY_SET_WITH_KWARG')
+            no_fetch_miss_function, 'foo', data='MANUALLY_SET_WITH_KWARG')
 
         assert no_fetch_miss_function('foo') == 'MANUALLY_SET_WITH_KWARG'
 

@@ -93,8 +93,8 @@ class Job(six.with_metaclass(JobBase)):
 
     #: parameter name to pass in the data which is to be cached in the set method. Data can
     #: also be passed as last positional argument in set method, but using a kw arg may be
-    #: clearer or even necessary. Defaults to 'cache_payload'
-    cache_payload_label = 'cache_payload'
+    #: clearer or even necessary. Defaults to 'data'
+    set_data_kwarg = 'data'
 
     #: Overrides options for `refresh_cache.apply_async` (e.g. `queue`).
     task_options = None
@@ -237,9 +237,9 @@ class Job(six.with_metaclass(JobBase)):
             self.cache.delete(key)
 
     def set(self, *raw_args, **raw_kwargs):
-        if raw_kwargs.get(self.cache_payload_label):
-            data = raw_kwargs[self.cache_payload_label]
-            del raw_kwargs[self.cache_payload_label]
+        if raw_kwargs.get(self.set_data_kwarg):
+            data = raw_kwargs[self.set_data_kwarg]
+            del raw_kwargs[self.set_data_kwarg]
         else:
             raw_args = list(raw_args)
             data = raw_args.pop()

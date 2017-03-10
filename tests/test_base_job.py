@@ -34,7 +34,7 @@ class FailJob(Job):
 
 
 class CustomPayloadLabelJob(Job):
-    cache_payload_label = 'my_cache_data'
+    set_data_kwarg = 'my_cache_data'
 
 
 @pytest.mark.usefixtures('cleared_cache', scope='function')
@@ -239,7 +239,7 @@ class TestJob:
     def test_set_default_kw_arg(self):
 
         job = DummyJob()
-        job.set('foo', cache_payload='MANUALLY_SET_WITH_KW_ARG')
+        job.set('foo', data='MANUALLY_SET_WITH_KW_ARG')
 
         assert job.get('foo') == 'MANUALLY_SET_WITH_KW_ARG'
 
