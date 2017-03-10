@@ -142,10 +142,10 @@ positional argument, as above. If that is unclear, you can also use the keyword 
     tweets_job.set(username, data=(current_tweets + [new_tweet]))
 
 And if your cache method already uses a keyword argument called ``data`` you can specify
-the name of a different parameter as a class variable called ``set_data_kw``::
+the name of a different parameter as a class variable called ``set_data_kwarg``::
 
     class CustomKwUserTweets(UserTweets):
-        set_data_kw = 'my_cache_data'
+        set_data_kwarg = 'my_cache_data'
 
     custom_tweets_job = CustomKwUserTweets()
 
@@ -168,9 +168,9 @@ or::
 
     fetch_tweets.job.set(fetch_tweets, username, data=(current_tweets + [new_tweet])))
 
-And you can specify the ``set_data_kw`` in the decorator params as you'd expect::
+And you can specify the ``set_data_kwarg`` in the decorator params as you'd expect::
 
-    @cacheback(set_data_kw='my_cache_data')
+    @cacheback(set_data_kwarg='my_cache_data')
     def fetch_tweets(username):
         url = "https://twitter.com/statuses/user_timeline.json?screen_name=%s"
         return requests.get(url % username).json
@@ -179,7 +179,7 @@ And you can specify the ``set_data_kw`` in the decorator params as you'd expect:
 
 **NOTE:** If your ``fetch`` method, or cacheback-decorated function takes a named parameter
 of ``data`` and you wish to use the ``set`` method, you **must** provide a new value for the
-``set_data_kw`` parameter, and not pass in the data to cache as the last positional argument.
+``set_data_kwarg`` parameter, and not pass in the data to cache as the last positional argument.
 Otherwise the value of the ``data`` parameter will be used as the data to cache.
 
 

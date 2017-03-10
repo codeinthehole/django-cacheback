@@ -237,9 +237,8 @@ class Job(six.with_metaclass(JobBase)):
             self.cache.delete(key)
 
     def set(self, *raw_args, **raw_kwargs):
-        if raw_kwargs.get(self.set_data_kwarg):
-            data = raw_kwargs[self.set_data_kwarg]
-            del raw_kwargs[self.set_data_kwarg]
+        if self.set_data_kwarg in raw_kwargs:
+            data = raw_kwargs.pop(self.set_data_kwarg)
         else:
             raw_args = list(raw_args)
             data = raw_args.pop()
