@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.3
+~~~
+* Add set method, with the same semantics as delete & get. Updated docs.
+
 1.2
 ~~~
 
@@ -30,7 +34,7 @@ Changelog
 
 0.9
 ~~~
-* Add support for other caches (`#32`_) 
+* Add support for other caches (`#32`_)
 * Fix inconsistent hasing issue in Python 3.x (`#28`_)
 * Allow ``job_class_kwargs`` to be passed to ``cacheback`` decorator (`#31`_)
 
