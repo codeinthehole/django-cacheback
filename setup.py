@@ -60,7 +60,7 @@ setup(
     packages=find_packages(exclude=['sandbox*', 'tests*']),
     include_package_data=True,
     install_requires=[
-        'django>=1.8,<1.11',
+        'django>=1.8,<2.0',
     ],
     extras_require={
         'celery': celery_requirements,
