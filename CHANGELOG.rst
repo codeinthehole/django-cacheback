@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.3.1
+~~~~~
+
+* Add support for Django 1.11.
+
 1.3
 ~~~
 * Add set method, with the same semantics as delete & get. Updated docs.
