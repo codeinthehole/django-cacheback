@@ -236,7 +236,23 @@ class Job(six.with_metaclass(JobBase)):
         if item is not None:
             self.cache.delete(key)
 
+    def raw_get(self, *raw_args, **raw_kwargs):
+        """
+        Retrieve the item (tuple of value and expiry) that is actually in the cache,
+        without causing a refresh.
+        """
+
+        args = self.prepare_args(*raw_args)
+        kwargs = self.prepare_kwargs(**raw_kwargs)
+
+        key = self.key(*args, **kwargs)
+
+        return self.cache.get(key)
+
     def set(self, *raw_args, **raw_kwargs):
+        """
+        Manually set the cache value with its appropriate expiry.
+        """
         if self.set_data_kwarg in raw_kwargs:
             data = raw_kwargs.pop(self.set_data_kwarg)
         else:
@@ -248,12 +264,12 @@ class Job(six.with_metaclass(JobBase)):
 
         key = self.key(*args, **kwargs)
 
-        timeout = self.timeout(*args, **kwargs)
+        expiry = self.expiry(*args, **kwargs)
 
-        logger.debug("Setting %s cache with key '%s', args '%r', kwargs '%r', timeout '%r'",
-                     self.class_path, key, args, kwargs, timeout)
+        logger.debug("Setting %s cache with key '%s', args '%r', kwargs '%r', expiry '%r'",
+                     self.class_path, key, args, kwargs, expiry)
 
-        self.store(key, timeout, data)
+        self.store(key, expiry, data)
 
     # --------------
     # HELPER METHODS
