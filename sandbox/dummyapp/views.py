@@ -1,11 +1,9 @@
 from django.shortcuts import render
 
-from cacheback.queryset import QuerySetFilterJob
-from cacheback.function import FunctionJob
 from cacheback.decorators import cacheback
-
-from dummyapp import jobs
-from dummyapp import models
+from cacheback.function import FunctionJob
+from cacheback.queryset import QuerySetFilterJob
+from dummyapp import jobs, models
 
 
 def fetch():
