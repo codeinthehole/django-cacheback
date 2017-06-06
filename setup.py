@@ -1,6 +1,5 @@
 import os
-
-from setuptools import find_packages, setup
+from setuptools import setup, find_packages
 
 from cacheback import __version__
 

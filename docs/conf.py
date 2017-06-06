@@ -11,23 +11,12 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import os
-import sys
-
-from django.conf import settings
-
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
-import cacheback
-
-
+import sys, os
 code_dir = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(code_dir)
 
+from django.conf import settings
 if not settings.configured:
     settings.configure(
         DATABASES={
@@ -67,6 +56,12 @@ master_doc = 'index'
 project = u'django-cacheback'
 copyright = u'2012, David Winterbottom'
 
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release|, also used in various other places throughout the
+# built documents.
+#
+# The short X.Y version.
+import cacheback
 version = cacheback.__version__
 # The full version, including alpha/beta/rc tags.
 release = cacheback.__version__
