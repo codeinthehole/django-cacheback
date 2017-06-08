@@ -183,6 +183,18 @@ of ``data`` and you wish to use the ``set`` method, you **must** provide a new v
 Otherwise the value of the ``data`` parameter will be used as the data to cache.
 
 
+Checking what's in the cache
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+On occasion you may wish to check exactly what Cacheback has stored in the cache without triggering a refresh — this is ususally useful for seeing if values have updated since the last time they were retrieved. The ``raw_get`` method allows you to do that, and uses the same semantics as ``get``, ``set``, etc. It returns the value that's actually stored in the cache, i.e., the ``(expiry, data)`` tuple, or ``None`` if no value has yet been set::
+
+
+    # Don't want to trigger a refetch at this point
+    raw_cache_value = fetch_tweets.job.raw_get(fetch_tweets, username)
+
+    if raw_cache_value is not None:
+        expiry, cached_tweets = raw_cache_value
+
+
 Post-processing
 ~~~~~~~~~~~~~~~
 

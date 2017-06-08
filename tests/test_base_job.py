@@ -220,9 +220,26 @@ class TestJob:
             '8856328b99ee7881e9bf7205296e056d:c9ebc77141c29f6d619cf8498631343d'
         )
 
+    def test_raw_get(self):
+        job = DummyJob()
+        with freeze_time('2016-03-20 14:05'):
+
+            job.set('foo', 'MANUALLY_SET')
+
+            expiry, value = job.raw_get('foo')
+
+        assert expiry == float(1458483300)
+        assert value == 'MANUALLY_SET'
+
+    def test_raw_get_empty(self):
+        job = DummyJob()
+
+        assert job.raw_get() is None
+
     def test_set(self):
         job = DummyJob()
         job.set('foo', 'MANUALLY_SET')
+
         assert job.get('foo') == 'MANUALLY_SET'
 
     def test_set_preset_cache(self):

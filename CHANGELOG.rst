@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.3.2
+~~~~~
+
+* Bugfix in set method — was using the timeout instead of the expiry. Also added a
+  raw_get method, which retrieves cache entry with same semantics as regular
+  get method.
+
 1.3.1
 ~~~~~
 
