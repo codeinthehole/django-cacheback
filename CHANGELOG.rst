@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.4.0
+~~~~~
+
+* Add support for Django 2.0.
+* Drop official support for Python 3.3 (py33 might work for bit longer).
+
 1.3.2
 ~~~~~
 
