@@ -328,7 +328,7 @@ class Job(six.with_metaclass(JobBase)):
                 ),
                 task_options=self.task_options
             )
-        except Exception as e:
+        except Exception:
             # Handle exceptions from talking to RabbitMQ - eg connection
             # refused.  When this happens, we try to run the task
             # synchronously.
