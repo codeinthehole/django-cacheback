@@ -4,10 +4,10 @@ import logging
 import time
 import warnings
 
+import six
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.db.models import Model as DjangoModel
-from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
 from django.utils.itercompat import is_iterable
 

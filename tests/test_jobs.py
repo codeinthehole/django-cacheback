@@ -21,16 +21,16 @@ class TestFunctionJob:
     def test_init_defaults(self):
         job = FunctionJob()
         assert job.lifetime == 600
-        assert job.fetch_on_miss is True
-        assert job.cache_alias is 'default'
+        assert job.fetch_on_miss
+        assert job.cache_alias == 'default'
         assert job.task_options == {}
 
     def test_init(self):
         job = FunctionJob(lifetime=30, fetch_on_miss=False, cache_alias='secondary',
                           task_options={'foo': 'bar'})
         assert job.lifetime == 30
-        assert job.fetch_on_miss is False
-        assert job.cache_alias is 'secondary'
+        assert not job.fetch_on_miss
+        assert job.cache_alias == 'secondary'
         assert job.task_options == {'foo': 'bar'}
 
     def test_prepare_args(self):
@@ -61,16 +61,16 @@ class TestQuerySetJob:
     def test_init_defaults(self):
         job = QuerySetJob(DummyModel)
         assert job.lifetime == 600
-        assert job.fetch_on_miss is True
-        assert job.cache_alias is 'default'
+        assert job.fetch_on_miss
+        assert job.cache_alias == 'default'
         assert job.task_options == {}
 
     def test_init(self):
         job = QuerySetJob(DummyModel, lifetime=30, fetch_on_miss=False,
                           cache_alias='secondary', task_options={'foo': 'bar'})
         assert job.lifetime == 30
-        assert job.fetch_on_miss is False
-        assert job.cache_alias is 'secondary'
+        assert not job.fetch_on_miss
+        assert job.cache_alias == 'secondary'
         assert job.task_options == {'foo': 'bar'}
 
     def test_key(self):

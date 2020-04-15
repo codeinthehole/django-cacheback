@@ -21,7 +21,7 @@ def skip_if_no_redis():
 
 
 def pytest_runtest_setup(item):
-    if item.get_marker('redis_required'):
+    if item.get_closest_marker('redis_required'):
         skip_if_no_redis()
 
 
