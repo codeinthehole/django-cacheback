@@ -2,6 +2,11 @@
 Changelog
 =========
 
+2.0.0
+~~~~~
+
+* BREAKING CHANGE: Dropping support for Python 2
+
 1.4.0
 ~~~~~
 

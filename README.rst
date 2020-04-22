@@ -30,9 +30,9 @@ Yup - `over on readthedocs.org`_.
 
 Do you support Python 3?
 ------------------------
-Pythons 2.7, 3.3, 3.4, 3.5, 3.6, 3.7, PyPy, and PyPy3 are supported.
+Python 3.4, 3.5, 3.6, 3.7 and PyPy3 are supported.
 
-Django versions 1.8 to 2.1 are supported.
+Django versions 1.8 to 3.0 are supported.
 
 Do you have tests?
 ------------------
