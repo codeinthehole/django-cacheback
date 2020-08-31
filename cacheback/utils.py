@@ -16,6 +16,7 @@ except ImportError:
 
 try:
     import django_rq
+
     from .rq_tasks import refresh_cache as rq_refresh_cache
 except ImportError:
     django_rq = None
