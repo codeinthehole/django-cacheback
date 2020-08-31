@@ -52,7 +52,12 @@ def enqueue_task(kwargs, task_options=None):
     task_queue = getattr(settings, 'CACHEBACK_TASK_QUEUE', 'celery')
 
     if task_queue == 'rq' and rq_refresh_cache is not None:
-        return django_rq.get_queue(**task_options or {}).enqueue(rq_refresh_cache, **kwargs)
+        queue = django_rq.get_queue(**task_options or {})
+        return queue.enqueue_call(
+            rq_refresh_cache,
+            kwargs=kwargs,
+            result_ttl=0 if getattr(settings, 'CACHEBACK_TASK_IGNORE_RESULT', False) else None
+        )
 
     elif task_queue == 'celery' and celery_refresh_cache is not None:
         return celery_refresh_cache.apply_async(kwargs=kwargs, **task_options or {})

@@ -23,8 +23,8 @@ This defines the task queue to use. Valid options are ``rq`` and ``celery``.
 Make sure that the corresponding task queue is configured too.
 
 
-``CACHEBACK_CELERY_IGNORE_RESULT``
-------------------------
+``CACHEBACK_TASK_IGNORE_RESULT``
+--------------------------------
 
 This specifies whether to ignore the result of the ``refresh_cache`` task
-and prevent Celery from storing it into its results backend.
+and prevent Celery/RQ from storing it into its results backend.
