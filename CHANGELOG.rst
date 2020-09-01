@@ -2,6 +2,11 @@
 Changelog
 =========
 
+2.1.0
+~~~~~
+
+* Add ``CACHEBACK_TASK_IGNORE_RESULT`` option to reduce noise in task queues.
+
 2.0.0
 ~~~~~
 
