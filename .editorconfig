@@ -1,0 +1,23 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = tab
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+multi_line_output = 3
+lines_after_imports = 2
+include_trailing_comma = True
+ensure_newline_before_comments = True
+force_grid_wrap = 0
+use_parentheses = True
+line_length = 96
+
+[*.rst]
+indent_style = space
+indent_size = 4

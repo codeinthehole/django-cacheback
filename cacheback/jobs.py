@@ -11,8 +11,14 @@ class FunctionJob(Job):
     Job for executing a function and caching the result
     """
 
-    def __init__(self, lifetime=None, fetch_on_miss=None, cache_alias=None,
-                 task_options=None, set_data_kwarg=None):
+    def __init__(
+        self,
+        lifetime=None,
+        fetch_on_miss=None,
+        cache_alias=None,
+        task_options=None,
+        set_data_kwarg=None,
+    ):
         super(FunctionJob, self).__init__()
         if lifetime is not None:
             self.lifetime = int(lifetime)
@@ -32,8 +38,7 @@ class FunctionJob(Job):
         """
         # We don't need to pass fetch_on_miss as it isn't used by the refresh
         # method.
-        return {'lifetime': self.lifetime,
-                'cache_alias': self.cache_alias}
+        return {'lifetime': self.lifetime, 'cache_alias': self.cache_alias}
 
     def prepare_args(self, fn, *args):
         # Convert function into "module:name" form so that is can be pickled and
@@ -56,8 +61,9 @@ class QuerySetJob(Job):
     Helper class for wrapping ORM reads
     """
 
-    def __init__(self, model, lifetime=None, fetch_on_miss=None, cache_alias=None,
-                 task_options=None):
+    def __init__(
+        self, model, lifetime=None, fetch_on_miss=None, cache_alias=None, task_options=None
+    ):
         """
         :model: The model class to use
         """
@@ -73,21 +79,17 @@ class QuerySetJob(Job):
             self.task_options = task_options
 
     def get_init_kwargs(self):
-        return {'model': self.model,
-                'lifetime': self.lifetime,
-                'cache_alias': self.cache_alias}
+        return {'model': self.model, 'lifetime': self.lifetime, 'cache_alias': self.cache_alias}
 
     def key(self, *args, **kwargs):
-        return "%s-%s" % (
-            self.model.__name__,
-            super(QuerySetJob, self).key(*args, **kwargs)
-        )
+        return "%s-%s" % (self.model.__name__, super(QuerySetJob, self).key(*args, **kwargs))
 
 
 class QuerySetGetJob(QuerySetJob):
     """
     For ORM reads that use the ``get`` method.
     """
+
     def fetch(self, *args, **kwargs):
         return self.model.objects.get(**kwargs)
 
@@ -96,5 +98,6 @@ class QuerySetFilterJob(QuerySetJob):
     """
     For ORM reads that use the ``filter`` method.
     """
+
     def fetch(self, *args, **kwargs):
         return self.model.objects.filter(**kwargs)

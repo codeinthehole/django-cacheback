@@ -1,8 +1,7 @@
 import pytest
 
 from cacheback.decorators import cacheback
-from cacheback.jobs import (
-    FunctionJob, QuerySetFilterJob, QuerySetGetJob, QuerySetJob)
+from cacheback.jobs import FunctionJob, QuerySetFilterJob, QuerySetGetJob, QuerySetJob
 from tests.dummyapp.models import DummyModel
 
 
@@ -17,7 +16,6 @@ def decorated_dummy_function(param):
 
 @pytest.mark.usefixtures('cleared_cache', scope='function')
 class TestFunctionJob:
-
     def test_init_defaults(self):
         job = FunctionJob()
         assert job.lifetime == 600
@@ -26,8 +24,12 @@ class TestFunctionJob:
         assert job.task_options == {}
 
     def test_init(self):
-        job = FunctionJob(lifetime=30, fetch_on_miss=False, cache_alias='secondary',
-                          task_options={'foo': 'bar'})
+        job = FunctionJob(
+            lifetime=30,
+            fetch_on_miss=False,
+            cache_alias='secondary',
+            task_options={'foo': 'bar'},
+        )
         assert job.lifetime == 30
         assert not job.fetch_on_miss
         assert job.cache_alias == 'secondary'
@@ -36,28 +38,34 @@ class TestFunctionJob:
     def test_prepare_args(self):
         job = FunctionJob()
         assert job.prepare_args(dummy_function, 'foo') == (
-            'tests.test_jobs:dummy_function', 'foo')
+            'tests.test_jobs:dummy_function',
+            'foo',
+        )
 
     def test_fetch(self):
         assert FunctionJob().fetch('tests.test_jobs:dummy_function', 'foo') == (
-            'JOB-EXECUTED:foo')
+            'JOB-EXECUTED:foo'
+        )
 
     def test_fetch_decorated(self):
         assert FunctionJob().fetch('tests.test_jobs:decorated_dummy_function', 'foo') == (
-            'JOB-EXECUTED:foo')
+            'JOB-EXECUTED:foo'
+        )
 
     def test_init_kwargs(self):
-        assert FunctionJob().get_init_kwargs() == {
-            'lifetime': 600, 'cache_alias': 'default'}
+        assert FunctionJob().get_init_kwargs() == {'lifetime': 600, 'cache_alias': 'default'}
         assert FunctionJob(lifetime=30).get_init_kwargs() == {
-            'lifetime': 30, 'cache_alias': 'default'}
+            'lifetime': 30,
+            'cache_alias': 'default',
+        }
         assert FunctionJob(cache_alias='secondary').get_init_kwargs() == {
-            'lifetime': 600, 'cache_alias': 'secondary'}
+            'lifetime': 600,
+            'cache_alias': 'secondary',
+        }
 
 
 @pytest.mark.django_db
 class TestQuerySetJob:
-
     def test_init_defaults(self):
         job = QuerySetJob(DummyModel)
         assert job.lifetime == 600
@@ -66,8 +74,13 @@ class TestQuerySetJob:
         assert job.task_options == {}
 
     def test_init(self):
-        job = QuerySetJob(DummyModel, lifetime=30, fetch_on_miss=False,
-                          cache_alias='secondary', task_options={'foo': 'bar'})
+        job = QuerySetJob(
+            DummyModel,
+            lifetime=30,
+            fetch_on_miss=False,
+            cache_alias='secondary',
+            task_options={'foo': 'bar'},
+        )
         assert job.lifetime == 30
         assert not job.fetch_on_miss
         assert job.cache_alias == 'secondary'
@@ -75,20 +88,29 @@ class TestQuerySetJob:
 
     def test_key(self):
         assert QuerySetJob(DummyModel).key('foo') == (
-            'DummyModel-cacheback.jobs.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8')
+            'DummyModel-cacheback.jobs.QuerySetJob:acbd18db4cc2f85cedef654fccc4a4d8'
+        )
 
     def test_init_kwargs(self):
         assert QuerySetJob(DummyModel).get_init_kwargs() == {
-            'model': DummyModel, 'lifetime': 600, 'cache_alias': 'default'}
+            'model': DummyModel,
+            'lifetime': 600,
+            'cache_alias': 'default',
+        }
         assert QuerySetJob(DummyModel, lifetime=30).get_init_kwargs() == {
-            'model': DummyModel, 'lifetime': 30, 'cache_alias': 'default'}
+            'model': DummyModel,
+            'lifetime': 30,
+            'cache_alias': 'default',
+        }
         assert QuerySetJob(DummyModel, cache_alias='secondary').get_init_kwargs() == {
-            'model': DummyModel, 'lifetime': 600, 'cache_alias': 'secondary'}
+            'model': DummyModel,
+            'lifetime': 600,
+            'cache_alias': 'secondary',
+        }
 
 
 @pytest.mark.django_db
 class TestQuerySetGetJob:
-
     def test_fetch(self):
         dummy1 = DummyModel.objects.create(name='Foo')
         assert QuerySetGetJob(DummyModel).fetch(name='Foo') == dummy1
@@ -96,7 +118,6 @@ class TestQuerySetGetJob:
 
 @pytest.mark.django_db
 class TestQuerySetGetFilterJob:
-
     def test_fetch(self):
         dummy1 = DummyModel.objects.create(name='Foo')
         dummy2 = DummyModel.objects.create(name='Bar')

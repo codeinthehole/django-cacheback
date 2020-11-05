@@ -10,7 +10,7 @@ def skip_if_no_redis():
         try:
             redis.StrictRedis(
                 settings.RQ_QUEUES['default'].get('HOST', 'localhost'),
-                settings.RQ_QUEUES['default'].get('POST', 6379)
+                settings.RQ_QUEUES['default'].get('POST', 6379),
             ).ping()
             skip_if_no_redis._redis_available = True
         except redis.ConnectionError:
@@ -49,7 +49,6 @@ def rq_worker(request):
 
 @pytest.yield_fixture
 def rq_burst(request, rq_worker):
-
     def burst():
         rq_worker.work(burst=True)
 

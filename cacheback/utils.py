@@ -56,7 +56,7 @@ def enqueue_task(kwargs, task_options=None):
         return queue.enqueue_call(
             rq_refresh_cache,
             kwargs=kwargs,
-            result_ttl=0 if getattr(settings, 'CACHEBACK_TASK_IGNORE_RESULT', False) else None
+            result_ttl=0 if getattr(settings, 'CACHEBACK_TASK_IGNORE_RESULT', False) else None,
         )
 
     elif task_queue == 'celery' and celery_refresh_cache is not None:

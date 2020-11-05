@@ -3,8 +3,14 @@ from functools import WRAPPER_ASSIGNMENTS, wraps
 from .jobs import FunctionJob
 
 
-def cacheback(lifetime=None, fetch_on_miss=None, cache_alias=None,
-              job_class=None, task_options=None, **job_class_kwargs):
+def cacheback(
+    lifetime=None,
+    fetch_on_miss=None,
+    cache_alias=None,
+    job_class=None,
+    task_options=None,
+    **job_class_kwargs
+):
     """
     Decorate function to cache its return value.
 
@@ -19,15 +25,20 @@ def cacheback(lifetime=None, fetch_on_miss=None, cache_alias=None,
     """
     if job_class is None:
         job_class = FunctionJob
-    job = job_class(lifetime=lifetime, fetch_on_miss=fetch_on_miss,
-                    cache_alias=cache_alias, task_options=task_options,
-                    **job_class_kwargs)
+    job = job_class(
+        lifetime=lifetime,
+        fetch_on_miss=fetch_on_miss,
+        cache_alias=cache_alias,
+        task_options=task_options,
+        **job_class_kwargs
+    )
 
     def _wrapper(fn):
         # using available_attrs to work around http://bugs.python.org/issue3445
         @wraps(fn, assigned=WRAPPER_ASSIGNMENTS)
         def __wrapper(*args, **kwargs):
             return job.get(fn, *args, **kwargs)
+
         # Assign reference to unwrapped function so that we can access it
         # later without descending into infinite regress.
         __wrapper.fn = fn

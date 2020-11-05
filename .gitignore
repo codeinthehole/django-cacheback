@@ -4,8 +4,10 @@ docs/_build
 dist/*
 build/*
 .coverage
+htmlcov/
 TODO
 .tox
 __pycache__
 *.egg-info
 .pytest_cache
+*.lock

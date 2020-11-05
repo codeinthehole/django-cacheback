@@ -1,4 +1,5 @@
-import mock
+from unittest import mock
+
 import pytest
 from django.core.cache import cache, caches
 from django.core.cache.backends.base import BaseCache
@@ -10,7 +11,6 @@ from tests.dummyapp.models import DummyModel
 
 
 class DummyJob(Job):
-
     def fetch(self, param):
         return ('JOB-EXECUTED:{0}'.format(param), timezone.now())
 
@@ -28,7 +28,6 @@ class StaleDummyJob(DummyJob):
 
 
 class FailJob(Job):
-
     def fetch(self):
         raise Exception('JOB-FAILED')
 
@@ -39,7 +38,6 @@ class CustomPayloadLabelJob(Job):
 
 @pytest.mark.usefixtures('cleared_cache', scope='function')
 class TestJob:
-
     def test_init(self):
         job = DummyJob()
         assert isinstance(job.cache, BaseCache)
@@ -206,7 +204,8 @@ class TestJob:
 
     def test_key_args_no_kwargs(self):
         assert DummyJob().key(1, 2, 3) == (
-            'tests.test_base_job.DummyJob:7b6e2994f12a7e000c01190edec1921e')
+            'tests.test_base_job.DummyJob:7b6e2994f12a7e000c01190edec1921e'
+        )
 
     def test_key_no_args_kwargs(self):
         assert DummyJob().key(foo='bar') == (
@@ -271,8 +270,10 @@ class TestJob:
     def test_key_django_model(self):
         alan = DummyModel.objects.create(name="Alan")
         john = DummyModel.objects.create(name="John")
-        assert DummyJob().key(alan) == \
-            'tests.test_base_job.DummyJob:9df82067f944cc95795bc89ec0aa65df'
+        assert (
+            DummyJob().key(alan)
+            == 'tests.test_base_job.DummyJob:9df82067f944cc95795bc89ec0aa65df'
+        )
         assert DummyJob().key(alan) != DummyJob().key(john)
 
     @mock.patch('cacheback.base.logger')

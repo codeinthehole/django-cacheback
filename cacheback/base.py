@@ -55,6 +55,7 @@ class Job(metaclass=JobBase):
     This is the core class for the package which is intended to be subclassed
     to allow the caching behaviour to be customised.
     """
+
     # All items are stored in memcache as a tuple (expiry, data).  We don't use
     # the TTL functionality within memcache but implement on own.  If the
     # expiry value is None, this indicates that there is already a job created
@@ -104,8 +105,9 @@ class Job(metaclass=JobBase):
         return '%s.%s' % (self.__module__, self.__class__.__name__)
 
     def __init__(self):
-        self.cache_alias = (self.cache_alias or
-                            getattr(settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS))
+        self.cache_alias = self.cache_alias or getattr(
+            settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS
+        )
         self.cache = caches[self.cache_alias]
         self.task_options = self.task_options or {}
 
@@ -150,17 +152,25 @@ class Job(metaclass=JobBase):
             #    the fetch has finished, or
             # b) trigger an async refresh and return an empty result
             if self.should_missing_item_be_fetched_synchronously(*args, **kwargs):
-                logger.debug(("Job %s with key '%s' - cache MISS - running "
-                              "synchronous refresh"),
-                             self.class_path, key)
+                logger.debug(
+                    ("Job %s with key '%s' - cache MISS - running " "synchronous refresh"),
+                    self.class_path,
+                    key,
+                )
                 result = self.refresh(*args, **kwargs)
                 return self.process_result(
-                    result, call=call, cache_status=self.MISS, sync_fetch=True)
+                    result, call=call, cache_status=self.MISS, sync_fetch=True
+                )
 
             else:
-                logger.debug(("Job %s with key '%s' - cache MISS - triggering "
-                              "async refresh and returning empty result"),
-                             self.class_path, key)
+                logger.debug(
+                    (
+                        "Job %s with key '%s' - cache MISS - triggering "
+                        "async refresh and returning empty result"
+                    ),
+                    self.class_path,
+                    key,
+                )
                 # To avoid cache hammering (ie lots of identical tasks
                 # to refresh the same cache item), we reset the cache with an
                 # empty result which will be returned until the cache is
@@ -169,8 +179,8 @@ class Job(metaclass=JobBase):
                 self.store(key, self.timeout(*args, **kwargs), result)
                 self.async_refresh(*args, **kwargs)
                 return self.process_result(
-                    result, call=call, cache_status=self.MISS,
-                    sync_fetch=False)
+                    result, call=call, cache_status=self.MISS, sync_fetch=False
+                )
 
         expiry, data = item
         delta = time.time() - expiry
@@ -180,22 +190,26 @@ class Job(metaclass=JobBase):
             #    the fetch has finished, or
             # b) trigger a refresh but allow the stale result to be
             #    returned this time.  This is normally acceptable.
-            if self.should_stale_item_be_fetched_synchronously(
-                    delta, *args, **kwargs):
+            if self.should_stale_item_be_fetched_synchronously(delta, *args, **kwargs):
                 logger.debug(
-                    ("Job %s with key '%s' - STALE cache hit - running "
-                     "synchronous refresh"),
-                    self.class_path, key)
+                    ("Job %s with key '%s' - STALE cache hit - running " "synchronous refresh"),
+                    self.class_path,
+                    key,
+                )
                 result = self.refresh(*args, **kwargs)
                 return self.process_result(
-                    result, call=call, cache_status=self.STALE,
-                    sync_fetch=True)
+                    result, call=call, cache_status=self.STALE, sync_fetch=True
+                )
 
             else:
                 logger.debug(
-                    ("Job %s with key '%s' - STALE cache hit - triggering "
-                     "async refresh and returning stale result"),
-                    self.class_path, key)
+                    (
+                        "Job %s with key '%s' - STALE cache hit - triggering "
+                        "async refresh and returning stale result"
+                    ),
+                    self.class_path,
+                    key,
+                )
                 # We replace the item in the cache with a 'timeout' expiry - this
                 # prevents cache hammering but guards against a 'limbo' situation
                 # where the refresh task fails for some reason.
@@ -203,7 +217,8 @@ class Job(metaclass=JobBase):
                 self.store(key, timeout, data)
                 self.async_refresh(*args, **kwargs)
                 return self.process_result(
-                    data, call=call, cache_status=self.STALE, sync_fetch=False)
+                    data, call=call, cache_status=self.STALE, sync_fetch=False
+                )
         else:
             logger.debug("Job %s with key '%s' - cache HIT", self.class_path, key)
             return self.process_result(data, call=call, cache_status=self.HIT)
@@ -261,8 +276,14 @@ class Job(metaclass=JobBase):
 
         expiry = self.expiry(*args, **kwargs)
 
-        logger.debug("Setting %s cache with key '%s', args '%r', kwargs '%r', expiry '%r'",
-                     self.class_path, key, args, kwargs, expiry)
+        logger.debug(
+            "Setting %s cache with key '%s', args '%r', kwargs '%r', expiry '%r'",
+            self.class_path,
+            key,
+            args,
+            kwargs,
+            expiry,
+        )
 
         self.store(key, expiry, data)
 
@@ -292,9 +313,7 @@ class Job(metaclass=JobBase):
             # without warning.
             __, cached_data = self.cache.get(key, (None, None))
             if data is not None and cached_data is None:
-                raise RuntimeError(
-                    "Unable to save data of type %s to cache" % (
-                        type(data)))
+                raise RuntimeError("Unable to save data of type %s to cache" % (type(data)))
 
     def refresh(self, *args, **kwargs):
         """
@@ -319,22 +338,24 @@ class Job(metaclass=JobBase):
                     obj_args=self.get_init_args(),
                     obj_kwargs=self.get_init_kwargs(),
                     call_args=args,
-                    call_kwargs=kwargs
+                    call_kwargs=kwargs,
                 ),
-                task_options=self.task_options
+                task_options=self.task_options,
             )
         except Exception:
             # Handle exceptions from talking to RabbitMQ - eg connection
             # refused.  When this happens, we try to run the task
             # synchronously.
-            logger.error("Unable to trigger task asynchronously - failing "
-                         "over to synchronous refresh", exc_info=True)
+            logger.error(
+                "Unable to trigger task asynchronously - failing "
+                "over to synchronous refresh",
+                exc_info=True,
+            )
             try:
                 return self.refresh(*args, **kwargs)
             except Exception as e:
                 # Something went wrong while running the task
-                logger.error("Unable to refresh data synchronously: %s", e,
-                             exc_info=True)
+                logger.error("Unable to refresh data synchronously: %s", e, exc_info=True)
             else:
                 logger.debug("Failover synchronous refresh completed successfully")
 
@@ -368,13 +389,14 @@ class Job(metaclass=JobBase):
 
     def should_item_be_fetched_synchronously(self, *args, **kwargs):
         import warnings
+
         warnings.warn(
             "The method 'should_item_be_fetched_synchronously' is deprecated "
             "and will be removed in 0.5.  Use "
             "'should_missing_item_be_fetched_synchronously' instead.",
-            DeprecationWarning)
-        return self.should_missing_item_be_fetched_synchronously(
-            *args, **kwargs)
+            DeprecationWarning,
+        )
+        return self.should_missing_item_be_fetched_synchronously(*args, **kwargs)
 
     def should_stale_item_be_fetched_synchronously(self, delta, *args, **kwargs):
         """
@@ -400,15 +422,18 @@ class Job(metaclass=JobBase):
             # The line might break if your passed values are un-hashable.  If
             # it does, you need to override this method and implement your own
             # key algorithm.
-            return "%s:%s:%s:%s" % (self.class_path,
-                                    self.hash(args),
-                                    self.hash([k for k in sorted(kwargs)]),
-                                    self.hash([kwargs[k] for k in sorted(kwargs)]))
+            return "%s:%s:%s:%s" % (
+                self.class_path,
+                self.hash(args),
+                self.hash([k for k in sorted(kwargs)]),
+                self.hash([kwargs[k] for k in sorted(kwargs)]),
+            )
         except TypeError:
             raise RuntimeError(
                 "Unable to generate cache key due to unhashable"
                 "args or kwargs - you need to implement your own"
-                "key generation method to avoid this problem")
+                "key generation method to avoid this problem"
+            )
 
     def hash(self, value):
         """
@@ -450,7 +475,7 @@ class Job(metaclass=JobBase):
     def job_refresh(cls, *args, **kwargs):
         warnings.warn(
             '`Job.job_refresh` is deprecated, use `perform_async_refresh` instead.',
-            RemovedInCacheback13Warning
+            RemovedInCacheback13Warning,
         )
         return cls.perform_async_refresh(*args, **kwargs)
 
@@ -473,18 +498,21 @@ class Job(metaclass=JobBase):
         """
         klass = get_job_class(klass_str)
         if klass is None:
-            logger.error("Unable to construct %s with args %r and kwargs %r",
-                         klass_str, obj_args, obj_kwargs)
+            logger.error(
+                "Unable to construct %s with args %r and kwargs %r",
+                klass_str,
+                obj_args,
+                obj_kwargs,
+            )
             return
 
-        logger.info("Using %s with constructor args %r and kwargs %r",
-                    klass_str, obj_args, obj_kwargs)
-        logger.info("Calling refresh with args %r and kwargs %r", call_args,
-                    call_kwargs)
+        logger.info(
+            "Using %s with constructor args %r and kwargs %r", klass_str, obj_args, obj_kwargs
+        )
+        logger.info("Calling refresh with args %r and kwargs %r", call_args, call_kwargs)
         start = time.time()
         try:
-            klass(*obj_args, **obj_kwargs).refresh(
-                *call_args, **call_kwargs)
+            klass(*obj_args, **obj_kwargs).refresh(*call_args, **call_kwargs)
         except Exception as e:
             logger.exception("Error running job: '%s'", e)
         else:

@@ -22,7 +22,7 @@ CACHES = {
     },
     'dummy': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
+    },
 }
 
 INSTALLED_APPS = [

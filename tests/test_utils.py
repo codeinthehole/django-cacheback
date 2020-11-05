@@ -1,4 +1,5 @@
-import mock
+from unittest import mock
+
 import pytest
 from django.core.exceptions import ImproperlyConfigured
 
@@ -10,7 +11,6 @@ class DummyClass:
 
 
 class TestGetJobClass:
-
     @mock.patch('cacheback.utils.logger')
     def test_invalid_module(self, logger_mock):
         assert get_job_class('tests.foo.DummyClass') is None
@@ -29,15 +29,13 @@ class TestGetJobClass:
 
 
 class TestEnqueueTask:
-
     @mock.patch('cacheback.utils.rq_refresh_cache')
     @mock.patch('cacheback.utils.celery_refresh_cache')
     def test_celery(self, celery_mock, rq_mock, settings):
         settings.CACHEBACK_TASK_QUEUE = 'celery'
         enqueue_task({'bar': 'baz'}, task_options={'foo': 'bar'})
         assert celery_mock.apply_async.called is True
-        assert celery_mock.apply_async.call_args[1] == {
-            'kwargs': {'bar': 'baz'}, 'foo': 'bar'}
+        assert celery_mock.apply_async.call_args[1] == {'kwargs': {'bar': 'baz'}, 'foo': 'bar'}
         assert rq_mock.delay.called is False
 
     @mock.patch('django_rq.get_queue')
@@ -51,7 +49,7 @@ class TestEnqueueTask:
         assert rq_mock.return_value.enqueue_call.called is True
         assert rq_mock.return_value.enqueue_call.call_args[1] == {
             'kwargs': {'bar': 'baz'},
-            'result_ttl': None
+            'result_ttl': None,
         }
 
     @mock.patch('django_rq.get_queue')
@@ -66,7 +64,7 @@ class TestEnqueueTask:
         assert rq_mock.return_value.enqueue_call.called is True
         assert rq_mock.return_value.enqueue_call.call_args[1] == {
             'kwargs': {'bar': 'baz'},
-            'result_ttl': 0
+            'result_ttl': 0,
         }
 
     def test_unkown(self, settings):
