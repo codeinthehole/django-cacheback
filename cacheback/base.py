@@ -2,15 +2,13 @@ import collections
 import hashlib
 import logging
 import time
-import warnings
 
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.db.models import Model as DjangoModel
-from django.utils.deprecation import RenameMethodsBase
 from django.utils.itercompat import is_iterable
 
-from .utils import RemovedInCacheback13Warning, enqueue_task, get_job_class
+from .utils import enqueue_task, get_job_class
 
 
 logger = logging.getLogger('cacheback')
@@ -39,16 +37,7 @@ def to_bytestring(value):
     return bytes(str(value), 'utf8')
 
 
-class JobBase(RenameMethodsBase):
-
-    renamed_methods = (
-        ('get_constructor_args', 'get_init_args', RemovedInCacheback13Warning),
-        ('get_constructor_kwargs', 'get_init_kwargs', RemovedInCacheback13Warning),
-        ('cache_set', 'store', RemovedInCacheback13Warning),
-    )
-
-
-class Job(metaclass=JobBase):
+class Job(object):
     """
     A cached read job.
 
@@ -387,17 +376,6 @@ class Job(metaclass=JobBase):
         """
         return self.fetch_on_miss
 
-    def should_item_be_fetched_synchronously(self, *args, **kwargs):
-        import warnings
-
-        warnings.warn(
-            "The method 'should_item_be_fetched_synchronously' is deprecated "
-            "and will be removed in 0.5.  Use "
-            "'should_missing_item_be_fetched_synchronously' instead.",
-            DeprecationWarning,
-        )
-        return self.should_missing_item_be_fetched_synchronously(*args, **kwargs)
-
     def should_stale_item_be_fetched_synchronously(self, delta, *args, **kwargs):
         """
         Return whether to refresh an item synchronously when it is found in the
@@ -470,14 +448,6 @@ class Job(metaclass=JobBase):
     # --------------------
     # ASYNC HELPER METHODS
     # --------------------
-
-    @classmethod
-    def job_refresh(cls, *args, **kwargs):
-        warnings.warn(
-            '`Job.job_refresh` is deprecated, use `perform_async_refresh` instead.',
-            RemovedInCacheback13Warning,
-        )
-        return cls.perform_async_refresh(*args, **kwargs)
 
     @classmethod
     def perform_async_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):

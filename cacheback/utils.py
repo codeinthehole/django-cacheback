@@ -26,10 +26,6 @@ except ImportError:
 logger = logging.getLogger('cacheback')
 
 
-class RemovedInCacheback13Warning(DeprecationWarning):
-    pass
-
-
 def get_job_class(klass_str):
     """
     Return the job class
