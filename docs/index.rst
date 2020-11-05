@@ -1,8 +1,3 @@
-.. django-async-cache documentation master file, created by
-   sphinx-quickstart on Mon Jul 30 21:40:46 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 ================
 Django Cacheback
 ================
@@ -17,7 +12,7 @@ synchronously.
 .. _rq: http://python-rq.org/
 
 Using this library, you can rework your views so that all reads are from
-cache - which can be a significant performance boost.  
+cache - which can be a significant performance boost.
 
 A corollary of this technique is that cache stampedes can be easily avoided,
 avoiding sudden surges of expensive reads when cached items becomes stale.
@@ -37,16 +32,16 @@ Consider a view for showing a user's tweets:
     from myproject.twitter import fetch_tweets
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html', 
+        return render(request, 'tweets.html',
                       {'tweets': fetch_tweets(username)})
 
 This works fine but the ``fetch_tweets`` function involves a HTTP round-trip and
-is slow.  
+is slow.
 
 Performance can be improved by using Django's `low-level cache API`_:
 
 .. _`low-level cache API`: https://docs.djangoproject.com/en/dev/topics/cache/?from=olddocs#the-low-level-cache-api
-        
+
 .. sourcecode:: python
 
     from django.shortcuts import render
@@ -54,7 +49,7 @@ Performance can be improved by using Django's `low-level cache API`_:
     from myproject.twitter import fetch_tweets
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html', 
+        return render(request, 'tweets.html',
                       {'tweets': fetch_cached_tweets(username)})
 
     def fetch_cached_tweets(username):
@@ -88,7 +83,7 @@ cache asynchronously instead of during the request/response cycle:
     from myproject.tasks import update_tweets
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html', 
+        return render(request, 'tweets.html',
                       {'tweets': fetch_cached_tweets(username)})
 
     def fetch_cached_tweets(username):
@@ -116,7 +111,7 @@ where the ``myproject.tasks.update_tweets`` task is implemented as:
     def update_tweets(username, ttl):
         tweets = fetch_tweets(username)
         now = datetime.datetime.now()
-        cache.set(username, (tweets, now+ttl), 2592000) 
+        cache.set(username, (tweets, now+ttl), 2592000)
 
 Some things to note:
 
@@ -147,7 +142,7 @@ Here's the same functionality implemented using a django-cacheback decorator:
     from cacheback.decorators import cacheback
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html', 
+        return render(request, 'tweets.html',
                       {'tweets': cacheback(60*15, fetch_on_miss=False)(fetch_tweets)(username)})
 
 Here the decorator simply wraps the ``fetch_tweets`` function - nothing else is
@@ -206,4 +201,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

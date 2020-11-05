@@ -1,12 +1,14 @@
 =========
 Cacheback
 =========
+
 ----------------------------------------
 Asynchronous cache refreshing for Django
 ----------------------------------------
 
 What does this library do?
 --------------------------
+
 It's an extensible caching library that refreshes stale cache items
 asynchronously using a Celery_ or rq_ task (utilizing django-rq). The key
 idea being that it's better to serve a stale item (and populate the cache
@@ -22,33 +24,41 @@ cache - which can be a significant performance boost.
 A corollary of this technique is that cache hammering can be handled simply and
 elegantly, avoiding sudden surges of expensive reads when a cached item becomes stale.
 
+
 Do you have good docs?
 ----------------------
+
 Yup - `over on readthedocs.org`_.
 
 .. _`over on readthedocs.org`: http://django-cacheback.readthedocs.org/en/latest/
 
-Do you support Python 3?
-------------------------
-Python 3.4, 3.5, 3.6, 3.7 and PyPy3 are supported.
 
-Django versions 1.8 to 3.0 are supported.
+Supported versions
+------------------
+
+Python 3.6+ is supported. Django 2.0+ is supported.
+
 
 Do you have tests?
 ------------------
+
 You betcha!
 
 .. image:: https://secure.travis-ci.org/codeinthehole/django-cacheback.png
     :target: https://travis-ci.org/#!/codeinthehole/django-cacheback
 
+
 Can I use this in my project?
 -----------------------------
+
 Probably - subject to the `MIT license`_.
 
 .. _`MIT license`: https://github.com/codeinthehole/django-cacheback/blob/master/LICENSE
 
+
 I want to contribute!
 ---------------------
+
 Brilliant!  Here are the `contributing guidelines`_.
 
 .. _`contributing guidelines`: http://django-cacheback.readthedocs.org/en/latest/contributing.html
