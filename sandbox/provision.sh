@@ -1,15 +1,14 @@
 #!/bin/bash
 
-apt-get update
-apt-get install -y rabbitmq-server redis-server memcached python-pip git
+sudo apt-get update
+sudo apt-get install -y redis-server memcached python3-pip git
+sudo pip3 install -U pip poetry honcho
 
-pip install -U pip honcho
 cd /vagrant
-pip install -e .[celery]
-pip install -e .[rq]
-`which pip` install -r requirements.txt -r sandbox/requirements.txt
+poetry install
+poetry run pip install -r sandbox/requirements.txt
 
-# Create database
+# Create and fill database
 cd /vagrant/sandbox
-./manage.py migrate
-./manage.py loaddata fixture.json
+poetry run python manage.py migrate
+poetry run python manage.py loaddata fixture.json

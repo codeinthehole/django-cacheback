@@ -95,7 +95,7 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sandbox',
     'dummyapp',
     'django_rq',
     'cacheback',
@@ -162,8 +163,8 @@ LOGGING = {
 
 # CACHEBACK SETTINGS
 
-BROKER_URL = 'amqp://guest:guest@localhost/'
-CELERY_RESULT_BACKEND = 'amqp://'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TASK_SERIALIZER = 'json'
 
 RQ_QUEUES = {

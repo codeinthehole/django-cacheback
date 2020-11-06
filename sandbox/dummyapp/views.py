@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
-from cacheback.queryset import QuerySetFilterJob
-from cacheback.function import FunctionJob
+from cacheback.jobs import QuerySetFilterJob
+from cacheback.jobs import FunctionJob
 from cacheback.decorators import cacheback
 
 from dummyapp import jobs

@@ -1,2 +1,2 @@
-web: env PYTHONUNBUFFERED=true python manage.py runserver 0.0.0.0:8000
-worker: env PYTHONUNBUFFERED=true celery -A sandbox worker --loglevel=INFO
+web: env QUEUE=celery poetry run python manage.py runserver 0.0.0.0:8000
+worker: env QUEUE=celery poetry run celery -A sandbox worker --loglevel=INFO

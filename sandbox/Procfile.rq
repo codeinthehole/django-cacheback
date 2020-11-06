@@ -1,2 +1,2 @@
-web: env PYTHONUNBUFFERED=true QUEUE=rq python manage.py runserver 0.0.0.0:8000
-worker: env PYTHONUNBUFFERED=true QUEUE=rq python manage.py rqworker
+web: env QUEUE=rq poetry run python manage.py runserver 0.0.0.0:8000
+worker: env QUEUE=rq poetry run python manage.py rqworker
