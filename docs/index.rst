@@ -32,8 +32,11 @@ Consider a view for showing a user's tweets:
     from myproject.twitter import fetch_tweets
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html',
-                      {'tweets': fetch_tweets(username)})
+        return render(
+            request,
+            'tweets.html',
+            {'tweets': fetch_tweets(username)}
+        )
 
 This works fine but the ``fetch_tweets`` function involves a HTTP round-trip and
 is slow.
@@ -49,8 +52,11 @@ Performance can be improved by using Django's `low-level cache API`_:
     from myproject.twitter import fetch_tweets
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html',
-                      {'tweets': fetch_cached_tweets(username)})
+        return render(
+            request,
+            'tweets.html',
+            {'tweets': fetch_cached_tweets(username)}
+        )
 
     def fetch_cached_tweets(username):
         tweets = cache.get(username)
@@ -83,8 +89,11 @@ cache asynchronously instead of during the request/response cycle:
     from myproject.tasks import update_tweets
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html',
-                      {'tweets': fetch_cached_tweets(username)})
+        return render(
+            request,
+            'tweets.html',
+            {'tweets': fetch_cached_tweets(username)}
+        )
 
     def fetch_cached_tweets(username):
         item = cache.get(username)
@@ -142,8 +151,11 @@ Here's the same functionality implemented using a django-cacheback decorator:
     from cacheback.decorators import cacheback
 
     def show_tweets(request, username):
-        return render(request, 'tweets.html',
-                      {'tweets': cacheback(60*15, fetch_on_miss=False)(fetch_tweets)(username)})
+        return render(
+            request,
+            'tweets.html',
+            {'tweets': cacheback(60*15, fetch_on_miss=False)(fetch_tweets)(username)}
+        )
 
 Here the decorator simply wraps the ``fetch_tweets`` function - nothing else is
 needed.  Cacheback ships with a flexible Celery task that can run any function
@@ -185,6 +197,7 @@ Contents
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
    installation
    usage

@@ -37,6 +37,7 @@ importlib-metadata = {version = "*", python = "<3.8"}
 django = ">=2"
 celery = {version = ">=4", optional = true}
 django-rq = {version = ">=2", optional = true}
+Sphinx = {version = ">=3.3.0,<4", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.0"
@@ -53,6 +54,7 @@ django-rq = ">=2"
 [tool.poetry.extras]
 celery = ["celery"]
 rq = ["django-rq"]
+docs = ["Sphinx"]
 
 [build-system]
 requires = ["poetry>=1.1"]

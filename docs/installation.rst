@@ -4,8 +4,8 @@ Installation
 
 You need to do three things:
 
-1. Install django-cacheback
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install django-cacheback
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 To install with Celery support, run::
 
@@ -19,8 +19,8 @@ After installing the package and dependencies, add ``cacheback`` to your ``INSTA
 If you want to use RQ as your task queue, you need to set ``CACHEBACK_TASK_QUEUE``
 in your settings to ``rq``.
 
-2. Install a message broker
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Install a message broker
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Celery requires a message broker.  Use `Celery's tutorial`_ to help set one up.
 I recommend rabbitmq.
@@ -32,8 +32,8 @@ up the `django-rq installation guide`_ for more details.
 .. _`Celery's tutorial`: http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html
 .. _`django-rq installation guide`: https://github.com/ui/django-rq#installation
 
-3. Set up a cache
-~~~~~~~~~~~~~~~~~
+Set up a cache
+~~~~~~~~~~~~~~
 
 You also need to ensure you have `a cache set up`_.  Most likely, you'll be using
 memcache so your settings will include something like::
@@ -48,7 +48,7 @@ memcache so your settings will include something like::
 .. _`a cache set up`: https://docs.djangoproject.com/en/dev/topics/cache/?from=olddocs
 
 Logging
--------
+~~~~~~~
 
 You may also want to configure logging handlers for the 'cacheback' named
 logger.  To set up console logging, use something like::

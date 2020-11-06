@@ -2,6 +2,9 @@
 API
 ===
 
+Jobs
+====
+
 The main class is ``cacheback.base.Job``.  The methods that are intended to be
 called from client code are:
 
@@ -11,11 +14,13 @@ called from client code are:
 It has some class properties than can be used to configure simple behaviour:
 
 .. autoclass:: cacheback.base.Job
+    :noindex:
     :members: lifetime, refresh_timeout, cache_alias, fetch_on_miss, fetch_on_stale_threshold, task_options
 
 There are also several methods intended to be overridden and customised:
 
 .. autoclass:: cacheback.base.Job
+    :noindex:
     :members: key, fetch, expiry, should_missing_item_be_fetched_synchronously, should_stale_item_be_fetched_synchronously, empty, key, prepare_args, prepare_kwargs, timeout, process_result
 
 
