@@ -44,8 +44,9 @@ Do you have tests?
 
 You betcha!
 
-.. image:: https://secure.travis-ci.org/codeinthehole/django-cacheback.png
-    :target: https://travis-ci.org/#!/codeinthehole/django-cacheback
+.. image:: https://github.com/codeinthehole/django-cacheback/workflows/CI/badge.svg?branch=master
+     :target: https://github.com/codeinthehole/django-cacheback/actions?workflow=CI
+     :alt: CI Status
 
 
 Can I use this in my project?
