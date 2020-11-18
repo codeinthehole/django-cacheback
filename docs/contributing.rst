@@ -3,7 +3,7 @@ Contributing
 ============
 
 Make sure to have `poetry` installed. Then, start by cloning the repo,
-and installing the dependencies:
+and installing the dependencies::
 
     $ pip install poetry  # if not already installed
     $ cd <repository directory>
