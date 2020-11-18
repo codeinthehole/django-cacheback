@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-cacheback"
-version = "2.1.0"
+version = "3.0.0"
 description = "Caching library for Django that uses Celery or RQ to refresh cache items asynchronously"
 authors = [
 	"David Winterbottom <david.winterbottom@gmail.com>",

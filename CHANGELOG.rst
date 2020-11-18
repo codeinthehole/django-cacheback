@@ -2,6 +2,11 @@
 Changelog
 =========
 
+3.0.0
+~~~~~
+
+* BREAKING CHANGE: Drop support for Django < 2 and Python < 3.6.
+
 2.1.0
 ~~~~~
 
