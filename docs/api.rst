@@ -21,7 +21,7 @@ There are also several methods intended to be overridden and customised:
 
 .. autoclass:: cacheback.base.Job
     :noindex:
-    :members: key, fetch, expiry, should_missing_item_be_fetched_synchronously, should_stale_item_be_fetched_synchronously, empty, key, prepare_args, prepare_kwargs, timeout, process_result
+    :members: key, fetch, expiry, should_missing_item_be_fetched_synchronously, should_stale_item_be_fetched_synchronously, empty, prepare_args, prepare_kwargs, timeout, process_result
 
 
 Queryset jobs
