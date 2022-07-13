@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 @shared_task(ignore_result=getattr(settings, 'CACHEBACK_TASK_IGNORE_RESULT', False))
-def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
+def refresh_cache(klass_str, obj_args, obj_kwargs, call_args, call_kwargs, key=None):
     from .base import Job
 
-    Job.perform_async_refresh(klass_str, obj_args, obj_kwargs, call_args, call_kwargs)
+    Job.perform_async_refresh(klass_str, obj_args, obj_kwargs, call_args, call_kwargs, key=key)

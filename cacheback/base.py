@@ -166,7 +166,7 @@ class Job(object):
                 # refreshed.
                 result = self.empty()
                 self.store(key, self.timeout(*args, **kwargs), result)
-                self.async_refresh(*args, **kwargs)
+                self.async_refresh(*args, key=key, **kwargs)
                 return self.process_result(
                     result, call=call, cache_status=self.MISS, sync_fetch=False
                 )
@@ -204,7 +204,7 @@ class Job(object):
                 # where the refresh task fails for some reason.
                 timeout = self.timeout(*args, **kwargs)
                 self.store(key, timeout, data)
-                self.async_refresh(*args, **kwargs)
+                self.async_refresh(*args, key=key, **kwargs)
                 return self.process_result(
                     data, call=call, cache_status=self.STALE, sync_fetch=False
                 )
@@ -224,7 +224,7 @@ class Job(object):
         if item is not None:
             expiry, data = item
             self.store(key, self.timeout(*args, **kwargs), data)
-            self.async_refresh(*args, **kwargs)
+            self.async_refresh(*args, key=key, **kwargs)
 
     def delete(self, *raw_args, **raw_kwargs):
         """
@@ -304,15 +304,19 @@ class Job(object):
             if data is not None and cached_data is None:
                 raise RuntimeError("Unable to save data of type %s to cache" % (type(data)))
 
-    def refresh(self, *args, **kwargs):
+    def refresh(self, *args, key=None, **kwargs):
         """
         Fetch the result SYNCHRONOUSLY and populate the cache
         """
         result = self.fetch(*args, **kwargs)
-        self.store(self.key(*args, **kwargs), self.expiry(*args, **kwargs), result)
+
+        if key is None:
+            key = self.key(*args, **kwargs)
+
+        self.store(key, self.expiry(*args, **kwargs), result)
         return result
 
-    def async_refresh(self, *args, **kwargs):
+    def async_refresh(self, *args, key=None, **kwargs):
         """
         Trigger an asynchronous job to refresh the cache
         """
@@ -328,6 +332,7 @@ class Job(object):
                     obj_kwargs=self.get_init_kwargs(),
                     call_args=args,
                     call_kwargs=kwargs,
+                    key=key,
                 ),
                 task_options=self.task_options,
             )
@@ -341,7 +346,7 @@ class Job(object):
                 exc_info=True,
             )
             try:
-                return self.refresh(*args, **kwargs)
+                return self.refresh(*args, key=key, **kwargs)
             except Exception as e:
                 # Something went wrong while running the task
                 logger.error("Unable to refresh data synchronously: %s", e, exc_info=True)
@@ -450,7 +455,9 @@ class Job(object):
     # --------------------
 
     @classmethod
-    def perform_async_refresh(cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs):
+    def perform_async_refresh(
+        cls, klass_str, obj_args, obj_kwargs, call_args, call_kwargs, key=None
+    ):
         """
         Re-populate cache using the given job class.
 
@@ -482,7 +489,7 @@ class Job(object):
         logger.info("Calling refresh with args %r and kwargs %r", call_args, call_kwargs)
         start = time.time()
         try:
-            klass(*obj_args, **obj_kwargs).refresh(*call_args, **call_kwargs)
+            klass(*obj_args, **obj_kwargs).refresh(*call_args, key=key, **call_kwargs)
         except Exception as e:
             logger.exception("Error running job: '%s'", e)
         else:
