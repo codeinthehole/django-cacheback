@@ -1,3 +1,6 @@
+import uuid
+
+import celery
 import pytest
 
 from cacheback.decorators import cacheback
@@ -62,6 +65,29 @@ class TestFunctionJob:
             'lifetime': 600,
             'cache_alias': 'secondary',
         }
+
+    @pytest.mark.skipif(celery.VERSION[:2] < (4, 4), reason="will only work with the new kombu serializer")
+    def test_non_serializable_creates_two_entries(self, settings):
+        settings.CELERY_TASK_ALWAYS_EAGER = True
+        settings.CACHEBACK_TASK_QUEUE = "celery"
+
+        dec_function = cacheback(fetch_on_miss=False)(dummy_function)
+
+        arg = [uuid.uuid4()]
+        str_arg = [str(x) for x in arg]
+
+        sync_key = dec_function.job.key("tests.test_jobs:dummy_function", arg)
+        async_key = dec_function.job.key("tests.test_jobs:dummy_function", str_arg)
+
+        assert sync_key != async_key
+
+        empty_result = dec_function(arg)
+
+        assert empty_result is None
+        assert dec_function.job.cache.has_key(sync_key)
+        assert dec_function.job.cache.has_key(async_key)
+
+        result = dec_function(arg)
 
 
 @pytest.mark.django_db
