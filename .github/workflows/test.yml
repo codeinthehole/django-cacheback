@@ -11,7 +11,7 @@ on:
 jobs:
   tests:
     name: "Python ${{ matrix.python-version }}"
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-20.04"
     services:
       redis:
         image: redis
@@ -24,7 +24,7 @@ jobs:
           - 6379:6379
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8"]
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
     steps:
       - uses: "actions/checkout@v2"
       - uses: "actions/setup-python@v2"
