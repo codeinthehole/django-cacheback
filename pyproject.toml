@@ -32,7 +32,7 @@ packages = [{ include = "cacheback" }]
 include = ["LICENSE"]
 
 [tool.poetry.dependencies]
-python = ">=3.6,<4"
+python = ">=3.6.2,<4"
 importlib-metadata = {version = "*", python = "<3.8"}
 
 django = ">=2"
@@ -46,11 +46,13 @@ pytest-django = ">=4.1"
 pytest-cov = ">=2.10"
 pytest-isort = ">=1.2"
 pytest-flake8 = ">=1.0"
-pytest-black = {version = ">=0.3", python = ">=3.6.2,<4"}
+flake8 = "<5"
+pytest-black = {version = ">=0.3"}
 freezegun = ">=1.0"
 coverage = {version = ">=5.0", extras = ["toml"]}
 celery = ">=4"
 django-rq = ">=2"
+typing_extensions = { version = ">=3.10", python = "<3.10" }
 
 [tool.poetry.extras]
 celery = ["celery"]
