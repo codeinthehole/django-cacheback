@@ -97,8 +97,11 @@ class Job(object):
         self.cache_alias = self.cache_alias or getattr(
             settings, 'CACHEBACK_CACHE_ALIAS', DEFAULT_CACHE_ALIAS
         )
-        self.cache = caches[self.cache_alias]
         self.task_options = self.task_options or {}
+
+    @property
+    def cache(self):
+        return caches[self.cache_alias]
 
     def get_init_args(self):
         """
