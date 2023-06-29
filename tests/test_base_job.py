@@ -291,3 +291,16 @@ class TestJob:
     def test_job_refresh(self):
         Job.perform_async_refresh('tests.test_base_job.EmptyDummyJob', (), {}, ('foo',), {})
         assert EmptyDummyJob().get('foo') is not None
+
+    @pytest.mark.redis_required
+    @mock.patch('tests.test_base_job.EmptyDummyJob.fetch', return_value='foo')
+    def test_escape_job_refresh(self, fetch_mock, rq_burst):
+        job = EmptyDummyJob()
+        job.task_options = {'is_async': False}
+
+        job.async_refresh('foo')
+        job.async_refresh('foo')
+
+        rq_burst()
+
+        assert fetch_mock.call_count == 1
