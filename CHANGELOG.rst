@@ -2,6 +2,12 @@
 Changelog
 =========
 
+3.0.1
+~~~~~
+
+* Fix incompatibility with Django 6.0.
+
+
 3.0.0
 ~~~~~
 
