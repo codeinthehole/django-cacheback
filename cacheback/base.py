@@ -6,7 +6,6 @@ import time
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.db.models import Model as DjangoModel
-from django.utils.itercompat import is_iterable
 
 from .utils import enqueue_task, get_job_class
 
@@ -283,6 +282,10 @@ class Job(object):
     # HELPER METHODS
     # --------------
 
+    @staticmethod
+    def is_iterable(value):
+        return isinstance(value, collections.abc.Iterable)
+
     def prepare_args(self, *args):
         return args
 
@@ -422,7 +425,7 @@ class Job(object):
 
         This is for use in a cache key.
         """
-        if is_iterable(value):
+        if self.is_iterable(value):
             value = tuple(to_bytestring(v) for v in value)
         return hashlib.md5(b':'.join(value)).hexdigest()
 
