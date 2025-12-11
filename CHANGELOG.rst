@@ -2,11 +2,15 @@
 Changelog
 =========
 
-3.0.1
+4.0.0
 ~~~~~
 
-* Fix incompatibility with Django 6.0.
-
+* BREAKING CHANGE: Drop support for Django < 5.2 and Python < 3.10.
+* BREAKING CHANGE: Drop support for Celery < 5.0.
+* BREAKING CHANGE: Drop support for django-rq < 3.0.
+* Add support for Django 5.2.
+* Add support for Django 6.0.
+* Modernise Python code.
 
 3.0.0
 ~~~~~
