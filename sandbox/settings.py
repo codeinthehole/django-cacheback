@@ -1,5 +1,5 @@
 import os
-
+import socket
 
 DEBUG = True
 
@@ -13,6 +13,7 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -80,11 +81,8 @@ SECRET_KEY = 'a5my98-t4si@aoegk1tm4!3w3&amp;vmsehkpez+5xp@b0kvk42t#b'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
         'OPTIONS': {
-            'loaders': [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -96,6 +94,7 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,9 +118,11 @@ INSTALLED_APPS = (
     'dummyapp',
     'django_rq',
     'cacheback',
+    'debug_toolbar',
 )
 
-INTERNAL_IPS = ('10.0.2.2',)
+_, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
