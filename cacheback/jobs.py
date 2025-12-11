@@ -19,7 +19,7 @@ class FunctionJob(Job):
         task_options=None,
         set_data_kwarg=None,
     ):
-        super(FunctionJob, self).__init__()
+        super().__init__()
         if lifetime is not None:
             self.lifetime = int(lifetime)
         if fetch_on_miss is not None:
@@ -43,7 +43,7 @@ class FunctionJob(Job):
     def prepare_args(self, fn, *args):
         # Convert function into "module:name" form so that is can be pickled and
         # then re-imported.
-        return ("%s:%s" % (fn.__module__, fn.__name__),) + args
+        return (f"{fn.__module__}:{fn.__name__}",) + args
 
     def fetch(self, fn_string, *args, **kwargs):
         # Import function from string representation
@@ -67,7 +67,7 @@ class QuerySetJob(Job):
         """
         :model: The model class to use
         """
-        super(QuerySetJob, self).__init__()
+        super().__init__()
         self.model = model
         if lifetime is not None:
             self.lifetime = lifetime
@@ -82,7 +82,7 @@ class QuerySetJob(Job):
         return {'model': self.model, 'lifetime': self.lifetime, 'cache_alias': self.cache_alias}
 
     def key(self, *args, **kwargs):
-        return "%s-%s" % (self.model.__name__, super(QuerySetJob, self).key(*args, **kwargs))
+        return f"{self.model.__name__}-{super().key(*args, **kwargs)}"
 
 
 class QuerySetGetJob(QuerySetJob):

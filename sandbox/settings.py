@@ -182,5 +182,5 @@ CACHES = {
     }
 }
 
-CACHEBACK_TASK_QUEUE = dict([(q, q) for q in ('celery', 'rq')]).get(
+CACHEBACK_TASK_QUEUE = {q: q for q in ('celery', 'rq')}.get(
     os.environ.get('QUEUE', ''), 'celery')

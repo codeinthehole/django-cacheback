@@ -6,12 +6,12 @@ from tests.dummyapp.models import DummyModel
 
 
 def dummy_function(param):
-    return 'JOB-EXECUTED:{0}'.format(param)
+    return f'JOB-EXECUTED:{param}'
 
 
 @cacheback()
 def decorated_dummy_function(param):
-    return 'JOB-EXECUTED:{0}'.format(param)
+    return f'JOB-EXECUTED:{param}'
 
 
 @pytest.mark.usefixtures('cleared_cache', scope='function')

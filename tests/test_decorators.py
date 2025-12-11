@@ -10,22 +10,22 @@ class OtherFunctionJob(FunctionJob):
 
 @cacheback(fetch_on_miss=False, job_class=OtherFunctionJob)
 def no_fetch_miss_function(param):
-    return 'JOB-EXECUTED:{0}'.format(param)
+    return f'JOB-EXECUTED:{param}'
 
 
 @cacheback(lifetime=30, fetch_on_miss=True)
 def fetch_miss_function(param):
-    return 'JOB-EXECUTED:{0}'.format(param)
+    return f'JOB-EXECUTED:{param}'
 
 
 @cacheback(cache_alias='secondary', fetch_on_miss=True)
 def fetch_cache_alias_function(param):
-    return 'JOB-EXECUTED:{0}'.format(param)
+    return f'JOB-EXECUTED:{param}'
 
 
 @cacheback(set_data_kwarg='my_data')
 def custom_payload_label_function(param):
-    return 'JOB-EXECUTED:{0}'.format(param)
+    return f'JOB-EXECUTED:{param}'
 
 
 @pytest.mark.usefixtures('cleared_cache', scope='function')
