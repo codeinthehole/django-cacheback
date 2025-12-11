@@ -1,0 +1,41 @@
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: sandbox/Dockerfile
+    entrypoint: /app/entrypoint
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    volumes:
+      - ./sandbox:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  celery:
+    depends_on:
+      - django
+      - redis
+    <<: *django
+    ports: []
+    entrypoint: celery -A sandbox worker --loglevel=INFO
+
+  rqworker:
+    depends_on:
+      - django
+      - redis
+    <<: *django
+    ports: []
+    entrypoint: python manage.py rqworker

@@ -163,24 +163,29 @@ LOGGING = {
 
 # CACHEBACK SETTINGS
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+REDIS_DB = os.environ.get('REDIS_DB', 0)
+REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TASK_SERIALIZER = 'json'
 
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
+        'HOST': REDIS_HOST,
+        'PORT': int(REDIS_PORT),
+        'DB': int(REDIS_DB),
     },
 }
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_URL,
     }
 }
 
 CACHEBACK_TASK_QUEUE = {q: q for q in ('celery', 'rq')}.get(
-    os.environ.get('QUEUE', ''), 'celery')
+    os.environ.get('Q', ''), 'celery')

@@ -38,24 +38,16 @@ all supported Django and Python versions::
 Sandbox VM
 ==========
 
-There is a ``VagrantFile`` for setting up a sandbox VM where you can play around
-with the functionality.  Bring up the Vagrant box::
+Alternatively, there's a ``docker compose`` stack for setting up a sandbox
+environment where you can play around with the functionality.
+Bring up the compose stack::
 
-    $ vagrant up
+    $ docker compose up
 
-This may take a while but will set up a Ubuntu Precise64 VM with RabbitMQ
-installed.  You can then SSH into the machine::
+The stack will start with Celery as a broker by default. You can Alternatively
+make use of rq by supplying the `Q` env var:
 
-    $ vagrant ssh
-    $ cd /vagrant/sandbox
-
-You can now decide to run the Celery implementation::
-
-    $ honcho -f Procfile.celery start
-
-Or you can run the RQ implementation::
-
-    $ honcho -f Procfile.rq start
+    $ Q=rq docker compose up
 
 The above commands will start a Django runserver and the selected task worker.
 The dummy site will be available at ``http://localhost:8080`` on your host

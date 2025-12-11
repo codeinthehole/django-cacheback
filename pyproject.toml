@@ -53,6 +53,11 @@ coverage = {version = ">=7.0", extras = ["toml"]}
 celery = ">=5.0"
 django-rq = ">=3"
 
+
+[tool.poetry.group.sandbox.dependencies]
+redis = "^7.1.0"
+django-debug-toolbar = "^6.1.0"
+
 [tool.poetry.extras]
 celery = ["celery"]
 rq = ["django-rq"]
