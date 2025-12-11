@@ -10,7 +10,7 @@ def skip_if_no_redis():
         try:
             redis.StrictRedis(
                 settings.RQ_QUEUES['default'].get('HOST', 'localhost'),
-                settings.RQ_QUEUES['default'].get('POST', 6379),
+                settings.RQ_QUEUES['default'].get('PORT', 6379),
             ).ping()
             skip_if_no_redis._redis_available = True
         except redis.ConnectionError:

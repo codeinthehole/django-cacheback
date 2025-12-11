@@ -1,7 +1,4 @@
-try:
-    import importlib
-except ImportError:
-    import django.utils.importlib as importlib
+import importlib
 
 from .base import Job
 

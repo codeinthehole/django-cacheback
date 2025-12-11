@@ -58,7 +58,7 @@ class Job:
     #: refresh the cache.
     refresh_timeout = 60
 
-    #: Secifies which cache to use from your `CACHES` setting. It defaults to
+    #: Specifies which cache to use from your `CACHES` setting. It defaults to
     #: `default`.
     cache_alias = None
 
@@ -443,7 +443,7 @@ class Job:
         :param result: The result to be returned
         :param call: A named tuple with properties 'args' and 'kwargs that
                      holds the call args and kwargs
-        :param cache_status: A status integrer, accessible as class constants
+        :param cache_status: A status integer, accessible as class constants
                              self.MISS, self.HIT, self.STALE
         :param sync_fetch: A boolean indicating whether a synchronous fetch was
                            performed. A value of None indicates that no fetch

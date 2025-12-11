@@ -1,13 +1,9 @@
+import importlib
 import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-
-try:
-    import importlib
-except ImportError:
-    import django.utils.importlib as importlib
 
 try:
     from .tasks import refresh_cache as celery_refresh_cache
@@ -58,4 +54,4 @@ def enqueue_task(kwargs, task_options=None):
     elif task_queue == 'celery' and celery_refresh_cache is not None:
         return celery_refresh_cache.apply_async(kwargs=kwargs, **task_options or {})
 
-    raise ImproperlyConfigured(f'Unkown task queue configured: {task_queue}')
+    raise ImproperlyConfigured(f'Unknown task queue or backend is not configured: {task_queue}')
