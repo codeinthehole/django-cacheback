@@ -11,7 +11,6 @@ RUN apt-get update \
 
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir "poetry>=2"
-    # && pip install --no-cache-dir -e .[celery,rq]
 
 COPY . /package/
 WORKDIR /package
