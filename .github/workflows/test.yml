@@ -34,8 +34,7 @@ jobs:
         run: |
           set -xe
           python -m pip install --upgrade pip setuptools
-          python -m pip install --upgrade poetry tox tox-gh-actions
-          pip install --user poetry-plugin-export
+          python -m pip install --upgrade poetry tox tox-gh-actions poetry-plugin-export
 
       - name: "Run tox targets for ${{ matrix.python-version }}"
         run: "python -m tox"

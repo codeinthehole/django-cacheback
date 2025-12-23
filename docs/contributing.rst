@@ -47,7 +47,7 @@ Bring up the compose stack::
 The stack will start with Celery as a broker by default. You can Alternatively
 make use of rq by supplying the `Q` env var:
 
-    $ Q=rq docker compose up
+    $ QUEUE=rq docker compose up
 
 The above commands will start a Django runserver and the selected task worker.
 The dummy site will be available at ``http://localhost:8080`` on your host

@@ -282,10 +282,6 @@ class Job:
     # HELPER METHODS
     # --------------
 
-    @staticmethod
-    def is_iterable(value):
-        return isinstance(value, collections.abc.Iterable)
-
     def prepare_args(self, *args):
         return args
 
@@ -425,7 +421,7 @@ class Job:
 
         This is for use in a cache key.
         """
-        if self.is_iterable(value):
+        if isinstance(value, collections.abc.Iterable):
             value = tuple(to_bytestring(v) for v in value)
         return hashlib.md5(b':'.join(value)).hexdigest()
 

@@ -121,7 +121,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
 )
 
-_, _, ips = socket.gethostbyname_ex(socket.gethostname())
+ips = socket.gethostbyname_ex(socket.gethostname())[2]
 INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips]
 
 # A sample logging configuration. The only tangible logging
@@ -164,9 +164,9 @@ LOGGING = {
 
 # CACHEBACK SETTINGS
 
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
-REDIS_DB = os.environ.get('REDIS_DB', 0)
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+REDIS_DB = os.getenv('REDIS_DB', 0)
 REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
 
 CELERY_BROKER_URL = REDIS_URL
@@ -189,4 +189,4 @@ CACHES = {
 }
 
 CACHEBACK_TASK_QUEUE = {q: q for q in ('celery', 'rq')}.get(
-    os.environ.get('Q', ''), 'celery')
+    os.getenv('QUEUE', ''), 'celery')
