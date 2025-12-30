@@ -12,7 +12,7 @@ from tests.dummyapp.models import DummyModel
 
 class DummyJob(Job):
     def fetch(self, param):
-        return ('JOB-EXECUTED:{0}'.format(param), timezone.now())
+        return (f'JOB-EXECUTED:{param}', timezone.now())
 
 
 class CacheAliasDummyJob(DummyJob):

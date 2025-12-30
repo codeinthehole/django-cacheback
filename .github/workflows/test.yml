@@ -11,7 +11,7 @@ on:
 jobs:
   tests:
     name: "Python ${{ matrix.python-version }}"
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-latest"
     services:
       redis:
         image: redis
@@ -24,17 +24,17 @@ jobs:
           - 6379:6379
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: "actions/checkout@v6"
+      - uses: "actions/setup-python@v6"
         with:
           python-version: "${{ matrix.python-version }}"
       - name: "Install dependencies"
         run: |
           set -xe
           python -m pip install --upgrade pip setuptools
-          python -m pip install --upgrade poetry tox tox-gh-actions
+          python -m pip install --upgrade poetry tox tox-gh-actions poetry-plugin-export
 
       - name: "Run tox targets for ${{ matrix.python-version }}"
         run: "python -m tox"

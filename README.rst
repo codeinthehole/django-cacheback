@@ -36,7 +36,7 @@ Yup - `over on readthedocs.org`_.
 Supported versions
 ------------------
 
-Python 3.6+ is supported. Django 2.2+ is supported.
+Python 3.10+ is supported. Django 5.2+ is supported.
 
 
 Do you have tests?

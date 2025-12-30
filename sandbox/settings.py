@@ -1,5 +1,5 @@
 import os
-
+import socket
 
 DEBUG = True
 
@@ -13,6 +13,7 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -80,11 +81,8 @@ SECRET_KEY = 'a5my98-t4si@aoegk1tm4!3w3&amp;vmsehkpez+5xp@b0kvk42t#b'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
         'OPTIONS': {
-            'loaders': [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -96,6 +94,7 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,9 +118,11 @@ INSTALLED_APPS = (
     'dummyapp',
     'django_rq',
     'cacheback',
+    'debug_toolbar',
 )
 
-INTERNAL_IPS = ('10.0.2.2',)
+ips = socket.gethostbyname_ex(socket.gethostname())[2]
+INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -163,24 +164,29 @@ LOGGING = {
 
 # CACHEBACK SETTINGS
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+REDIS_DB = os.getenv('REDIS_DB', 0)
+REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TASK_SERIALIZER = 'json'
 
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
+        'HOST': REDIS_HOST,
+        'PORT': int(REDIS_PORT),
+        'DB': int(REDIS_DB),
     },
 }
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_URL,
     }
 }
 
-CACHEBACK_TASK_QUEUE = dict([(q, q) for q in ('celery', 'rq')]).get(
-    os.environ.get('QUEUE', ''), 'celery')
+CACHEBACK_TASK_QUEUE = {q: q for q in ('celery', 'rq')}.get(
+    os.getenv('QUEUE', ''), 'celery')

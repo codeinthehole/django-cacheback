@@ -72,4 +72,4 @@ class TestEnqueueTask:
         with pytest.raises(ImproperlyConfigured) as exc:
             enqueue_task('foo')
 
-        assert 'Unkown task queue' in str(exc.value)
+        assert 'Unknown task queue' in str(exc.value)

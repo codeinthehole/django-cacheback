@@ -35,12 +35,12 @@ up the `django-rq installation guide`_ for more details.
 Set up a cache
 ~~~~~~~~~~~~~~
 
-You also need to ensure you have `a cache set up`_.  Most likely, you'll be using
-memcache so your settings will include something like::
+You also need to ensure you have `a cache set up`_.  Most likely, you'll be using Redis
+or memcache so your settings will include something like::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
             'LOCATION': '127.0.0.1:11211',
         }
     }
