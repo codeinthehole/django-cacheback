@@ -2,6 +2,13 @@
 Changelog
 =========
 
+4.1.0
+~~~~~
+
+* New opt-in setting `CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED`, makes the
+  async refresh task verify the cached value's lifetime before running
+  and skip the refresh if the data is still fresh.
+
 4.0.0
 ~~~~~
 
