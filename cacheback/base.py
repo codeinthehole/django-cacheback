@@ -314,6 +314,27 @@ class Job:
         self.store(self.key(*args, **kwargs), self.expiry(*args, **kwargs), result)
         return result
 
+    def should_refresh(self, *args, **kwargs):
+        """
+        Verify if the cache should be refreshed.
+
+        When ``CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED`` is enabled, the refresh
+        is skipped if the cached value is still fresh (i.e. its ``lifetime``
+        has not yet been exceeded). Otherwise the refresh always runs.
+        """
+        if not getattr(settings, 'CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED', False):
+            return True
+
+        expiry, data = self.cache.get(self.key(*args, **kwargs), (None, None))
+        if data is None:
+            return True
+
+        delta = expiry - time.time() - self.refresh_timeout
+        if delta > 0:
+            return False
+
+        return True
+
     def async_refresh(self, *args, **kwargs):
         """
         Trigger an asynchronous job to refresh the cache
@@ -481,10 +502,16 @@ class Job:
         logger.info(
             "Using %s with constructor args %r and kwargs %r", klass_str, obj_args, obj_kwargs
         )
+
+        job = klass(*obj_args, **obj_kwargs)
+        if not job.should_refresh(*call_args, **call_kwargs):
+            logger.info('Refresh escaped, cache is already fresh.')
+            return
+
         logger.info("Calling refresh with args %r and kwargs %r", call_args, call_kwargs)
         start = time.time()
         try:
-            klass(*obj_args, **obj_kwargs).refresh(*call_args, **call_kwargs)
+            job.refresh(*call_args, **call_kwargs)
         except Exception as e:
             logger.exception("Error running job: '%s'", e)
         else:

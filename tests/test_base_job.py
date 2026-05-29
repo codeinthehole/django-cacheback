@@ -199,6 +199,44 @@ class TestJob:
     def test_should_stale_item_be_fetched_synchronously_not_reached(self):
         assert StaleDummyJob().should_stale_item_be_fetched_synchronously(300) is False
 
+    def test_should_refresh_setting_disabled(self, settings):
+        settings.CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED = False
+        assert DummyJob().should_refresh('foo') is True
+
+    def test_should_refresh_cache_empty(self, settings):
+        settings.CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED = True
+        assert DummyJob().should_refresh('foo') is True
+
+    def test_should_refresh_cache_fresh_with_margin(self, settings):
+        settings.CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED = True
+        with freeze_time('2016-03-20 14:00'):
+            job = DummyJob()
+            job.refresh('foo')
+
+        # lifetime=600, refresh_timeout=60 -> skip while delta > 0
+        # at +539s remaining time is 61s, which is > refresh_timeout=60s
+        with freeze_time('2016-03-20 14:08:59'):
+            assert job.should_refresh('foo') is False
+
+    def test_should_refresh_cache_within_refresh_timeout(self, settings):
+        settings.CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED = True
+        with freeze_time('2016-03-20 14:00'):
+            job = DummyJob()
+            job.refresh('foo')
+
+        # at +540s the remaining time equals refresh_timeout -> must refresh
+        with freeze_time('2016-03-20 14:09:00'):
+            assert job.should_refresh('foo') is True
+
+    def test_should_refresh_cache_expired(self, settings):
+        settings.CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED = True
+        with freeze_time('2016-03-20 14:00'):
+            job = DummyJob()
+            job.refresh('foo')
+
+        with freeze_time('2016-03-20 14:11'):
+            assert job.should_refresh('foo') is True
+
     def test_key_no_args_no_kwargs(self):
         assert DummyJob().key() == 'tests.test_base_job.DummyJob'
 
@@ -291,3 +329,27 @@ class TestJob:
     def test_job_refresh(self):
         Job.perform_async_refresh('tests.test_base_job.EmptyDummyJob', (), {}, ('foo',), {})
         assert EmptyDummyJob().get('foo') is not None
+
+    @pytest.mark.redis_required
+    @mock.patch('tests.test_base_job.EmptyDummyJob.fetch', return_value='bar')
+    @pytest.mark.parametrize(
+        'validate_refresh_enabled, refresh_count',
+        [
+            (True, 1),
+            (False, 2),
+        ],
+    )
+    def test_validate_job_refresh_needed(
+        self, fetch_mock, rq_burst, settings, validate_refresh_enabled, refresh_count
+    ):
+        settings.CACHEBACK_VALIDATE_JOB_REFRESH_NEEDED = validate_refresh_enabled
+
+        job = EmptyDummyJob()
+        job.task_options = {'is_async': False}
+
+        job.async_refresh('foo')
+        job.async_refresh('foo')
+
+        rq_burst()
+
+        assert fetch_mock.call_count == refresh_count
